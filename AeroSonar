@@ -1,0 +1,324 @@
+#!/usr/bin/python3
+
+import sys, os 
+
+import math
+from PySide6.QtCore import Qt, QSize, QTimer
+from PySide6.QtGui import QColor, QIcon, QFont
+from PySide6.QtWidgets import (
+   QApplication,
+   QMainWindow,
+   QWidget,
+   QLabel,
+   QVBoxLayout, 
+   QHBoxLayout,
+   QPushButton,
+)
+from PySide6.QtWebEngineWidgets import QWebEngineView
+import pyqtgraph
+import subprocess
+import struct
+import serial
+import time
+import numpy as np
+
+import matplotlib
+matplotlib.use("QtAgg")  
+
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
+ 
+# Global constants and definations
+
+SAMPLE_SIZE = 512
+PORT_NAME =  "/dev/ttyUSB0"
+BAUDRATE = 115200
+
+DSP_PATH = os.path.abspath("./dsp")
+PLANE_PATH = os.path.abspath("./icons/paper-plane.png")
+START_PATH = os.path.abspath("./icons/eye.png")
+SUSPEND_PATH = os.path.abspath("./icons/control-stop-square.png")
+CLEAN_PATH = os.path.abspath("./icons/counter-reset.png")
+MAP_PATH = os.path.abspath("./icons/counter-reset.png")
+ABOUTUS_PATH = os.path.abspath("./icons/question.png")
+
+HTML = """
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Leaflet Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link 
+      rel="stylesheet" 
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script 
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      const map = L.map('map').setView([41.0138, 28.9497], 17);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      
+    </script>
+  </body>
+</html>
+"""
+
+class SONARMap(QWidget):
+   """ Passive SONAR map window for displaying the coordinates. """
+   def __init__(self):
+      super(SONARMap, self).__init__()
+      
+      self.setWindowTitle("Passive SONAR Map")
+      
+      self.pageLayout = QVBoxLayout()
+      
+      self.webPage = QWebEngineView()
+      self.webPage.setHtml(HTML)
+      self.pageLayout.addWidget(self.webPage)
+      
+      self.pageLayout.setContentsMargins(0, 0, 0, 0)
+      self.setLayout(self.pageLayout)
+
+class AeroSonar(QMainWindow):
+
+   def __init__(self):
+      super(AeroSonar, self).__init__()
+      
+      # Set the common application properties.
+      self.setWindowTitle("AeroSonar Ground Station")
+      self.setWindowIcon(QIcon(PLANE_PATH))
+      self.setPalette(QColor(28, 28, 28)) 
+      self.showMaximized()
+      self.setContentsMargins(0, 0, 0, 0)
+      
+      # Determine layouts of application.
+      self.pageLayout = QHBoxLayout()
+      self.leftLayout = QVBoxLayout()
+      self.leftLayout.setContentsMargins(1, 1, 5, 1)
+      self.rightLayout = QVBoxLayout()
+      self.rightLayout.setContentsMargins(5, 1, 1, 1)
+      self.buttonLayout = QHBoxLayout()
+      
+      # Create a timer to update plot and numerical analyzes.
+      self.timer = QTimer()
+      self.timer.timeout.connect(self.making_signal_processing)
+      
+      # Put the header label at the top of application.
+      header = QLabel("\nAeroSonar Ground Station")
+      font = header.font()
+      font.setPointSize(20)
+      font.setBold(True)
+      header.setFont(font)
+      self.leftLayout.addWidget(header, alignment=Qt.AlignmentFlag.AlignCenter) 
+      
+      # Put the description label after the header.
+      description = QLabel("\
+AeroSonar is a SONAR system primarly designed for aircraft. This system is\n\
+responsible for capturing, processing and visualizing the audio data around\n\
+the aircraft. It supports real-time signal processing so that when audio\n\
+data occurs around the aircraft, the pilot will be able to track the all data\n\
+simultaniously.\n")
+      self.leftLayout.addWidget(description, alignment=Qt.AlignmentFlag.AlignLeft)
+
+      # Put the signal parameter labels after the desription.
+      self.parameters = [
+         QLabel("Maximum:\t\t\t*"),  
+         QLabel("Minimum:\t\t\t*"),
+         QLabel("Absolute maximum:\t\t*"), 
+         QLabel("Absolute minimum:\t\t*"), 
+         QLabel("Mean:\t\t\t\t*"), 
+         QLabel("Standard Deviation:\t\t*"), 
+         QLabel("Energy:\t\t\t\t*"),
+         QLabel("RMS:\t\t\t\t*"), 
+         QLabel("Power (dB):\t\t\t*"), 
+         QLabel("Crest Factor:\t\t\t*"),
+         QLabel("Skewness:\t\t\t*"),
+         QLabel("Kurtosis:\t\t\t\t*"),
+         QLabel("Variance:\t\t\t*"),
+         QLabel("Direction:\t\t\t*"),
+         QLabel("Distance:\t\t\t*"),
+         QLabel("Coordinate:\t\t\t*"),
+         QLabel("Estimated Target:\t\t\t*")
+      ]
+      self.initLengths = [len(label.text()) for label in self.parameters]
+      for param in self.parameters:
+         font = param.font()
+         font.setBold(True)
+         param.setFont(font)
+         self.leftLayout.addWidget(param, alignment=Qt.AlignmentFlag.AlignLeft)    
+         
+      self.leftLayout.addStretch()
+         
+      # Put the start, stop, reset, map and about us buttons.
+      self.start = QPushButton(QIcon(START_PATH), "Start")
+      self.start.setFixedHeight(36)
+      self.start.clicked.connect(self.making_signal_processing)
+      self.buttonLayout.addWidget(self.start)
+      
+      self.suspend = QPushButton(QIcon(SUSPEND_PATH), "Suspend")
+      self.suspend.setFixedHeight(36)
+      self.suspend.clicked.connect(self.suspend_execution)
+      self.buttonLayout.addWidget(self.suspend)
+      
+      self.clean = QPushButton(QIcon(CLEAN_PATH), "Clean")
+      self.clean.setFixedHeight(36)
+      self.clean.clicked.connect(self.clean_graphs)
+      self.buttonLayout.addWidget(self.clean)
+      
+      self.map = QPushButton(QIcon(MAP_PATH), "Map")
+      self.map.setFixedHeight(36)
+      self.map.clicked.connect(self.map_coordinate)
+      self.buttonLayout.addWidget(self.map)
+      
+      self.aboutus = QPushButton(QIcon(ABOUTUS_PATH), "About Us")
+      self.aboutus.setFixedHeight(36)
+      # self.buttonLayout.addWidget(self.aboutus)
+      self.aboutus.clicked.connect(self.personal_info)
+      self.leftLayout.addLayout(self.buttonLayout)
+      self.leftLayout.addWidget(self.aboutus)
+      
+      # Put the copyright symbol.
+      copyright = QLabel("\n\u00A9 All Rights Reserved")
+      font = copyright.font()
+      font.setPointSize(10)
+      copyright.setFont(font)
+      self.leftLayout.addWidget(copyright, alignment=Qt.AlignmentFlag.AlignCenter)
+      
+      # Put the signal graphics to display the captured raw PWM data.
+      self.signal = pyqtgraph.PlotWidget()
+      self.signal.setBackground("white")
+      self.signal.showGrid(x=True, y=True, alpha=1)
+      self.signal.setTitle("Time-Domain Signal", color="black")
+      self.signal.setLabel("bottom", "Data points", color="black")
+      self.signal.setLabel("left", "Amplitude (PCM Raw Data)", color="black")
+      self.signal.setLabel("top", "")
+      self.signal.setLabel("right", "") 
+      self.signal.enableAutoRange(True, True)
+      self.signal.setYRange(-500, 500)
+      self.signal.plot()
+      self.rightLayout.addWidget(self.signal, stretch=1)
+      
+      
+      # Put the polar graphic to display the coordinates.
+      self.figure, self.ax = plt.subplots(subplot_kw={'projection': 'polar'},
+                                          layout='constrained')
+      
+      theta = np.radians(np.linspace(0, 45, 10))
+      r_outer = np.ones_like(theta)
+      r_inner = np.zeros_like(theta)
+      theta_full = np.concatenate((theta, theta[::-1]))
+      r_full = np.concatenate((r_outer, r_inner))
+      
+      # r = 1 + 0.5 * np.sin(4 * theta)
+      # self.ax.plot(theta, r, linewidth=2)
+      # self.ax.scatter(theta, r, c='red', s=10)
+      self.ax.set_theta_zero_location("N")
+      self.ax.set_theta_direction(-1)
+      self.ax.set_thetagrids([0, 45, 90, 135, 180, 225, 270, 315], 
+            labels=["0", "45", "90", "135", "180", "225", "270", "315"], 
+            color="black")
+      self.ax.fill(theta_full, r_full, color="green", alpha=0.7)
+      self.ax.set_yticklabels([])
+      self.ax.grid(True)
+      
+      canvas = Canvas(self.figure)
+      self.rightLayout.addWidget(canvas, stretch=1)
+      
+      # Put the all widgets in the layouts.
+      self.leftLayout.setSpacing(5)
+      self.rightLayout.setSpacing(5)
+      self.buttonLayout.setSpacing(2)
+      self.pageLayout.addLayout(self.leftLayout, 2)
+      self.pageLayout.addLayout(self.rightLayout, 3)
+      container = QWidget()
+      container.setLayout(self.pageLayout)
+      self.setCentralWidget(container)
+      
+   def making_signal_processing(self):
+      """ Plot the both time-domain and freq-domain graphs. """
+      # Start the timer to update plot continuously.
+      self.timer.start(1)
+      
+      # Open serial device ans then get the data in proper form.
+      self.device = serial.Serial(port = PORT_NAME, baudrate=BAUDRATE)
+      data = self.device.read(SAMPLE_SIZE * 2)
+      samples = struct.unpack(f"<{SAMPLE_SIZE}h", data)
+      
+      # Clear and update the plot.
+      self.signal.clear()  
+      pen = pyqtgraph.mkPen(color="red", width=2)
+      self.signal.plot(pen=pen).setData(range(SAMPLE_SIZE), samples)
+      
+      # Make numerical analyzes onto gathered data.
+      samples_str = ""
+      for i, sample in enumerate(samples):
+         samples_str += str(sample)
+         if len(samples) - 1 != i:
+            samples_str += ","
+         
+      commands = [
+         [DSP_PATH, "time", "max", samples_str],
+         [DSP_PATH, "time", "min", samples_str],
+         [DSP_PATH, "time", "abs_max", samples_str],
+         [DSP_PATH, "time", "abs_min", samples_str],
+         [DSP_PATH, "time", "mean", samples_str],
+         [DSP_PATH, "time", "stddev", samples_str],
+         [DSP_PATH, "time", "energy", samples_str],
+         [DSP_PATH, "time", "rms", samples_str],
+         [DSP_PATH, "time", "power", samples_str],
+         [DSP_PATH, "time", "crest_factor", samples_str],
+         [DSP_PATH, "time", "skewness", samples_str],
+         [DSP_PATH, "time", "kurtosis", samples_str],
+         [DSP_PATH, "time", "variance", samples_str],
+      ]
+      results = [subprocess.run(command, capture_output=True, text=True, check=True).stdout for command in commands]
+      results = [result[:-1] for result in results]
+      results[8] = str((10 * math.log10(float(results[8]))))[0:8]
+      
+      for i in range(len(results)):
+         self.parameters[i].setText(
+            self.parameters[i].text()[:self.initLengths[i]-1] + results[i])
+      
+   def suspend_execution(self):
+      """ Suspend the execution of getting and visualizating data. """
+      self.timer.stop()
+   
+   def clean_graphs(self):
+      """ Clean the graphs and setup the again. """
+      self.signal.clear()
+   
+   def map_coordinate(self):
+      """ Map the coordinate of SONAR device. """
+      
+      self.sonarmap = SONARMap()
+      self.sonarmap.show()
+      
+   def personal_info(self):
+      """ Display a window containig informations about us. """
+      print("about us button clicked")
+      pass
+      
+if __name__ == "__main__":
+   
+   app = QApplication(sys.argv)
+   
+   aerosonar = AeroSonar()
+   aerosonar.show()
+   
+   sys.exit(app.exec())
