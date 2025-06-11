@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
-import sys, os 
+import sys, os, math, subprocess, struct, serial
 
-import math
 from PySide6.QtCore import Qt, QSize, QTimer
 from PySide6.QtGui import QColor, QIcon, QFont
 from PySide6.QtWidgets import (
@@ -16,31 +15,35 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtWebEngineWidgets import QWebEngineView
 import pyqtgraph
-import subprocess
-import struct
-import serial
-import time
-import numpy as np
 
 import matplotlib
-matplotlib.use("QtAgg")  
-
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
- 
-# Global constants and definations
 
-SAMPLE_SIZE = 512
-PORT_NAME =  "/dev/ttyUSB0"
-BAUDRATE = 115200
+matplotlib.use("QtAgg")  
 
-DSP_PATH = os.path.abspath("./dsp")
-PLANE_PATH = os.path.abspath("./icons/paper-plane.png")
-START_PATH = os.path.abspath("./icons/eye.png")
-SUSPEND_PATH = os.path.abspath("./icons/control-stop-square.png")
-CLEAN_PATH = os.path.abspath("./icons/counter-reset.png")
-MAP_PATH = os.path.abspath("./icons/counter-reset.png")
-ABOUTUS_PATH = os.path.abspath("./icons/question.png")
+# Serial port definations
+
+SAMPLE_SIZE          = 32
+PORT_NAME            =  "/dev/ttyUSB0"
+BAUDRATE             = 115200
+MIC_COUNT            = 6
+DATA_SIZE            = SAMPLE_SIZE * MIC_COUNT
+SAMPLING_FREQ        = 8000 # Hz
+
+# Direction of Arrival (DoA) and beamforming definations
+
+# Icon path defination
+
+DSP_PATH             = os.path.abspath("./dsp")
+PLANE_PATH           = os.path.abspath("./icons/paper-plane.png")
+START_PATH           = os.path.abspath("./icons/eye.png")
+SUSPEND_PATH         = os.path.abspath("./icons/control-stop-square.png")
+CLEAN_PATH           = os.path.abspath("./icons/counter-reset.png")
+MAP_PATH             = os.path.abspath("./icons/regular-search.png")
+ABOUTUS_PATH         = os.path.abspath("./icons/question.png")
+
+# HTML script for mapping the current location over free server
 
 HTML = """
 <!DOCTYPE html>
@@ -79,6 +82,7 @@ HTML = """
 </html>
 """
 
+
 class SONARMap(QWidget):
    """ Passive SONAR map window for displaying the coordinates. """
    def __init__(self):
@@ -95,6 +99,7 @@ class SONARMap(QWidget):
       self.pageLayout.setContentsMargins(0, 0, 0, 0)
       self.setLayout(self.pageLayout)
 
+
 class AeroSonar(QMainWindow):
 
    def __init__(self):
@@ -106,6 +111,11 @@ class AeroSonar(QMainWindow):
       self.setPalette(QColor(28, 28, 28)) 
       self.showMaximized()
       self.setContentsMargins(0, 0, 0, 0)
+      
+      # General varibles.
+      self.index = 0
+      self.buffer = list()
+      self.doa = 0
       
       # Determine layouts of application.
       self.pageLayout = QHBoxLayout()
@@ -188,7 +198,6 @@ simultaniously.\n")
       
       self.aboutus = QPushButton(QIcon(ABOUTUS_PATH), "About Us")
       self.aboutus.setFixedHeight(36)
-      # self.buttonLayout.addWidget(self.aboutus)
       self.aboutus.clicked.connect(self.personal_info)
       self.leftLayout.addLayout(self.buttonLayout)
       self.leftLayout.addWidget(self.aboutus)
@@ -213,17 +222,16 @@ simultaniously.\n")
       self.signal.setYRange(-500, 500)
       self.signal.plot()
       self.rightLayout.addWidget(self.signal, stretch=1)
-      
-      
+   
       # Put the polar graphic to display the coordinates.
       self.figure, self.ax = plt.subplots(subplot_kw={'projection': 'polar'},
                                           layout='constrained')
       
-      theta = np.radians(np.linspace(0, 45, 10))
-      r_outer = np.ones_like(theta)
-      r_inner = np.zeros_like(theta)
-      theta_full = np.concatenate((theta, theta[::-1]))
-      r_full = np.concatenate((r_outer, r_inner))
+      # theta = np.radians(np.linspace(0, 45, 10))
+      # r_outer = np.ones_like(theta)
+      # r_inner = np.zeros_like(theta)
+      # theta_full = np.concatenate((theta, theta[::-1]))
+      # r_full = np.concatenate((r_outer, r_inner))
       
       # r = 1 + 0.5 * np.sin(4 * theta)
       # self.ax.plot(theta, r, linewidth=2)
@@ -233,7 +241,7 @@ simultaniously.\n")
       self.ax.set_thetagrids([0, 45, 90, 135, 180, 225, 270, 315], 
             labels=["0", "45", "90", "135", "180", "225", "270", "315"], 
             color="black")
-      self.ax.fill(theta_full, r_full, color="green", alpha=0.7)
+      # self.ax.fill(theta_full, r_full, color="green", alpha=0.7)
       self.ax.set_yticklabels([])
       self.ax.grid(True)
       
@@ -257,43 +265,66 @@ simultaniously.\n")
       
       # Open serial device ans then get the data in proper form.
       self.device = serial.Serial(port = PORT_NAME, baudrate=BAUDRATE)
-      data = self.device.read(SAMPLE_SIZE * 2)
-      samples = struct.unpack(f"<{SAMPLE_SIZE}h", data)
+      data = self.device.read(DATA_SIZE * 2)
+      samples = list(struct.unpack(f"<{DATA_SIZE}h", data))
       
+      for i in range(MIC_COUNT):
+         self.buffer.append([str(element) for element in 
+            samples[self.index : (self.index + SAMPLE_SIZE)]])
+         self.index += SAMPLE_SIZE
+         
+      samples = [",".join(buf) for buf in self.buffer]
+   
+      freqs = [
+         subprocess.run([DSP_PATH, "transform", "dft_real", samples[i]],
+         capture_output=True, text=True, check=True).stdout 
+         for i in range(MIC_COUNT)
+      ]   
+      max_mags = [
+         subprocess.run([DSP_PATH, "freq", "magnitude_argmax", freqs[i]],
+         capture_output=True, text=True, check=True).stdout 
+         for i in range(MIC_COUNT)
+      ]
+      max_freqs = [int(max_mags[i]) * SAMPLING_FREQ / SAMPLE_SIZE 
+                   for i in range(MIC_COUNT)]
+      max_freq = max(max_freqs)
+
+      # Apply direction of arrival algorithm to find arrival angle.
+         
+      # Apply beamforming to enhance signals coming from source direction.
+         
+      # Reset the variables.
+      self.index = 0
+      self.buffer.clear()
+         
       # Clear and update the plot.
       self.signal.clear()  
       pen = pyqtgraph.mkPen(color="red", width=2)
       self.signal.plot(pen=pen).setData(range(SAMPLE_SIZE), samples)
-      
-      # Make numerical analyzes onto gathered data.
-      samples_str = ""
-      for i, sample in enumerate(samples):
-         samples_str += str(sample)
-         if len(samples) - 1 != i:
-            samples_str += ","
          
-      commands = [
-         [DSP_PATH, "time", "max", samples_str],
-         [DSP_PATH, "time", "min", samples_str],
-         [DSP_PATH, "time", "abs_max", samples_str],
-         [DSP_PATH, "time", "abs_min", samples_str],
-         [DSP_PATH, "time", "mean", samples_str],
-         [DSP_PATH, "time", "stddev", samples_str],
-         [DSP_PATH, "time", "energy", samples_str],
-         [DSP_PATH, "time", "rms", samples_str],
-         [DSP_PATH, "time", "power", samples_str],
-         [DSP_PATH, "time", "crest_factor", samples_str],
-         [DSP_PATH, "time", "skewness", samples_str],
-         [DSP_PATH, "time", "kurtosis", samples_str],
-         [DSP_PATH, "time", "variance", samples_str],
-      ]
-      results = [subprocess.run(command, capture_output=True, text=True, check=True).stdout for command in commands]
-      results = [result[:-1] for result in results]
-      results[8] = str((10 * math.log10(float(results[8]))))[0:8]
+      # commands = [
+      #    [DSP_PATH, "time", "max", samples_str],
+      #    [DSP_PATH, "time", "min", samples_str],
+      #    [DSP_PATH, "time", "abs_max", samples_str],
+      #    [DSP_PATH, "time", "abs_min", samples_str],
+      #    [DSP_PATH, "time", "mean", samples_str],
+      #    [DSP_PATH, "time", "stddev", samples_str],
+      #    [DSP_PATH, "time", "energy", samples_str],
+      #    [DSP_PATH, "time", "rms", samples_str],
+      #    [DSP_PATH, "time", "power", samples_str],
+      #    [DSP_PATH, "time", "crest_factor", samples_str],
+      #    [DSP_PATH, "time", "skewness", samples_str],
+      #    [DSP_PATH, "time", "kurtosis", samples_str],
+      #    [DSP_PATH, "time", "variance", samples_str],
+      # ]
+      # results = [subprocess.run(command, capture_output=True, text=True, 
+      #                           check=True).stdout for command in commands]
+      # results = [result[:-1] for result in results]
+      # results[8] = str((10 * math.log10(float(results[8]))))[0:8]
       
-      for i in range(len(results)):
-         self.parameters[i].setText(
-            self.parameters[i].text()[:self.initLengths[i]-1] + results[i])
+      # for i in range(len(results)):
+      #    self.parameters[i].setText(
+      #       self.parameters[i].text()[:self.initLengths[i]-1] + results[i])
       
    def suspend_execution(self):
       """ Suspend the execution of getting and visualizating data. """

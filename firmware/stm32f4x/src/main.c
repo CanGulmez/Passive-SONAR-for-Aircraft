@@ -60,12 +60,15 @@ void SystemData12Config(void)
 {
    HAL_StatusTypeDef status;
 
-   igpio.Pin = PIN_DATA12_WS | PIN_DATA12_CK | PIN_DATA12_SD;
+   igpio.Pin = PIN_DATA12_WS | PIN_DATA12_CK;
    igpio.Mode = GPIO_MODE_AF_PP;
    igpio.Pull = GPIO_NOPULL;
    igpio.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
    igpio.Alternate = GPIO_AF5_SPI1;
    HAL_GPIO_Init(GPIOA, &igpio);
+
+   igpio.Pin = PIN_DATA12_SD;
+   HAL_GPIO_Init(GPIOB, &igpio);
 
    hi2s1.Instance = SPI1;
    hi2s1.Init.Mode = I2S_MODE_MASTER_RX;
@@ -89,11 +92,12 @@ void SystemData12Config(void)
    hdma2_i2s1.Init.Mode = DMA_CIRCULAR;
    hdma2_i2s1.Init.Priority = DMA_PRIORITY_HIGH;
    hdma2_i2s1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+
+   __HAL_LINKDMA(&hi2s1, hdmarx, hdma2_i2s1);
+
    status = HAL_DMA_Init(&hdma2_i2s1);
    if (status != HAL_OK)
       SYS_ERROR(&huart3, status);
-
-   __HAL_LINKDMA(&hi2s1, hdmarx, hdma2_i2s1);
 
    HAL_NVIC_SetPriority(DATA12_IRQn, 1, 0);
    HAL_NVIC_EnableIRQ(DATA12_IRQn);
@@ -103,21 +107,18 @@ void SystemData12Config(void)
  * System Data 3/4 Configuration
  * 
  * Peripherals:         I2S2, GPIOB, GPIOC, DMA1
- * Pins:                PB12(WS), PB13(CK), PC1(SD)
+ * Pins:                PB12(WS), PB13(CK), PB15(SD)
  */
 void SystemData34Config(void)
 {
    HAL_StatusTypeDef status;
 
-   igpio.Pin = PIN_DATA34_WS | PIN_DATA34_CK;
+   igpio.Pin = PIN_DATA34_WS | PIN_DATA34_CK | PIN_DATA34_SD;
    igpio.Mode = GPIO_MODE_AF_PP;
    igpio.Pull = GPIO_NOPULL;
    igpio.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
    igpio.Alternate = GPIO_AF5_SPI2;
    HAL_GPIO_Init(GPIOB, &igpio);
-
-   igpio.Pin = PIN_DATA34_SD;
-   HAL_GPIO_Init(GPIOC, &igpio);
 
    hi2s2.Instance = SPI2;
    hi2s2.Init.Mode = I2S_MODE_MASTER_RX;
@@ -141,11 +142,12 @@ void SystemData34Config(void)
    hdma1_i2s2.Init.Mode = DMA_CIRCULAR;
    hdma1_i2s2.Init.Priority = DMA_PRIORITY_HIGH;
    hdma1_i2s2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+
+   __HAL_LINKDMA(&hi2s2, hdmarx, hdma1_i2s2);
+
    status = HAL_DMA_Init(&hdma1_i2s2);
    if (status != HAL_OK)
       SYS_ERROR(&huart3, status);
-
-   __HAL_LINKDMA(&hi2s2, hdmarx, hdma1_i2s2);
 
    HAL_NVIC_SetPriority(DATA34_IRQn, 2, 0);
    HAL_NVIC_EnableIRQ(DATA34_IRQn);
@@ -193,11 +195,12 @@ void SystemData56Config(void)
    hdma1_i2s3.Init.Mode = DMA_CIRCULAR;
    hdma1_i2s3.Init.Priority = DMA_PRIORITY_HIGH;
    hdma1_i2s3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+
+   __HAL_LINKDMA(&hi2s3, hdmarx, hdma1_i2s3);
+
    status = HAL_DMA_Init(&hdma1_i2s3);
    if (status != HAL_OK)
       SYS_ERROR(&huart3, status);
-
-   __HAL_LINKDMA(&hi2s3, hdmarx, hdma1_i2s3);
 
    HAL_NVIC_SetPriority(DATA56_IRQn, 3, 0);
    HAL_NVIC_EnableIRQ(DATA56_IRQn);
@@ -237,7 +240,7 @@ void SystemDebugConfig(void)
 
 void main(void) 
 {
-   int i, j;
+   int i, j, index = 0;
    HAL_StatusTypeDef status;
    char buffer[BUFFER_SIZE];
 
@@ -254,8 +257,14 @@ void main(void)
    __HAL_RCC_SPI3_CLK_ENABLE();
    __HAL_RCC_USART3_CLK_ENABLE();
 
+   /* Configure the system peripherals */
+   SystemOscConfig();
+   SystemClockConfig();
+
    /* Make I2Sx clock settings */
    hperip.PeriphClockSelection = RCC_PERIPHCLK_I2S_APB1 | RCC_PERIPHCLK_I2S_APB2;
+   hperip.I2sApb1ClockSelection = RCC_I2SAPB1CLKSOURCE_PLLI2S;
+   hperip.I2sApb2ClockSelection = RCC_I2SAPB2CLKSOURCE_PLLI2S;
    hperip.PLLI2S.PLLI2SM = 8;                    /* HSI=16MHz → 2MHz */
    hperip.PLLI2S.PLLI2SN = 192;                  /* 2*192=384MHz     */
    hperip.PLLI2S.PLLI2SR = 5;                    /* 384/5=76.8MHz    */
@@ -264,17 +273,15 @@ void main(void)
       SYS_ERROR(&huart3, status);
 
    /* Configure the system peripherals */
-   SystemOscConfig();
-   SystemClockConfig();
    SystemData12Config();
    SystemData34Config();
    SystemData56Config();
    SystemDebugConfig();
-
+ 
    /* Start the microhone readings in DMA circular mode */
    status = HAL_I2S_Receive_DMA(&hi2s1, data[0], DATA_SIZE);
    if (status != HAL_OK)
-      SYS_ERROR(&huart3, status);
+      SYS_ERROR(&huart3, status); 
 
    status = HAL_I2S_Receive_DMA(&hi2s2, data[1], DATA_SIZE);
    if (status != HAL_OK)
@@ -295,19 +302,24 @@ void main(void)
                extracted[2 * i][j] = data[i][2 * j],
                extracted[2 * i + 1][j] = data[i][2 * j + 1];
          
-         /* Compress the splitted data to transmit over serial line */
+         /* Compress the splitted data to reduce sample payloads */
          for (i = 0; i < MIC_COUNT; i++)
             for (j = 0; j < COM_SIZE; j++)
-               compressed[i][j] = extracted[i][(int) (j * MIC_SIZE / COM_SIZE)];
+               compressed[index] = extracted[i][(int) (j*MIC_SIZE/COM_SIZE)],
+               index ++;
+         index = 0;
 
-         for (i = 0; i < MIC_COUNT; i++) {
-            for (j = 0; j < COM_SIZE; j++) {
-               snprintf(buffer, BUFFER_SIZE, "%d ", compressed[i][j]);
-               SYS_PRINT(&huart3, buffer);         
-            }
-            SYS_PRINT(&huart3, "\r\n");
-         }
-         SYS_PRINT(&huart3, "\r\n");
+         /* Transmit the compressed raw data over serial line */
+         HAL_UART_Transmit(&huart3, compressed, MIC_COUNT*COM_SIZE*2, HAL_MAX_DELAY);
+
+         // for (i = 0; i < MIC_COUNT * COM_SIZE; i++) {
+            // for (j = 0; j < COM_SIZE; j++) {
+               // snprintf(buffer, BUFFER_SIZE, "%d ", compressed[i]);
+               // SYS_PRINT(&huart3, buffer);
+            // }
+            // SYS_PRINT(&huart3, "\r\n");
+         // }
+         // SYS_PRINT(&huart3, "\r\n\n");
         
          /* Reset the 'flags' variable for next compilation */
          memset(flags, FALSE, sizeof(flags));
@@ -322,7 +334,7 @@ void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s)
    if (hi2s->Instance == SPI2)   flags[1] = TRUE;
    if (hi2s->Instance == SPI3)   flags[2] = TRUE;
 }
- 
+
 void SysTick_Handler(void) 
 {
    HAL_IncTick();

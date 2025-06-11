@@ -14,10 +14,6 @@
 #include <unistd.h>
 #include <math.h>
 
-/* Hardware Abstraction Layer (HAL) API */
-
-#include <stm32f4xx_hal.h>
-
 /* FreeRTOS API */
 
 #include <FreeRTOS.h>
@@ -26,6 +22,10 @@
 #include <queue.h>
 #include <timers.h>
 #include <semphr.h>
+
+/* Hardware Abstraction Layer (HAL) API */
+
+#include <stm32f4xx_hal.h>
 
 /* Global definations */
 
@@ -36,17 +36,17 @@
 #define MIC_COUNT          (CHANNEL_COUNT * 2)
 
 #define SAMPLE_SIZE        1024
-#define DATA_SIZE          (SAMPLE_SIZE * 10)
+#define DATA_SIZE          (SAMPLE_SIZE * 8)
 #define MIC_SIZE           (DATA_SIZE / 2)
 #define COM_SIZE           (DATA_SIZE / 256)
-#define BUFFER_SIZE        32
+#define BUFFER_SIZE        64
 
 #define PIN_DATA12_WS      GPIO_PIN_4     /* PA4, I2S1_WS */
 #define PIN_DATA12_CK      GPIO_PIN_5     /* PA5, I2S1_CK */
-#define PIN_DATA12_SD      GPIO_PIN_7     /* PA7, I2S1_SD */
+#define PIN_DATA12_SD      GPIO_PIN_5     /* PB5, I2S1_SD */
 #define PIN_DATA34_WS      GPIO_PIN_12    /* PB12, I2S2_WS */
 #define PIN_DATA34_CK      GPIO_PIN_13    /* PB13, I2S2_CK */
-#define PIN_DATA34_SD      GPIO_PIN_1     /* PC1,  I2S2_SD */
+#define PIN_DATA34_SD      GPIO_PIN_15    /* PB15, I2S2_SD */
 #define PIN_DATA56_WS      GPIO_PIN_15    /* PA15, I2S3_WS */
 #define PIN_DATA56_CK      GPIO_PIN_10    /* PC10, I2S3_CK */
 #define PIN_DATA56_SD      GPIO_PIN_12    /* PC12, I2S3_SD */
@@ -93,10 +93,11 @@ DMA_HandleTypeDef hdma2_i2s1 = {0};
 DMA_HandleTypeDef hdma1_i2s2 = {0};
 DMA_HandleTypeDef hdma1_i2s3 = {0};
 
-/* Initial conditions */
-volatile int16_t data[CHANNEL_COUNT][DATA_SIZE] = {0};
-volatile int16_t extracted[MIC_COUNT][MIC_SIZE] = {0};
-volatile int16_t compressed[MIC_COUNT][COM_SIZE] = {0};
+/* Initial data buffers to hold captured data */
+
+volatile int16_t data[CHANNEL_COUNT][DATA_SIZE] = {FALSE};
+volatile int16_t extracted[MIC_COUNT][MIC_SIZE] = {FALSE};
+volatile int16_t compressed[MIC_COUNT * COM_SIZE] = {FALSE};
 volatile char flags[CHANNEL_COUNT] = {FALSE};
 
 /* System peripheral configurations */
