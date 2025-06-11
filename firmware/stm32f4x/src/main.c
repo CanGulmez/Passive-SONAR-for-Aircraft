@@ -311,15 +311,6 @@ void main(void)
 
          /* Transmit the compressed raw data over serial line */
          HAL_UART_Transmit(&huart3, compressed, MIC_COUNT*COM_SIZE*2, HAL_MAX_DELAY);
-
-         // for (i = 0; i < MIC_COUNT * COM_SIZE; i++) {
-            // for (j = 0; j < COM_SIZE; j++) {
-               // snprintf(buffer, BUFFER_SIZE, "%d ", compressed[i]);
-               // SYS_PRINT(&huart3, buffer);
-            // }
-            // SYS_PRINT(&huart3, "\r\n");
-         // }
-         // SYS_PRINT(&huart3, "\r\n\n");
         
          /* Reset the 'flags' variable for next compilation */
          memset(flags, FALSE, sizeof(flags));
