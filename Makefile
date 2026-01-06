@@ -5,7 +5,7 @@ PIO			:= pio
 CFLAGS		:= -lm -g3 -lsqlite3
 
 SRC			:= ./src/*.h ./src/*.c
-DEPENDS		:= gtk4 libadwaita-1 epoxy shumate-1.0
+DEPENDS		:= gtk4 libadwaita-1 shumate-1.0
 CONFIG		:= $(shell pkg-config --cflags --libs $(DEPENDS))
 PROGRAM		:= SONAR
 

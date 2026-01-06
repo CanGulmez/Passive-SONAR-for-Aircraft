@@ -12,7 +12,7 @@
  * 
  * This software is licensed under the MIT License.
  * 
- *****************************************************************************
+ ******************************************************************************
  */
 
 #ifndef SMARTBP_H
@@ -74,12 +74,6 @@ extern "C" {
 /* Compile-specific definations */
 
 #pragma GCC optimize("O3")
-// #pragma GCC diagnostic warning "-Wunused-variable"
-// #pragma GCC diagnostic warning "-Wunused-parameter"
-// #pragma GCC diagnostic warning "-Wunused-function"
-// #pragma GCC diagnostic warning "-Wunused-parameter"
-// #pragma GCC diagnostic warning "-Wall"
-// #pragma GCC diagnostic warning "-Wextra"
 
 /* Global macro definations */
 
@@ -198,6 +192,7 @@ extern "C" {
 #define pressed_signal(widget, callback) (g_signal_connect(widget, "pressed", G_CALLBACK(callback), NULL))
 #define released_signal(widget, callback) (g_signal_connect(widget, "released", G_CALLBACK(callback), NULL))
 #define motion_signal(widget, callback) (g_signal_connect(widget, "motion", G_CALLBACK(callback), NULL))
+
 #define cmp(fstring, sstring)	(strcmp(fstring, sstring) == 0)
 
 /*****************************************************************************/
@@ -208,9 +203,8 @@ extern "C" {
 
 typedef enum {
 	PAGE_MICROPHONE,
-	PAGE_CAMERA,
 	PAGE_AI_MODEL,
-	PAGE_SIMULATION,
+	PAGE_NAVIGATION,
 	PAGE_GPS_MAP
 } CurrentPage;
 
@@ -283,7 +277,6 @@ typedef struct __packed {
 } MicSensorData;
 
 /* AI model enumerations and structures */
-
 typedef enum {
 	MODEL_LAYER_TYPE_LSTM,
 	MODEL_LAYER_TYPE_GRU
@@ -321,27 +314,7 @@ typedef struct {
 	const char *dropout;
 } ModelParams;
 
-/* Simulation enumerations and structures */
-
-typedef enum {
-	SIM_LAYER_MATERIAL_B4C,
-	SIM_LAYER_MATERIAL_AL2O3,
-	SIM_LAYER_MATERIAL_SIC,
-	SIM_LAYER_MATERIAL_TIB2,
-	SIM_LAYER_MATERIAL_SI3N4,
-	SIM_LAYER_MATERIAL_ZRB2,
-	SIM_LAYER_MATERIAL_WC,
-	SIM_LAYER_MATERIAL_FE
-} SimLayerMaterial;
-
-typedef enum {
-	SIM_BUTTON_SET,
-	SIM_BUTTON_RENDER,
-	SIM_BUTTON_SIMULATE
-} SimButton;
-
 /* GPS map enumerations and structures */
-
 typedef struct {
 	uint8_t ID;
 	const char *UTCTime;
@@ -355,6 +328,20 @@ typedef struct {
 	const char *course;		/* degrees */
 	const char *date;
 } GPSData;
+
+/* Navigation enumerations and structures */
+
+typedef struct {
+	double accelX;
+	double accelY;
+	double accelZ;
+	double gyroX;
+	double gyroY;
+	double gyroZ;
+	double magnetX;
+	double magnetY;
+	double magnetZ;
+} IMUData;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -403,27 +390,13 @@ extern ModelEarlyStopping modelEarlyStopping;
 extern char *modelOutputName;
 extern ModelButton modelButton;
 
-/* Simulation shared widgets and variables */
-
-extern GtkWidget *simBallLayers[MAX_BALLISTIC_LAYER];
-extern guint simLayerNumber;
-extern SimLayerMaterial simLayerMaterial;
-extern gdouble simLayerThickness;
-extern guint simCurrentLayer;
-extern SimButton simButton;
-extern GLuint shaderProgram;
-extern GLuint VAO, VBO, EBO;
-extern GLuint lineVAO, lineVBO, lineEBO;
-extern GLuint transformLoc, colorLoc, alphaLoc;
-extern const char *vertexShaderSrc;
-extern const char *fragmentShaderSrc;
-extern float rotationX, rotationY;
-extern gboolean isDragging;
-extern gdouble lastX, lastY;
-
 /* GPS map shared widgets and variables */
 
 extern GPSData gpsData;
+
+/* Nagivation shared widgets and variables */
+
+extern IMUData imuData;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -461,10 +434,9 @@ extern void model(GtkBox *, gpointer);
 extern void model_group_dataset(GtkWidget *);
 extern void model_group_model(GtkWidget *);
 
-/* Simulation function prototypes */
+/* Navigation function prototypes */
 
-extern void simulation(GtkBox *, gpointer);
-extern void simulation_group_layer(guint, gpointer);
+extern void navigation(GtkBox *, gpointer);
 
 /* GPS map function prototypes */
 
@@ -550,18 +522,9 @@ extern void on_early_stopping_switched(GObject *, GParamSpec *, gpointer);
 extern void on_output_model_texted(GObject *, GParamSpec *, gpointer);
 extern void on_model_button_clicked(GtkButton *, gpointer);
 
-/* Simulation signal handler prototypes */
+/* Navigation signal handler prototypes */
 
-extern void on_ballistic_layer_changed(GObject *, GParamSpec *, gpointer);
-extern void on_sim_button_clicked(GtkButton *, gpointer);
-extern void on_layer_material_selected(GObject *, GParamSpec *, gpointer);
-extern void on_layer_thickness_changed(GObject *, GParamSpec *, gpointer);
-extern gboolean on_gesture_click_press(GtkGestureClick *, int, double, double, gpointer);
-extern gboolean on_gesture_click_release(GtkGestureClick *, int, double, double, gpointer);
-extern gboolean on_event_controller_motion(GtkEventControllerMotion *, double, double, gpointer);
-extern void on_sim_rotation_changed(float, float, float *);
-extern void on_ballistic_sim_realize(GtkGLArea *);
-extern void on_ballistic_sim_render(GtkGLArea *);
+extern void on_nagivation_button_clicked(GtkButton *, gpointer);
 
 /* GPS map signal handler prototypes */
 

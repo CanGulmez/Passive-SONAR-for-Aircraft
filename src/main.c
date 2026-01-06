@@ -12,7 +12,7 @@
  * 
  * This software is licensed under the MIT License.
  * 
- *****************************************************************************
+ ******************************************************************************
  */
 
 #include "main.h"
@@ -25,9 +25,10 @@ CurrentPage currentPage = PAGE_MICROPHONE;
 void on_activate(GtkApplication *app, gpointer user_data)
 {
 	GtkWidget *window, *headerBar;
-	GtkWidget *mainBox, *micBox, *modelBox, *simBox, *gpsBox;
+	GtkWidget *mainBox, *micBox, *modelBox, *imuBox, *gpsBox;
 	GtkWidget *viewSwitcher, *viewStack;
-	GtkWidget *newBtn, *saveAsBtn, *trashBtn, *prefsBtn, *infoBtn, *avatarBtn;
+	GtkWidget *newBtn, *saveAsBtn, *trashBtn, *prefsBtn, *infoBtn, 
+				 *avatarBtn;
 
 	/* Main Window */
 
@@ -40,7 +41,7 @@ void on_activate(GtkApplication *app, gpointer user_data)
 	mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	micBox = __generic_page_box_new();
 	modelBox = __generic_page_box_new();
-	simBox = __generic_page_box_new();
+	imuBox = __generic_page_box_new();
 	gpsBox = __generic_page_box_new();
 
 	/* View Switchers */
@@ -90,11 +91,11 @@ void on_activate(GtkApplication *app, gpointer user_data)
 		adw_view_stack_get_page(ADW_VIEW_STACK(viewStack), modelBox), 
 		"application-x-addon-symbolic");
 
-	adw_view_stack_add_titled(ADW_VIEW_STACK(viewStack), simBox,
-	 	"simulation", "Simulation");
+	adw_view_stack_add_titled(ADW_VIEW_STACK(viewStack), imuBox,
+	 	"navigation", "Navigation");
 	adw_view_stack_page_set_icon_name(
-		adw_view_stack_get_page(ADW_VIEW_STACK(viewStack), simBox), 
-		"accessories-calculator-symbolic");
+		adw_view_stack_get_page(ADW_VIEW_STACK(viewStack), imuBox), 
+		"find-location-symbolic");
 	
 	adw_view_stack_add_titled(ADW_VIEW_STACK(viewStack), gpsBox,
 		"gps_map", "GPS Map");
@@ -114,7 +115,7 @@ void on_activate(GtkApplication *app, gpointer user_data)
 
 	/* Simulation Page */
 
-	simulation(GTK_BOX(simBox), NULL);
+	// navigation(GTK_BOX(imuBox), NULL);
 
 	/* GPS Map Page */
 

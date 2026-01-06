@@ -12,7 +12,7 @@
  * 
  * This software is licensed under the MIT License.
  * 
- *****************************************************************************
+ ******************************************************************************
  */
 
 #include "main.h"
@@ -30,17 +30,13 @@ void on_visible_page_changed(GObject *object, GParamSpec *pspec, gpointer data)
 	{
 		currentPage = PAGE_MICROPHONE;
 	}
-	else if (cmp(page, "camera"))
-	{
-		currentPage = PAGE_CAMERA;
-	}
 	else if (cmp(page, "ai_model"))
 	{
 		currentPage = PAGE_AI_MODEL;
 	}
-	else if (cmp(page, "simulation"))
+	else if (cmp(page, "navigation"))
 	{
-		currentPage = PAGE_SIMULATION;
+		currentPage = PAGE_NAVIGATION;
 	}
 	else if (cmp(page, "gps_map"))
 	{
@@ -353,48 +349,7 @@ void on_output_model_texted(GObject *gobject, GParamSpec *pspec, gpointer data)
 /*****************************************************************************/
 /*****************************************************************************/
 
-void on_ballistic_layer_changed(GObject *gobject, GParamSpec *pspec, gpointer data)
-{
-	/* Call the generic combo row signal and get the selected item. */
-	simLayerNumber = __generic_row_changed(gobject, pspec, data, __func);
-}
 
-void on_layer_material_selected(GObject * gobject, GParamSpec *pspec, gpointer data)
-{
-	guint selected;
-
-	/* Call the generic combo row signal and get the selected item. */
-	selected = __generic_row_selected(gobject, pspec, data, __func);
-	simCurrentLayer = GPOINTER_TO_UINT(data);
-
-	switch (selected) 
-	{
-		case 0:	simLayerMaterial = SIM_LAYER_MATERIAL_B4C;		break;
-		case 1:	simLayerMaterial = SIM_LAYER_MATERIAL_AL2O3;		break;
-		case 2:	simLayerMaterial = SIM_LAYER_MATERIAL_SIC;		break;
-		case 3:	simLayerMaterial = SIM_LAYER_MATERIAL_TIB2;		break;
-		case 4:	simLayerMaterial = SIM_LAYER_MATERIAL_SI3N4;		break;
-		case 5:	simLayerMaterial = SIM_LAYER_MATERIAL_ZRB2;		break;
-		case 6:	simLayerMaterial = SIM_LAYER_MATERIAL_WC;			break;
-		case 7:	simLayerMaterial = SIM_LAYER_MATERIAL_FE;			break;
-		default:
-			custom_error("Unknown combo row selection");
-	}
-}
-
-void on_layer_thickness_changed(GObject * gobject, GParamSpec *pspec, gpointer data)
-{
-	gdouble value;
-	AdwSpinRow *spinRow;
-	guint layer;
-
-	spinRow = ADW_SPIN_ROW(gobject); 
-	value = adw_spin_row_get_value(spinRow);
-	print_log("%s(): %u. - '%.2f mm'", __func, simCurrentLayer, value);
-
-	simLayerThickness = value;
-	simCurrentLayer = GPOINTER_TO_UINT(data);
-}
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -542,43 +497,7 @@ void on_model_button_clicked(GtkButton *button, gpointer data)
 	}
 }
 
-void on_sim_button_clicked(GtkButton *button, gpointer data)
+void on_navigation_button_clicked(GtkButton *button, gpointer data)
 {
-	int i;
-	const char *label;
-	GtkWidget *child;
-
-	label = gtk_button_get_label(button);
-	print_log("%s(): '%s'", __func, label);
-
-	if (cmp(label, "Set"))
-	{
-		simButton = SIM_BUTTON_SET;
-	}
-	else if (cmp(label, "Render"))
-	{
-		simButton = SIM_BUTTON_RENDER;
-	}
-	else if (cmp(label, "Simulate"))
-	{
-		simButton = SIM_BUTTON_SIMULATE;
-	}
-	else
-	{
-		custom_error("Unknown simulation button: '%s'", label);
-	}
-
-	/* Remove all current layer groups */
-	for (child = gtk_widget_get_first_child(GTK_WIDGET(data)); 
-		  child != NULL; 
-		  child = gtk_widget_get_first_child(GTK_WIDGET(data))) 
-	{
-		gtk_box_remove(GTK_BOX(data), child);
-	}
-	/* Initialize the required ballistic layers */
-	for (i = 0; i < simLayerNumber; i++) 
-	{
-		simulation_group_layer(i, NULL);
-		gtk_box_append(GTK_BOX(data), simBallLayers[i]);
-	}
+	
 }

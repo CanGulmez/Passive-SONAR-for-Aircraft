@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * @file 	microphone.h
+ * @file 	navigation.c
  * @author 	Ahmet Can GULMEZ
- * @brief 	Microphone headers of AeroSONAR.
+ * @brief 	Navigation system of AeroSONAR.
  * 
  ******************************************************************************
  * @attention
@@ -12,11 +12,12 @@
  * 
  * This software is licensed under the MIT License.
  * 
- *****************************************************************************
+ ******************************************************************************
  */
 
-#ifndef MICROPHONE_H
-#define MICROPHONE_H
+#include "main.h"
 
-
-#endif /* MICROPHONE_H */
+void nagivation(GtkBox *imuBox, gpointer data)
+{
+	
+}

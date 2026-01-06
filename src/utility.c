@@ -12,7 +12,7 @@
  * 
  * This software is licensed under the MIT License.
  * 
- *****************************************************************************
+ ******************************************************************************
  */
 
 #include "main.h"
@@ -340,7 +340,7 @@ int run_keras_script(const char *script)
 
 	/* Set the model parameters. */
 	set_keras_script_params(&modelParams);
-
+	
 	switch (childPid = fork()) 
 	{
 		case -1: 	/* child-process couldn't be forked */

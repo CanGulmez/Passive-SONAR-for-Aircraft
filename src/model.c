@@ -12,7 +12,7 @@
  * 
  * This software is licensed under the MIT License.
  * 
- *****************************************************************************
+ ******************************************************************************
  */
 
 #include "main.h"
@@ -31,7 +31,7 @@ guint modelUnits = 1;
 guint modelEpochs = 1;
 gdouble modelDropout = 0.1;
 ModelBatchSize modelBatchSize = MODEL_BATCH_SIZE_16;
-ModelEarlyStopping modelEarlyStopping = MODEL_EARLY_STOPPING_TRUE;
+ModelEarlyStopping modelEarlyStopping = MODEL_EARLY_STOPPING_FALSE;
 char *modelOutputName = NULL;
 ModelButton modelButton;
 

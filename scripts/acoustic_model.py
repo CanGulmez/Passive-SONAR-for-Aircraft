@@ -28,14 +28,10 @@ $ python3 acoustic_model.py [-h] dataset output_model layer units \
 
 # Import the libraries.
 
-import os 
-import sys
-import fcntl
-import time
-import argparse
+import os , sys, time, argparse
 import numpy as np
 import pandas as pd
-import keras
+import tensorflow.keras as keras
 
 # Parse the command-line aeguments.
 
@@ -116,6 +112,7 @@ raw_data /= std
 sampling_rate = 6
 sequence_length = 120
 delay = sampling_rate * (sequence_length + 24 - 1)
+batch_size = 256
 
 train_dataset = keras.utils.timeseries_dataset_from_array(
 	data=raw_data[:-delay],
@@ -123,7 +120,7 @@ train_dataset = keras.utils.timeseries_dataset_from_array(
 	sampling_rate=sampling_rate,
 	sequence_length=sequence_length,
 	shuffle=True,
-	batch_size=BATCH_SIZE,
+	batch_size=batch_size,
 	start_index=0,
 	end_index=num_train_samples
 )
@@ -134,7 +131,7 @@ val_dataset = keras.utils.timeseries_dataset_from_array(
 	sampling_rate=sampling_rate,
 	sequence_length=sequence_length,
 	shuffle=True,
-	batch_size=BATCH_SIZE,
+	batch_size=batch_size,
 	start_index=num_train_samples,
 	end_index=num_train_samples + num_val_samples
 )
@@ -144,7 +141,7 @@ test_dataset = keras.utils.timeseries_dataset_from_array(
 	targets=temperature[delay:],
 	sequence_length=sequence_length,
 	shuffle=True,
-	batch_size=BATCH_SIZE,
+	batch_size=batch_size,
 	start_index=num_train_samples + num_val_samples,
 )
 
@@ -190,4 +187,10 @@ model.summary()
 
 print("\nFitting the model with common datasets:\n")
 model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset,
-          verbose=2, callbacks=callbacks)
+          verbose=2, callbacks=callbacks, batch_size=BATCH_SIZE)
+
+# Evaluate the fitted model.
+
+print("\nEvaluating the fitted model with test dataset:\n")
+model = keras.models.load_model(f"./scripts/{OUTPUT_MODEL}.keras")
+print(f"\nTest MAE: {model.evaluate(test_dataset, verbose=2)[1]:.4f}")
