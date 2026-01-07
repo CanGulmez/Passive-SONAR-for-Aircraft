@@ -1,0 +1,162 @@
+/**
+ ******************************************************************************
+ * @file 	gps_map.c
+ * @author 	Ahmet Can GULMEZ
+ * @brief 	GPS map interation of AeroSONAR.
+ * 
+ ******************************************************************************
+ * @attention
+ * 
+ * Copyright (c) 2026 Ahmet Can GULMEZ.
+ * All rights reserved.
+ * 
+ * This software is licensed under the MIT License.
+ * 
+ ******************************************************************************
+ */
+
+#include "main.h"
+
+
+/* GPS map shared widgets and variables */
+
+GPSData gpsData;
+
+/**
+ * GPS Map Page Area
+ */
+void gps_map_area(GtkBox *rightBox, gpointer data)
+{
+	ShumateSimpleMap *simpleMap;
+	ShumateViewport *viewport;
+	ShumateMapSourceRegistry *registry;
+	ShumateMapSource *mapSource;
+	ShumateMap *map;
+	ShumateLocation *location;
+
+	simpleMap = shumate_simple_map_new();
+	map = shumate_simple_map_get_map(simpleMap);
+	viewport = shumate_simple_map_get_viewport(simpleMap);
+
+	registry = shumate_map_source_registry_new_with_defaults();
+	mapSource = shumate_map_source_registry_get_by_id(registry,
+		SHUMATE_MAP_SOURCE_OSM_MAPNIK);
+
+	shumate_map_center_on(map, 41.008, 28.9784);
+	shumate_simple_map_set_map_source(simpleMap, mapSource);
+
+	shumate_viewport_set_reference_map_source(viewport, mapSource);
+	shumate_viewport_set_zoom_level(viewport, 10.0);
+
+	gtk_widget_set_size_request(GTK_WIDGET(simpleMap), 
+		900, -1);
+	gtk_widget_set_hexpand(GTK_WIDGET(simpleMap), TRUE);
+	gtk_widget_set_vexpand(GTK_WIDGET(simpleMap), TRUE);
+
+   gtk_box_append(GTK_BOX(rightBox), GTK_WIDGET(simpleMap));
+}
+
+/**
+ * GPS Map Page
+ */
+void gps_map(GtkBox *mapBox, gpointer data)
+{
+	GtkWidget *rightBox, *leftBox, *separator;	
+	GtkWidget *GPSModuleGroup, *GPSResGroup;
+	GtkWidget *scrolledWin, *propertyBox;
+	GtkWidget *timeRow, *latitudeRow, *longitudeRow, *qualityRow;
+	GtkWidget *numSatRow, *altitudeRow, *statusRow, *speedRow;
+	GtkWidget *courseRow, *dateRow, *seriesRow;
+	GtkWidget *startBtn;
+
+	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+	propertyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+	separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	scrolledWin = gtk_scrolled_window_new();
+
+	gtk_widget_set_hexpand(leftBox, TRUE);
+	gtk_widget_set_vexpand(leftBox, TRUE);
+	gtk_widget_set_vexpand(propertyBox, TRUE);
+	gtk_widget_set_hexpand(rightBox, TRUE);
+	gtk_widget_set_vexpand(rightBox, TRUE);
+
+	gtk_widget_set_margin_end(leftBox, BOX_INNER_MARGIN);
+	gtk_widget_set_margin_start(rightBox, BOX_INNER_MARGIN);
+
+	gtk_widget_set_size_request(leftBox, 300, -1);
+
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin),
+		GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledWin), 
+		propertyBox);
+
+	/*	Show the used GPS module infomration */
+	GPSModuleGroup = __generic_group_new("GPS Module",
+		"Show the used GPS module information");
+
+	seriesRow = __generic_action_row_new("Module Series", "Null");
+	__generic_group_add(GPSModuleGroup, seriesRow);
+
+	/* GPS Data (NMEA 0183 sentences)
+	
+		$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
+			+ 123519 		--> UTC time (12:35:19)
+			+ 4807.038,N	--> latitude 48^07.038' North
+			+ 01131.000,E	--> longitude 11^31.000' East
+			+ 1 				--> fix quality (1 = GPS fix)
+			+ 08				--> number of sattelite used
+			+ 545.4,M		--> altitude 545.4 m
+
+		$GPRCM,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+			+ 123519			--> UTC time
+			+ A				--> status (A = valid, V = invalid)
+			+ 					--> latitude
+			+ 					--> longitude
+			+ 022.4			--> speed over ground (knots)
+			+ 084.4			--> course over ground (degrees)
+			+ 230394			--> date (23 March 1994)
+	*/
+	GPSResGroup = __generic_group_new("GPS Data",
+		"Show the GPS module data simultaneously");
+
+	/* Put the GPS module outputs. */
+	timeRow = __generic_action_row_new("UTC Time", "Null");
+	latitudeRow = __generic_action_row_new("Latitude", "Null");
+	longitudeRow = __generic_action_row_new("Longitude", "Null");
+	qualityRow = __generic_action_row_new("Fix Quality", "Null");
+	numSatRow = __generic_action_row_new("Number of Sattelites", "Null");
+	altitudeRow = __generic_action_row_new("Altitude", "Null");
+	statusRow = __generic_action_row_new("Status", "Null");
+	speedRow = __generic_action_row_new("Speed over Ground (knots)", "Null");
+	courseRow = __generic_action_row_new("Course over Ground (degrees)", "Null");
+	dateRow = __generic_action_row_new("Date", "Null");
+
+	__generic_group_add(GPSResGroup, timeRow);
+	__generic_group_add(GPSResGroup, latitudeRow);
+	__generic_group_add(GPSResGroup, longitudeRow);
+	__generic_group_add(GPSResGroup, qualityRow);
+	__generic_group_add(GPSResGroup, numSatRow);
+	__generic_group_add(GPSResGroup, altitudeRow);
+	__generic_group_add(GPSResGroup, statusRow);
+	__generic_group_add(GPSResGroup, speedRow);
+	__generic_group_add(GPSResGroup, courseRow);
+	__generic_group_add(GPSResGroup, dateRow);
+
+	/* Put the required buttons. */
+	startBtn = __generic_button_new("Start", "suggested-action");
+	button_signal(startBtn, on_gps_button_clicked);
+	
+	/* Layout */
+	gtk_box_append(GTK_BOX(propertyBox), GPSModuleGroup);
+	gtk_box_append(GTK_BOX(propertyBox), GPSResGroup);
+
+	gtk_box_append(GTK_BOX(leftBox), scrolledWin);
+	gtk_box_append(GTK_BOX(leftBox), startBtn);
+	gps_map_area(GTK_BOX(rightBox), NULL);
+
+	gtk_box_append(mapBox, leftBox);
+	gtk_box_append(mapBox, separator);
+	gtk_box_append(mapBox, rightBox);
+}
+ 
