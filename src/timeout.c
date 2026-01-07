@@ -28,6 +28,21 @@ gboolean timeout_mic_device_node(gpointer data)
 }
 
 /**
+ * Redraw the plot areas.
+ */
+gboolean timeout_mic_plot(gpointer data)
+{
+	GtkWidget *carPlot;
+	
+	carPlot = GTK_WIDGET(data);
+	if (micTimeout)
+	{
+		gtk_widget_queue_draw(carPlot); /* request redraw */
+	}
+	return G_SOURCE_CONTINUE;
+}
+
+/**
  * Set the timeout to get the Keras logs into text view.
  */
 gboolean timeout_model_keras_log(gpointer data)

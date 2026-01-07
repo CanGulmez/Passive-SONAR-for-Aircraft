@@ -61,20 +61,23 @@ void gps_map_area(GtkBox *rightBox, gpointer data)
  */
 void gps_map(GtkBox *mapBox, gpointer data)
 {
-	GtkWidget *rightBox, *leftBox, *sep;	
+	GtkWidget *rightBox, *leftBox, *separator;	
 	GtkWidget *GPSModuleGroup, *GPSResGroup;
-	GtkWidget *scrolledWin;
+	GtkWidget *scrolledWin, *propertyBox;
 	GtkWidget *timeRow, *latitudeRow, *longitudeRow, *qualityRow;
 	GtkWidget *numSatRow, *altitudeRow, *statusRow, *speedRow;
 	GtkWidget *courseRow, *dateRow, *seriesRow;
+	GtkWidget *startBtn;
 
-	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
-	sep = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+	propertyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+	separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	scrolledWin = gtk_scrolled_window_new();
 
 	gtk_widget_set_hexpand(leftBox, TRUE);
 	gtk_widget_set_vexpand(leftBox, TRUE);
+	gtk_widget_set_vexpand(propertyBox, TRUE);
 	gtk_widget_set_hexpand(rightBox, TRUE);
 	gtk_widget_set_vexpand(rightBox, TRUE);
 
@@ -85,7 +88,8 @@ void gps_map(GtkBox *mapBox, gpointer data)
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin),
 		GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledWin), leftBox);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledWin), 
+		propertyBox);
 
 	/*	Show the used GPS module infomration */
 	GPSModuleGroup = __generic_group_new("GPS Module",
@@ -116,55 +120,43 @@ void gps_map(GtkBox *mapBox, gpointer data)
 	GPSResGroup = __generic_group_new("GPS Data",
 		"Show the GPS module data simultaneously");
 
-	/* UTC Time */
+	/* Put the GPS module outputs. */
 	timeRow = __generic_action_row_new("UTC Time", "Null");
-	__generic_group_add(GPSResGroup, timeRow);
-	
-	/* Latitude */
 	latitudeRow = __generic_action_row_new("Latitude", "Null");
-	__generic_group_add(GPSResGroup, latitudeRow);
-
-	/* Longitude */
 	longitudeRow = __generic_action_row_new("Longitude", "Null");
-	__generic_group_add(GPSResGroup, longitudeRow);
-
-	/* Fix Quality */
 	qualityRow = __generic_action_row_new("Fix Quality", "Null");
-	__generic_group_add(GPSResGroup, qualityRow);
-
-	/* Number of Sattelites */
 	numSatRow = __generic_action_row_new("Number of Sattelites", "Null");
-	__generic_group_add(GPSResGroup, numSatRow);
-
-	/* Altitude */
 	altitudeRow = __generic_action_row_new("Altitude", "Null");
-	__generic_group_add(GPSResGroup, altitudeRow);
-
-	/* Status */
 	statusRow = __generic_action_row_new("Status", "Null");
-	__generic_group_add(GPSResGroup, statusRow);
-
-	/* Speed over Ground (knots) */
 	speedRow = __generic_action_row_new("Speed over Ground (knots)", "Null");
-	__generic_group_add(GPSResGroup, speedRow);
-
-	/* Course over Ground (degrees) */
 	courseRow = __generic_action_row_new("Course over Ground (degrees)", "Null");
-	__generic_group_add(GPSResGroup, courseRow);
-
-	/* Date */
 	dateRow = __generic_action_row_new("Date", "Null");
+
+	__generic_group_add(GPSResGroup, timeRow);
+	__generic_group_add(GPSResGroup, latitudeRow);
+	__generic_group_add(GPSResGroup, longitudeRow);
+	__generic_group_add(GPSResGroup, qualityRow);
+	__generic_group_add(GPSResGroup, numSatRow);
+	__generic_group_add(GPSResGroup, altitudeRow);
+	__generic_group_add(GPSResGroup, statusRow);
+	__generic_group_add(GPSResGroup, speedRow);
+	__generic_group_add(GPSResGroup, courseRow);
 	__generic_group_add(GPSResGroup, dateRow);
+
+	/* Put the required buttons. */
+	startBtn = __generic_button_new("Start", "suggested-action");
+	button_signal(startBtn, on_gps_button_clicked);
 	
-	/* Map area */
+	/* Layout */
+	gtk_box_append(GTK_BOX(propertyBox), GPSModuleGroup);
+	gtk_box_append(GTK_BOX(propertyBox), GPSResGroup);
+
+	gtk_box_append(GTK_BOX(leftBox), scrolledWin);
+	gtk_box_append(GTK_BOX(leftBox), startBtn);
 	gps_map_area(GTK_BOX(rightBox), NULL);
 
-	/* Layout */
-	gtk_box_append(GTK_BOX(leftBox), GPSModuleGroup);
-	gtk_box_append(GTK_BOX(leftBox), GPSResGroup);
-
-	gtk_box_append(mapBox, scrolledWin);
-	gtk_box_append(mapBox, sep);
+	gtk_box_append(mapBox, leftBox);
+	gtk_box_append(mapBox, separator);
 	gtk_box_append(mapBox, rightBox);
 }
  

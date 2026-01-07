@@ -79,7 +79,7 @@ void mic_plot_car_area_label_x(cairo_t *cr, int width, int height)
 	cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);	/* black indices */
 	cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, 
 		CAIRO_FONT_WEIGHT_NORMAL);
-   cairo_set_font_size(cr, 15.0);
+   cairo_set_font_size(cr, 15.0);	
 
 	cairo_move_to(cr, 250, height - MIC_PLOT_MARGIN + 20);
 	
@@ -134,7 +134,7 @@ void mic_plot_car_area_data(cairo_t *cr, int width, int height)
 void mic_plot_car(GtkDrawingArea *area, cairo_t *cr, 
 	int width, int height, gpointer data)
 {
-	/* Set the background of plot area */
+	/* Set the background of plot area. */
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);			/* white background */
 	cairo_paint(cr);
 
@@ -254,18 +254,3 @@ extern void mic_plot_polar(GtkDrawingArea *area, cairo_t *cr,
 	mic_plot_polar_frame(cr, width, height);	
 	mic_plot_polar_label(cr, width, height);
 }
-
-/**
- * Redraw the plot areas.
- */
-gboolean mic_plot_timeout(gpointer data)
-{
-	GtkWidget *carPlot;
-	
-	carPlot = GTK_WIDGET(data);
-	if (micTimeout)
-		gtk_widget_queue_draw(carPlot); /* request redraw */
-
-	return G_SOURCE_CONTINUE;
-}
-

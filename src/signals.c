@@ -497,7 +497,12 @@ void on_model_button_clicked(GtkButton *button, gpointer data)
 	}
 }
 
-void on_navigation_button_clicked(GtkButton *button, gpointer data)
+void on_nav_button_clicked(GtkButton *button, gpointer data)
 {
 	
+}
+
+void on_gps_button_clicked(GtkButton *button, gpointer data)
+{
+
 }

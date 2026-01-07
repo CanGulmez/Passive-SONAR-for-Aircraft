@@ -33,7 +33,6 @@ void on_activate(GtkApplication *app, gpointer user_data)
 	/* Main Window */
 
 	window = adw_application_window_new(app);
-	gtk_window_set_title(GTK_WINDOW(window), "Smart Ballistic Protection");
 	gtk_window_maximize(GTK_WINDOW(window));	
 
 	/* Main Boxes */
@@ -113,9 +112,9 @@ void on_activate(GtkApplication *app, gpointer user_data)
 
 	model(GTK_BOX(modelBox), NULL);
 
-	/* Simulation Page */
-
-	// navigation(GTK_BOX(imuBox), NULL);
+	/* Navigation Page */
+	
+	navigation(GTK_BOX(imuBox), NULL);
 
 	/* GPS Map Page */
 
@@ -123,7 +122,8 @@ void on_activate(GtkApplication *app, gpointer user_data)
 
 	/* Presentation */
 	
-	adw_application_window_set_content(ADW_APPLICATION_WINDOW(window), mainBox);
+	adw_application_window_set_content(ADW_APPLICATION_WINDOW(window), 
+		mainBox);
 	gtk_window_present(GTK_WINDOW(window));
 }
 

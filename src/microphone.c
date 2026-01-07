@@ -189,13 +189,13 @@ void microphone(GtkBox *micBox, gpointer data)
 	GtkWidget *carPlot, *polarPlot;
 	GtkWidget *startBtn, *stopBtn;
 
-	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
+	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
 	leftSep = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	centerBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	rightSep = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	propertyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-	btnBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+	btnBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	scrolledWin = gtk_scrolled_window_new();
 
 	gtk_widget_set_hexpand(rightBox, TRUE);
@@ -205,8 +205,6 @@ void microphone(GtkBox *micBox, gpointer data)
 
 	gtk_widget_set_size_request(leftBox, 300, -1);
 	gtk_widget_set_size_request(centerBox, 300, -1);
-
-	gtk_widget_set_halign(btnBox, GTK_ALIGN_CENTER);
 
 	gtk_widget_set_margin_end(leftBox, BOX_INNER_MARGIN);
 	gtk_widget_set_margin_start(centerBox, BOX_INNER_MARGIN);
@@ -274,7 +272,7 @@ void microphone(GtkBox *micBox, gpointer data)
 	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(polarPlot),
 		mic_plot_polar, NULL, NULL);
 		
-	g_timeout_add(TIMEOUT_PLOT_REDRAW, mic_plot_timeout, carPlot);
+	g_timeout_add(TIMEOUT_PLOT_REDRAW, timeout_mic_plot, carPlot);
 	// g_timeout_add(PLOT_REDRAW_TIMEOUT, page_mic_data_plot_timeout, polarPlot);
 
 	gtk_widget_set_hexpand(carPlot, TRUE);

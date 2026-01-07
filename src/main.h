@@ -99,9 +99,9 @@ extern "C" {
 #define MAX_CAMERA_FILE						16	
 
 #define BUTTON_WIDTH							100 	/* pixel */	
-#define BUTTON_HEIGHT						45  	/* pixel */	
+#define BUTTON_HEIGHT						40  	/* pixel */	
 #define PAGE_BOX_MARGIN_WIDTH				20  	/* pixel */	
-#define PAGE_BOX_MARGIN_HEIGHT			10  	/* pizel */	
+#define PAGE_BOX_MARGIN_HEIGHT			10  	/* pixel */	
 #define BOX_INNER_MARGIN					10  	/* pixel */	
 #define BOX_SPACING							25  	/* pixel */		
 
@@ -119,6 +119,10 @@ extern "C" {
 #define MODEL_EVALUATE_SCRIPT				"scripts/evaluating_acoustic_model.py"
 #define MODEL_PREDICT_SCRIPT				"scripts/predicting_acoustic_model.py"
 #define MODEL_LOG_PATH						"./logs/keras-output.log"
+
+#define NAV_PLOT_MARGIN						40		/* pixel */
+#define NAV_PLOT_GRID						30		/* pixel */
+#define NAV_PLOT_INDICE						100	/* pixel */
 
 #define TIMEOUT_DEVICE_READ				1000	/* ms */
 #define TIMEOUT_PLOT_REDRAW				1000	/* ms */
@@ -414,19 +418,15 @@ extern void microphone_row_flow_control(GtkWidget *);
 extern void microphone_group_UART(gpointer);
 extern void microphone_group_USB(gpointer);
 extern void microphone_group_WiFi(gpointer);
-
 extern void mic_plot_car(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_car_area_frame(cairo_t *, int, int);	
 extern void mic_plot_car_area_grid(cairo_t *, int, int);	
 extern void mic_plot_car_area_label_x(cairo_t *, int, int);		
 extern void mic_plot_car_area_label_y(cairo_t *, int, int);	
 extern void mic_plot_car_area_data(cairo_t *, int, int);
-
 extern void mic_plot_polar(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_polar_frame(cairo_t *, int, int);
 extern void mic_plot_polar_label(cairo_t *, int, int);
-
-extern gboolean mic_plot_timeout(gpointer);
 
 /* AI model function prototypes */
 
@@ -437,6 +437,10 @@ extern void model_group_model(GtkWidget *);
 /* Navigation function prototypes */
 
 extern void navigation(GtkBox *, gpointer);
+extern GtkWidget *navigation_accel_group(gpointer);
+extern GtkWidget *navigation_gyro_group(gpointer);
+extern GtkWidget *navigation_magnet_group(gpointer);
+extern void nav_plot_area(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 
 /* GPS map function prototypes */
 
@@ -472,6 +476,7 @@ extern char *get_keras_script_logs(const char *);
 extern gboolean timeout_mic_device_node(gpointer);
 extern gboolean timeout_model_keras_log(gpointer);
 extern gboolean timeout_database_record(gpointer);
+extern gboolean timeout_mic_plot(gpointer);
 
 /* Generic component function prototypes */
 
@@ -524,9 +529,11 @@ extern void on_model_button_clicked(GtkButton *, gpointer);
 
 /* Navigation signal handler prototypes */
 
-extern void on_nagivation_button_clicked(GtkButton *, gpointer);
+extern void on_nav_button_clicked(GtkButton *, gpointer);
 
 /* GPS map signal handler prototypes */
+
+extern void on_gps_button_clicked(GtkButton *, gpointer);
 
 #ifdef __cplusplus
 }

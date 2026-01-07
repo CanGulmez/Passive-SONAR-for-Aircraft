@@ -122,12 +122,11 @@ void model(GtkBox *modelBox, gpointer data)
 	GtkWidget *fitBtn, *abortBtn, *evaluateBtn, *predictBtn;
 	GtkWidget *scrolledText;
 
-	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
+	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
 	separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-	settingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
-	btnBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-
+	settingsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+	btnBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	scrolledWin = gtk_scrolled_window_new();
 	scrolledText = gtk_scrolled_window_new();
 
@@ -181,14 +180,13 @@ void model(GtkBox *modelBox, gpointer data)
 	abortBtn = __generic_button_new("Abort", "destructive-action");
 	evaluateBtn = __generic_button_new("Evaluate", "suggested-action");
 	predictBtn = __generic_button_new("Predict", "suggested-action");
-	GtkWidget *buttons[3] = {fitBtn, predictBtn, abortBtn};
+	GtkWidget *buttons[2] = {fitBtn, abortBtn};
 
-	for (i = 0; i < 3; i++) 
+	for (i = 0; i < 2; i++) 
 	{
 		button_signal(buttons[i], on_model_button_clicked);
 		gtk_box_append(GTK_BOX(btnBox), buttons[i]);
 	}
-	gtk_widget_set_halign(btnBox, GTK_ALIGN_CENTER);
 
 	/* Put the component layouts into page. */
 	gtk_box_append(GTK_BOX(leftBox), scrolledWin);
