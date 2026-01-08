@@ -15,8 +15,8 @@
  ******************************************************************************
  */
 
-#ifndef SMARTBP_H
-#define SMARTBP_H
+#ifndef AERO_SONAR_H
+#define AERO_SONAR_H
 
 #ifdef __cplusplus
 extern "C" {	
@@ -55,12 +55,6 @@ extern "C" {
 /* GPS map interface */
 
 #include <shumate/shumate.h>
-
-/* OpenGL rendering libraries */
-
-#include <epoxy/gl.h>
-#include <epoxy/glx.h>
-#include <epoxy/egl.h>
 
 /* Database libraries */
 
@@ -539,4 +533,4 @@ extern void on_gps_button_clicked(GtkButton *, gpointer);
 }
 #endif
 
-#endif /* SMARTBP_H */
+#endif /* AERO_SONAR_H */
