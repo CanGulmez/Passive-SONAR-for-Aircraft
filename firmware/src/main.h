@@ -43,7 +43,6 @@
 
 /* Global and General Definitions */
 
-#define LINE_SIZE								64
 #define BUFFER_SIZE							512
 #define DATA_SIZE								BUFFER_SIZE					
 #define MIC_CHANNEL							4
@@ -193,7 +192,7 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 #define GPS_ALTERNATE						GPIO_AF7_UART7
 #define GPS_INSTANCE							UART7
 #define GPS_UART_MODE						UART_MODE_RX | UART_MODE_TX							
-#define GPS_BAUDRATE							115200
+#define GPS_BAUDRATE							9600
 #define GPS_WORDLEN							UART_WORDLENGTH_8B
 #define GPS_STOPBITS							UART_STOPBITS_1
 #define GPS_PARITY							UART_PARITY_NONE
@@ -249,6 +248,11 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 #define IMU_FIRSTBIT							SPI_FIRSTBIT_MSB
 #define IMU_TIMODE							SPI_TIMODE_DISABLE
 
+#define IMU_NSS_LOW()						(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, RESET))
+#define IMU_NSS_HIGH()						(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, SET))
+
+#define IMU_REG_WHO_AM_I					0x0F
+
 /* Microhone Sensor Definitions */
 
 #define MIC_PIN_DATAIN0						GPIO_PIN_1	/* GPIOC - DFSDM1 */ 
@@ -260,16 +264,13 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 #define MIC_PORTC								GPIOC
 #define MIC_GPIO_MODE						GPIO_MODE_AF_PP
 #define MIC_PULL								GPIO_NOPULL
-#define MIC_ALTERNATE						GPIO_AF6_DFSDM1
-
-#define MIC_CHANNEL0							DFSDM1_Channel0
-#define MIC_CHANNEL1							DFSDM1_Channel1
-#define MIC_CHANNEL2							DFSDM1_Channel2
-#define MIC_CHANNEL3							DFSDM1_Channel3
-#define MIC_FILTER0							DFSDM1_Filter0
-#define MIC_FILTER1							DFSDM1_Filter1
-#define MIC_FILTER2							DFSDM1_Filter2
-#define MIC_FILTER3							DFSDM1_Filter3
+#define MIC_ALTERNATE						GPIO_AF3_DFSDM1
+#define MIC_DIVIDER							32
+#define MIC_FILTER_TYPE						DFSDM_CHANNEL_FASTSINC_ORDER
+#define MIC_OFFSET							0
+#define MIC_RIGHT_SHIFT						0
+#define MIC_SINC_ORDER						DFSDM_FILTER_SINC3_ORDER
+#define MIC_OVERSAMPLING					64
 
 /* LED Definitions */
 
@@ -293,36 +294,36 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 /**
  * Transmit the logs from MCU to PC over serial UAR line.
  */
-#define printLog(format, ...)																\
-{																									\
-	char buffer[BUFFER_SIZE];																\
-																									\
-	snprintf(buffer, BUFFER_SIZE, format "\r\n", ##__VA_ARGS__);				\
-	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);		\
+#define printLog(format, ...)																	\
+{																										\
+	char buffer[BUFFER_SIZE];																	\
+																										\
+	snprintf(buffer, BUFFER_SIZE, format "\r\n", ##__VA_ARGS__);					\
+	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);			\
 }
 
 /**
  * Transmit the error from MCU to PC over serial UAR line.
  */
-#define printError(status, format, ...)												\
-{																									\
-	char buffer[BUFFER_SIZE];																\
-																									\
-	snprintf(buffer, BUFFER_SIZE, "*** " format 	" (STATUS = %s) " 			\
-		"(%s::%d) ***\r\n", ##__VA_ARGS__, STATUS(status), FILE, LINE);		\
-	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);		\
+#define printError(status, format, ...)													\
+{																										\
+	char buffer[BUFFER_SIZE];																	\
+																										\
+	snprintf(buffer, BUFFER_SIZE, "*** " format 	" (STATUS = %s) " 				\
+		"(%s::%d) ***\r\n", ##__VA_ARGS__, STATUS(status), FILE, LINE);			\
+	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);			\
 }
 
 /**
- * Transmit the kernel message from MCU to PC over serial UAR line.
+ * Transmit the kernel error from MCU to PC over serial UAR line.
  */
-#define printKernel(format, ...)															\
-{																									\
-	char buffer[BUFFER_SIZE];																\
-																									\
-	snprintf(buffer, BUFFER_SIZE, "*** " format 	" (%s::%d) ***\r\n", 		\
-		##__VA_ARGS__, FILE, LINE);														\
-	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);		\
+#define printKernel(format, ...)																\
+{																										\
+	char buffer[BUFFER_SIZE];																	\
+																										\
+	snprintf(buffer, BUFFER_SIZE, "*** " format 	" (%s::%d) ***\r\n", 			\
+		##__VA_ARGS__, FILE, LINE);															\
+	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);			\
 }
 
 /*****************************************************************************/
@@ -332,155 +333,182 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 /**
  * Initialize the system oscillator with given parameters.
  */
-#define initOscillator(handle, type, hsestate, pllstate, 		\
-	pllsrc, pllm, plln, pllp, pllq, pllr, pllrge, pllvcosel,		\
-	pllfracn)																	\
-{																					\
-	handle.OscillatorType = type;											\
-	handle.HSEState = hsestate;											\
-	handle.PLL.PLLState = pllstate;										\
-	handle.PLL.PLLSource = pllsrc;										\
-	handle.PLL.PLLM = pllm;													\
-	handle.PLL.PLLN = plln;													\
-	handle.PLL.PLLP = pllp;													\
-	handle.PLL.PLLQ = pllq;													\
-	handle.PLL.PLLR = pllr;													\
-	handle.PLL.PLLRGE = pllrge;											\
-	handle.PLL.PLLVCOSEL = pllvcosel;									\
-	handle.PLL.PLLFRACN = pllfracn;										\
+#define initOscillator(handle, type, hsestate, pllstate, pllsrc, pllm, plln,	\
+							  pllp, pllq, pllr, pllrge, pllvcosel, pllfracn)			\
+{																										\
+	handle.OscillatorType = type;																\
+	handle.HSEState = hsestate;																\
+	handle.PLL.PLLState = pllstate;															\
+	handle.PLL.PLLSource = pllsrc;															\
+	handle.PLL.PLLM = pllm;																		\
+	handle.PLL.PLLN = plln;																		\
+	handle.PLL.PLLP = pllp;																		\
+	handle.PLL.PLLQ = pllq;																		\
+	handle.PLL.PLLR = pllr;																		\
+	handle.PLL.PLLRGE = pllrge;																\
+	handle.PLL.PLLVCOSEL = pllvcosel;														\
+	handle.PLL.PLLFRACN = pllfracn;															\
 }
 
 /**
  * Initialize the system clock with given parameters.
  */
-#define initClock(handle, type, source, sysdiv, ahbdiv, 			\
-	apb1div, apb2div, apb3div, apb4div)									\
-{																					\
-	handle.ClockType = type;												\
-	handle.SYSCLKSource = source;											\
-	handle.SYSCLKDivider = sysdiv;										\
-	handle.AHBCLKDivider = ahbdiv;										\
-	handle.APB1CLKDivider = apb1div;										\
-	handle.APB2CLKDivider = apb2div;										\
-	handle.APB3CLKDivider = apb3div;										\
-	handle.APB4CLKDivider = apb4div;										\
+#define initClock(handle, type, source, sysdiv, ahbdiv, apb1div, apb2div,		\
+						apb3div, apb4div)															\
+{																										\
+	handle.ClockType = type;																	\
+	handle.SYSCLKSource = source;																\
+	handle.SYSCLKDivider = sysdiv;															\
+	handle.AHBCLKDivider = ahbdiv;															\
+	handle.APB1CLKDivider = apb1div;															\
+	handle.APB2CLKDivider = apb2div;															\
+	handle.APB3CLKDivider = apb3div;															\
+	handle.APB4CLKDivider = apb4div;															\
 }
 
 /**
  * Initialize GPIO peripheral with given parameters.
  */
-#define initGPIO(handle, pin, mode, pull, alternate)				\
-{																					\
-	handle.Pin = pin;															\
-	handle.Mode = mode;														\
-	handle.Pull = pull;														\
-	handle.Speed = GPIO_SPEED_FREQ_HIGH;								\
-	if (alternate != NULL)													\
-	{																				\
-		handle.Alternate = alternate;										\
-	}																				\
+#define initGPIO(handle, pin, mode, pull, alternate)									\
+{																										\
+	handle.Pin = pin;																				\
+	handle.Mode = mode;																			\
+	handle.Pull = pull;																			\
+	handle.Speed = GPIO_SPEED_FREQ_HIGH;													\
+	if (alternate != NULL)																		\
+	{																									\
+		handle.Alternate = alternate;															\
+	}																									\
 }
 
 /**
  * Initialize UART peripheral with given parameters.
  */
-#define initUART(handle, instance, baudrate, mode, wordlen,		\
-	stopbits, parity, hwcontrol, sampling)								\
-{																					\
-	handle.Instance = instance;											\
-	handle.Init.BaudRate = baudrate;										\
-	handle.Init.Mode = mode;												\
-	handle.Init.WordLength = wordlen;									\
-	handle.Init.StopBits = stopbits;										\
-	handle.Init.Parity = parity;											\
-	handle.Init.HwFlowCtl = hwcontrol;									\
-	handle.Init.OverSampling = sampling;								\
+#define initUART(handle, instance, baudrate, mode, wordlen,	stopbits, 			\
+					  parity, hwcontrol, sampling)											\
+{																										\
+	handle.Instance = instance;																\
+	handle.Init.BaudRate = baudrate;															\
+	handle.Init.Mode = mode;																	\
+	handle.Init.WordLength = wordlen;														\
+	handle.Init.StopBits = stopbits;															\
+	handle.Init.Parity = parity;																\
+	handle.Init.HwFlowCtl = hwcontrol;														\
+	handle.Init.OverSampling = sampling;													\
 }
 
 /**
  * Initialize base TIM peripheral with given parameters.
  */
-#define initBaseTIM(handle, instance, prescaler, period, 		\
-	clockdiv, countermode, repitation, autoreload)					\
-{																					\
-	handle.Instance = instance;											\
-	handle.Init.Prescaler = prescaler;									\
-	handle.Init.CounterMode = countermode;								\
-	handle.Init.Period = period;											\
-	handle.Init.ClockDivision = clockdiv;								\
-	handle.Init.RepetitionCounter = repitation;						\
-	handle.Init.AutoReloadPreload = autoreload;						\
+#define initBaseTIM(handle, instance, prescaler, period, clockdiv, 				\
+						  countermode, repitation, autoreload)								\
+{																										\
+	handle.Instance = instance;																\
+	handle.Init.Prescaler = prescaler;														\
+	handle.Init.CounterMode = countermode;													\
+	handle.Init.Period = period;																\
+	handle.Init.ClockDivision = clockdiv;													\
+	handle.Init.RepetitionCounter = repitation;											\
+	handle.Init.AutoReloadPreload = autoreload;											\
 }
 
 /**
  * Initialize DMA peripheral with given parameters.
  */
-#define initDMA(handle, instance, stream, direction, 				\
-	periphinc, meminc, periphdataalign, memdataalign, 				\
-	mode, priority, fifomode)												\
-{																					\
-	handle.Instance = instance;											\
-	handle.Init.Request = stream;											\
-	handle.Init.Direction = direction;									\
-	handle.Init.PeriphInc = periphinc;									\
-	handle.Init.MemInc = meminc;											\
-	handle.Init.PeriphDataAlignment = periphdataalign;				\
-	handle.Init.MemDataAlignment = memdataalign;						\
-	handle.Init.Mode = mode;												\
-	handle.Init.Priority = priority;										\
+#define initDMA(handle, instance, stream, direction, periphinc, meminc, 		\
+					 periphdataalign, memdataalign, mode, priority)						\
+{																										\
+	handle.Instance = instance;																\
+	handle.Init.Request = stream;																\
+	handle.Init.Direction = direction;														\
+	handle.Init.PeriphInc = periphinc;														\
+	handle.Init.MemInc = meminc;																\
+	handle.Init.PeriphDataAlignment = periphdataalign;									\
+	handle.Init.MemDataAlignment = memdataalign;											\
+	handle.Init.Mode = mode;																	\
+	handle.Init.Priority = priority;															\
 }
-
-/**
- * Initialize PWM peripheral with given parameters.
- */
-#define initPWM()
 
 /**
  * Initialize SPI peripheral with given parameters.
  */
-#define initSPI(handle, instance, mode, direction, datasize, 	\
-	polarity, phase, nss, prescaler, firstbit, timode)				\
-{																					\
-	handle.Instance = instance;											\
-	handle.Init.Mode = mode;												\
-	handle.Init.Direction = direction;									\
-	handle.Init.DataSize = datasize;										\
-	handle.Init.CLKPolarity = polarity;									\
-	handle.Init.CLKPhase = phase;											\
-	handle.Init.NSS = nss;													\
-	handle.Init.BaudRatePrescaler = prescaler;						\
-	handle.Init.FirstBit = firstbit;										\
-	handle.Init.TIMode = timode;											\
+#define initSPI(handle, instance, mode, direction, datasize, polarity, 			\
+					 phase, nss, prescaler, firstbit, timode)								\
+{																										\
+	handle.Instance = instance;																\
+	handle.Init.Mode = mode;																	\
+	handle.Init.Direction = direction;														\
+	handle.Init.DataSize = datasize;															\
+	handle.Init.CLKPolarity = polarity;														\
+	handle.Init.CLKPhase = phase;																\
+	handle.Init.NSS = nss;																		\
+	handle.Init.BaudRatePrescaler = prescaler;											\
+	handle.Init.FirstBit = firstbit;															\
+	handle.Init.TIMode = timode;																\
 }
 
 /**
  * Initialize SDMMC peripheral with given parameters.
  */
-#define initSDMMC(handle, instance, buswide, clockedge, 			\
-	powersave, clockdiv, hwcontrol)										\
-{																					\
-	handle.Instance = instance;											\
-	handle.Init.BusWide = buswide;										\
-	handle.Init.ClockEdge = clockedge;									\
-	handle.Init.ClockPowerSave = powersave;							\
-	handle.Init.ClockDiv = clockdiv;										\
-	handle.Init.HardwareFlowControl = hwcontrol;						\
+#define initSDMMC(handle, instance, buswide, clockedge, powersave, 				\
+						clockdiv, hwcontrol)														\
+{																										\
+	handle.Instance = instance;																\
+	handle.Init.BusWide = buswide;															\
+	handle.Init.ClockEdge = clockedge;														\
+	handle.Init.ClockPowerSave = powersave;												\
+	handle.Init.ClockDiv = clockdiv;															\
+	handle.Init.HardwareFlowControl = hwcontrol;											\
 }
 
 /**
  * Initialize DFSDM peripheral with given parameters
  */
-#define initDFSDM()
+#define initDFSDMChannel(handle, i, divider, filtertype, offset, rightshift)	\
+{																										\
+	handle[i].Instance = DFSDM1_Channel0 + i;												\
+	handle[i].Init.OutputClock.Activation = ENABLE;										\
+	handle[i].Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_SYSTEM;	\
+	handle[i].Init.OutputClock.Divider = divider;										\
+	handle[i].Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;				\
+	handle[i].Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;				\
+	handle[i].Init.SerialInterface.Type = DFSDM_CHANNEL_SPI_RISING;				\
+	handle[i].Init.Awd.FilterOrder = filtertype;											\
+	handle[i].Init.Offset = offset;															\
+	handle[i].Init.RightBitShift = rightshift;											\
+}
+
+#define initDFSDMFilter(handle, i, sincorder, oversampling)							\
+{																										\
+	handle[i].Instance = DFSDM1_Filter0 + i;												\
+	handle[i].Init.RegularParam.Trigger = DFSDM_FILTER_SW_TRIGGER;					\
+	handle[i].Init.RegularParam.FastMode = ENABLE;										\
+	handle[i].Init.RegularParam.DmaMode = DISABLE;										\
+	handle[i].Init.FilterParam.SincOrder = sincorder;									\
+	handle[i].Init.FilterParam.Oversampling = oversampling;							\
+	handle[i].Init.FilterParam.IntOversampling = 1;										\
+}
 
 /*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 
-/* Required Structures and Enumerations */
+/* Data structures and enumerations */
 
-typedef struct {
-	uint8_t ID;
-	uint8_t timestamp[LINE_SIZE];
+typedef enum _IMUAccelScale {
+	IMU_ACCEL_SCALE_2G = 0,
+	IMU_ACCEL_SCALE_4G = 2,
+	IMU_ACCEL_SCALE_8G = 3,
+	IMU_ACCEL_SCALE_16G = 1
+} IMUAccelScale;
+
+typedef enum _IMUGyroScale {
+	IMU_GYRO_SCALE_250DPS = 0,
+	IMU_GYRO_SCALE_500DPS = 1,
+	IMU_GYRO_SCALE_1000DPS = 2,
+	IMU_GYRO_SCALE_2000DPS = 3
+} IMUGyroScale;
+typedef struct _MicData {
 	int8_t north[DATA_SIZE];
 	int8_t northEast[DATA_SIZE];
 	int8_t east[DATA_SIZE];
@@ -491,53 +519,54 @@ typedef struct {
 	int8_t northWest[DATA_SIZE];
 } MicData;
 
-typedef struct {
-	uint8_t ID;
-	uint8_t UTCTime[LINE_SIZE];
-	uint8_t latitude[LINE_SIZE];
-	uint8_t longitude[LINE_SIZE];
-	uint8_t quality[LINE_SIZE];
-	uint8_t numSat[LINE_SIZE];
-	uint8_t altitude[LINE_SIZE];
-	uint8_t status[LINE_SIZE];
-	uint8_t speed[LINE_SIZE];		/* knots */
-	uint8_t course[LINE_SIZE];		/* degrees */
-	uint8_t date[LINE_SIZE];
+typedef struct _GPSData {
+	uint8_t *UTCTime;
+	uint8_t *latitude;
+	uint8_t *longitude;
+	uint8_t *quality;
+	uint8_t *numSat;
+	uint8_t *altitude;
+	uint8_t *status;
+	uint8_t *speed;		/* knots */
+	uint8_t *course;		/* degrees */
+	uint8_t *date;
 } GPSData;
 
-typedef struct {
-
+typedef struct _IMUData {
+	double accelX;			/* mg */
+	double accelY;			/* mg */
+	double accelZ;			/* mg */
+	double gyroX;			/* dps */
+	double gyroY;			/* dps */
+	double gyroZ;			/* dps */
 } IMUData;
 
-typedef struct {
-	MicData *micData;
-	GPSData *gpsData;
-	IMUData *imuData;
+typedef struct _DataPackage {
+	MicData MicData;
+	GPSData GPSData;
+	IMUData IMUData;
 } DataPackage;
 
 /*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 
-/* Required Global Static Definitions */
+/* Global static definitions */
 
-extern RCC_OscInitTypeDef iosc;		/* Clock */
-extern RCC_ClkInitTypeDef iclk;		/* Oscillator */
-extern GPIO_InitTypeDef	igpio;		/* Generic IO */
-extern UART_HandleTypeDef huart4;	/* Debug Port */
-extern UART_HandleTypeDef huart5;	/* LoRa Module Port */
-extern UART_HandleTypeDef huart7;	/* GPS Module Port */
-extern SPI_HandleTypeDef hspi1;		/* IMU Sensor Port */
-extern SD_HandleTypeDef	hsdmmc1;		/* SD Card Port */
-extern DFSDM_Channel_HandleTypeDef hdfsdm1c[MIC_CHANNEL];
-extern DFSDM_Filter_HandleTypeDef hdfsdm1f[MIC_CHANNEL];
+extern RCC_OscInitTypeDef iosc;										/* Oscillator */
+extern RCC_ClkInitTypeDef iclk;										/* Clock */
+extern GPIO_InitTypeDef	igpio;										/* Generic IO */
+extern UART_HandleTypeDef huart4;									/* Debug Port */
+extern UART_HandleTypeDef huart5;									/* LoRa Module */
+extern UART_HandleTypeDef huart7;									/* GPS Module */
+extern SPI_HandleTypeDef hspi1;										/* IMU Sensor */
+extern SD_HandleTypeDef	hsdmmc1;										/* SD Card */
+extern DFSDM_Channel_HandleTypeDef hdfsdm1c[MIC_CHANNEL];	/* Mic Sensor */
+extern DFSDM_Filter_HandleTypeDef hdfsdm1f[MIC_CHANNEL];		/* Mic Sensor */
 
-extern MicData 				micData;
-extern GPSData 				gpsData;
-extern IMUData					imuData;
-extern DataPackage			dataPackage;
+extern volatile DataPackage dataPackage;
 
-/* Required Function Prototypes */
+/* Function prototypes */
 
 extern void configOscClk(void);
 extern void configDebugPort(void);
@@ -548,7 +577,7 @@ extern void configSDCard(void);
 extern void configLoRaModule(void);
 extern void configServoMotors(void);
 extern void configLEDs(void);
-extern void configWatchDog(void);
+extern void configWatchdog(void);
 
 extern void taskMicReadingNorth(void *pvParams);
 extern void taskMicReadingEast(void *pvParams);
@@ -561,10 +590,14 @@ extern void taskLoRaTransmitting(void *pvParams);
 extern void taskSystemChecking(void *pvParams);
 extern void taskServoDriving(void *pvParams);
 extern void taskLEDUpdating(void *pvParams);
-extern void taskWatchDogTiming(void *pvParams);
+extern void taskWatchdogTiming(void *pvParams);
 
 extern void SysTick_Handler(void);
 extern void xPortSysTickHandler(void);
 extern void vApplicationIdleHook(void);
+
+extern void __parse_nmea_sentences(uint8_t *sentences, GPSData *result);
+extern void __write_to_imu_reg(uint8_t reg, uint8_t data);
+extern uint8_t __read_from_imu_reg(uint8_t reg);
 
 #endif /* FIRMWARE_H */

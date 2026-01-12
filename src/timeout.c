@@ -7,7 +7,7 @@
  ******************************************************************************
  * @attention 
  * 
- * Copyright (c) 2025 Ahmet Can GULMEZ.
+ * Copyright (c) 2026 Ahmet Can GULMEZ.
  * All rights reserved.
  * 
  * This software is licensed under the MIT License.

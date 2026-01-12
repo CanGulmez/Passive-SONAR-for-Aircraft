@@ -7,7 +7,7 @@
  ******************************************************************************
  * @attention 
  * 
- * Copyright (c) 2025 Ahmet Can GULMEZ.
+ * Copyright (c) 2026 Ahmet Can GULMEZ.
  * All rights reserved.
  * 
  * This software is licensed under the MIT License.
@@ -43,7 +43,7 @@ void write_system_log(const char* buffer, size_t size)
 
 	if (write(fd, buffer, size) == -1)	/* write the logs. */
 		syscall_error();
-
+	
 	/* Make sure that each log is explicitly written. */
 	if (fsync(fd) == -1)
 		syscall_error();
@@ -219,16 +219,6 @@ void read_mic_device_node(MicChannel channel, const char* node)
 	}
 }
 
-void export_sensor_data_as_csv(void)
-{
-
-}
-
-void convert_sensor_data_to_pdf(void)
-{
-
-}
-
 /*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
@@ -309,7 +299,7 @@ void set_keras_script_params(ModelParams *modelParams)
 	{
 		case MODEL_BATCH_SIZE_16:	modelParams->batchSize = "16";  break;
 		case MODEL_BATCH_SIZE_32:	modelParams->batchSize = "32";  break;
-		case MODEL_BATCH_SIZE_64:	modelParams->batchSize = "64";	 break;
+		case MODEL_BATCH_SIZE_64:	modelParams->batchSize = "64";  break;
 		case MODEL_BATCH_SIZE_128:	modelParams->batchSize = "128"; break;
 		case MODEL_BATCH_SIZE_256:	modelParams->batchSize = "256"; break;
 		case MODEL_BATCH_SIZE_512:	modelParams->batchSize = "512"; break;

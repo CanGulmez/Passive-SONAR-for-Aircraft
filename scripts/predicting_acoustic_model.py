@@ -1,1 +1,0 @@
-""" Predicting Acoustic Sensor Model """

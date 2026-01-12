@@ -2,12 +2,12 @@
  ******************************************************************************
  * @file 	main.h
  * @author 	Ahmet Can GULMEZ
- * @brief 	Passive SONAR implementation for aircrafts.
+ * @brief 	Passive SONAR implementation for aircraft.
  * 
  ******************************************************************************
  * @attention
  * 
- * Copyright (c) 2025 Ahmet Can GULMEZ.
+ * Copyright (c) 2026 Ahmet Can GULMEZ.
  * All rights reserved.
  * 
  * This software is licensed under the MIT License.
@@ -15,8 +15,8 @@
  ******************************************************************************
  */
 
-#ifndef SMARTBP_H
-#define SMARTBP_H
+#ifndef AERO_SONAR_H
+#define AERO_SONAR_H
 
 #ifdef __cplusplus
 extern "C" {	
@@ -52,15 +52,9 @@ extern "C" {
 #include <cairo/cairo.h>
 #include <adwaita.h>
 
-/* GPS map interface */
+/* GPS map libraries */
 
 #include <shumate/shumate.h>
-
-/* OpenGL rendering libraries */
-
-#include <epoxy/gl.h>
-#include <epoxy/glx.h>
-#include <epoxy/egl.h>
 
 /* Database libraries */
 
@@ -111,7 +105,7 @@ extern "C" {
 #define MIC_USB_PREFIX						"ttyUSB"
 #define MIC_WIFI_PREFIX						"wl"
 #define MIC_PLOT_MARGIN						40		/* pixel */
-#define MIC_PLOT_GRID						20 	/* pixel */
+#define MIC_PLOT_GRID						20 	/* pixel */		
 
 #define MODEL_DATASET_PATH					"/home/can/Datasets/"
 #define MODEL_DATASET_SUFFIX				".csv"
@@ -419,14 +413,15 @@ extern void microphone_group_UART(gpointer);
 extern void microphone_group_USB(gpointer);
 extern void microphone_group_WiFi(gpointer);
 extern void mic_plot_car(GtkDrawingArea *, cairo_t *, int, int, gpointer);
-extern void mic_plot_car_area_frame(cairo_t *, int, int);	
-extern void mic_plot_car_area_grid(cairo_t *, int, int);	
-extern void mic_plot_car_area_label_x(cairo_t *, int, int);		
-extern void mic_plot_car_area_label_y(cairo_t *, int, int);	
-extern void mic_plot_car_area_data(cairo_t *, int, int);
+extern void mic_plot_car_frame(cairo_t *, int, int);	
+extern void mic_plot_car_grid(cairo_t *, int, int);	
+extern void mic_plot_car_label_x(cairo_t *, int, int);		
+extern void mic_plot_car_label_y(cairo_t *, int, int);	
+extern void mic_plot_car_data(cairo_t *, int, int);
 extern void mic_plot_polar(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_polar_frame(cairo_t *, int, int);
 extern void mic_plot_polar_label(cairo_t *, int, int);
+extern void mic_plot_polar_fill(cairo_t *, int, int, double, double);
 
 /* AI model function prototypes */
 
@@ -539,4 +534,4 @@ extern void on_gps_button_clicked(GtkButton *, gpointer);
 }
 #endif
 
-#endif /* SMARTBP_H */
+#endif /* AERO_SONAR_H */

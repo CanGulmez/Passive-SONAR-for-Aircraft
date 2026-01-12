@@ -7,7 +7,7 @@
  ******************************************************************************
  * @attention
  * 
- * Copyright (c) 2025 Ahmet Can GULMEZ.
+ * Copyright (c) 2026 Ahmet Can GULMEZ.
  * All rights reserved.
  * 
  * This software is licensed under the MIT License.
@@ -16,7 +16,6 @@
  */
 
 #include "main.h"
-
 
 /* GPS map shared widgets and variables */
 
@@ -37,14 +36,14 @@ void gps_map_area(GtkBox *rightBox, gpointer data)
 	simpleMap = shumate_simple_map_new();
 	map = shumate_simple_map_get_map(simpleMap);
 	viewport = shumate_simple_map_get_viewport(simpleMap);
-
+	
 	registry = shumate_map_source_registry_new_with_defaults();
 	mapSource = shumate_map_source_registry_get_by_id(registry,
 		SHUMATE_MAP_SOURCE_OSM_MAPNIK);
-
+	
 	shumate_map_center_on(map, 41.008, 28.9784);
 	shumate_simple_map_set_map_source(simpleMap, mapSource);
-
+	
 	shumate_viewport_set_reference_map_source(viewport, mapSource);
 	shumate_viewport_set_zoom_level(viewport, 10.0);
 

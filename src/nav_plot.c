@@ -7,7 +7,7 @@
  ******************************************************************************
  * @attention
  * 
- * Copyright (c) 2025 Ahmet Can GULMEZ.
+ * Copyright (c) 2026 Ahmet Can GULMEZ.
  * All rights reserved.
  * 
  * This software is licensed under the MIT License.
@@ -97,9 +97,9 @@ void nav_plot_area_device(cairo_t *cr, int width, int height)
 	centerX = (width - (NAV_PLOT_MARGIN * 2)) / 2 + NAV_PLOT_MARGIN;
 	centerY = (height - (NAV_PLOT_MARGIN * 2)) / 2 + NAV_PLOT_MARGIN;
 
-	cairo_move_to(cr, centerX - 40, centerY); 
-	cairo_line_to(cr, centerX + 40, centerY);
-	cairo_line_to(cr, centerX, centerY - 100);
+	cairo_move_to(cr, centerX - 30, centerY); 
+	cairo_line_to(cr, centerX + 30, centerY);
+	cairo_line_to(cr, centerX, centerY - 120);
 	cairo_close_path(cr);
 	cairo_fill(cr);
 }
@@ -113,7 +113,7 @@ void nav_plot_area_label(cairo_t *cr, int width, int height)
 
 	cairo_move_to(cr, width - NAV_PLOT_MARGIN - 200, 
 							NAV_PLOT_MARGIN + 75);
-	cairo_show_text(cr, "Noth-Eastean");
+	cairo_show_text(cr, "North-Eastean");
 
 	cairo_move_to(cr, width - NAV_PLOT_MARGIN - 200, 
 							height - NAV_PLOT_MARGIN - 70);
@@ -121,7 +121,7 @@ void nav_plot_area_label(cairo_t *cr, int width, int height)
 
 	cairo_move_to(cr, NAV_PLOT_MARGIN + 50, 
 							NAV_PLOT_MARGIN + 75);
-	cairo_show_text(cr, "Noth-Westean");
+	cairo_show_text(cr, "North-Westean");
 
 	cairo_move_to(cr, NAV_PLOT_MARGIN + 50, 
 							height - NAV_PLOT_MARGIN - 70);

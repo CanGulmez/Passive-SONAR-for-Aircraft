@@ -17,11 +17,9 @@
 
 #include "main.h"
 
-/* Global and shared objects */
-MicData 		micData		= {0};
-GPSData 		gpsData		= {0};
-IMUData		imuData		= {0};
-DataPackage	dataPackage = {0};
+/* Global and static variables. */
+
+volatile DataPackage dataPackage = {0};
 
 /**
  * Read microphone data from the north channel.
@@ -31,7 +29,7 @@ void taskMicReadingNorth(void *pvParams)
 	for (;;)
 	{
 		taskENTER_CRITICAL();	/* enter into critical code section */
-		
+
 		printLog("I'm taskMicReadingNorth() task!");
 
 		taskEXIT_CRITICAL();		/* exit from critical code section */
@@ -47,7 +45,7 @@ void taskMicReadingEast(void *pvParams)
 	for (;;)
 	{
 		taskENTER_CRITICAL();	/* enter into critical code section */
-
+		
 		printLog("I'm taskMicReadingEast() task!");
 
 		taskEXIT_CRITICAL();		/* exit from critical code section */
@@ -97,7 +95,7 @@ void taskGPSReading(void *pvParams)
 		taskENTER_CRITICAL();	/* enter into critical code section */
 
 		printLog("I'm taskGPSReading() task!");
-
+		
 		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
@@ -202,7 +200,7 @@ void taskLEDUpdating(void *pvParams)
 /**
  * Handle the watch dog to maintain system wakeup. 
  */
-void taskWatchDogTiming(void *pvParams)
+void taskWatchdogTiming(void *pvParams)
 {
 	for (;;)
 	{

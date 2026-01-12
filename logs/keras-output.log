@@ -1,14 +1,13 @@
-2026-01-06 19:43:29.497039: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-06 19:43:29.502843: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-06 19:43:29.520939: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-2026-01-06 19:43:29.550256: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-2026-01-06 19:43:29.560389: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-2026-01-06 19:43:29.589976: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+2026-01-11 19:20:30.484119: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-01-11 19:20:31.709074: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-01-11 19:20:32.732094: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-01-11 19:20:33.407433: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-01-11 19:20:33.663148: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-01-11 19:20:35.851871: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
 To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2026-01-06 19:43:32.433335: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-2026-01-06 19:43:38.713855: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+2026-01-11 19:20:49.629961: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
-Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 32 units per layer, 25 epochs, and 16 batch size as 'jena_cl,mate.keras' in the script directory.
+Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 64 units per layer, 50 epochs, and 16 batch size as 'jena_climate.keras' in the script directory.
 
 Found 420451 samples and 15 data in each sample.
 Raw data shape : ((420451, 14))
@@ -22,34 +21,23 @@ Model: "functional_1"
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
 │ input_layer (InputLayer)        │ (None, 120, 14)        │             0 │
 ├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ lstm (LSTM)                     │ (None, 120, 32)        │         6,016 │
+│ lstm (LSTM)                     │ (None, 120, 64)        │        20,224 │
 ├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ lstm_1 (LSTM)                   │ (None, 32)             │         8,320 │
+│ lstm_1 (LSTM)                   │ (None, 64)             │        33,024 │
 ├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dropout (Dropout)               │ (None, 32)             │             0 │
+│ dropout (Dropout)               │ (None, 64)             │             0 │
 ├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dense (Dense)                   │ (None, 1)              │            33 │
+│ dense (Dense)                   │ (None, 1)              │            65 │
 └─────────────────────────────────┴────────────────────────┴───────────────┘
- Total params: 14,369 (56.13 KB)
- Trainable params: 14,369 (56.13 KB)
+ Total params: 53,313 (208.25 KB)
+ Trainable params: 53,313 (208.25 KB)
  Non-trainable params: 0 (0.00 B)
 
 Fitting the model with common datasets:
 
-Epoch 1/25
-2026-01-06 19:43:39.259139: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
-819/819 - 421s - 514ms/step - loss: 21.1472 - mae: 3.3754 - val_loss: 9.5683 - val_mae: 2.4020
-Epoch 2/25
-819/819 - 412s - 503ms/step - loss: 10.7259 - mae: 2.5592 - val_loss: 8.8868 - val_mae: 2.3101
-Epoch 3/25
-819/819 - 425s - 519ms/step - loss: 9.8964 - mae: 2.4614 - val_loss: 8.9227 - val_mae: 2.3313
-Epoch 4/25
-819/819 - 439s - 536ms/step - loss: 9.2593 - mae: 2.3812 - val_loss: 8.9874 - val_mae: 2.3368
-Epoch 5/25
-819/819 - 419s - 512ms/step - loss: 8.7266 - mae: 2.3101 - val_loss: 9.3057 - val_mae: 2.3827
-
-Evaluating the fitted model with test dataset:
-
-407/407 - 84s - 206ms/step - loss: 30.2285 - mae: 4.3540
-
-Test MAE: 4.3540
+Epoch 1/50
+2026-01-11 19:21:10.663846: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+819/819 - 1114s - 1s/step - loss: 14.7942 - mae: 2.8969 - val_loss: 8.9842 - val_mae: 2.3291
+Epoch 2/50
+819/819 - 931s - 1s/step - loss: 9.2276 - mae: 2.3754 - val_loss: 9.0814 - val_mae: 2.3336
+Epoch 3/50
