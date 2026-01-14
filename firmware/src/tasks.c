@@ -29,7 +29,7 @@ void taskMicReadingNorth(void *pvParams)
 	for (;;)
 	{
 		taskENTER_CRITICAL();	/* enter into critical code section */
-
+		
 		printLog("I'm taskMicReadingNorth() task!");
 
 		taskEXIT_CRITICAL();		/* exit from critical code section */

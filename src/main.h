@@ -63,13 +63,13 @@ extern "C" {
 /* Custom libraries */
 
 // #include "../lib/include/alat.h"
-// #include "../lib/include/dsp.h"
+#include "../lib/include/dsp.h"
 
-/* Compile-specific definations */
+/* Compile-specific definitions */
 
 #pragma GCC optimize("O3")
 
-/* Global macro definations */
+/* Global macro definitions */
 
 #define TIME_FORMAT							"%F %T"
 #define BUFFER_SIZE							512
@@ -123,7 +123,7 @@ extern "C" {
 #define TIMEOUT_MODEL_LOG					5000	/* ms */
 #define TIMEOUT_DATA_RECORD				4000	/* ms */
 
-/* Attribute and built-in macro definations  */
+/* Attribute and built-in macro definitions  */
 
 #define __file									__FILE__
 #define __line									__LINE__
@@ -136,7 +136,7 @@ extern "C" {
 #define __address0							__builtin_return_address(0)
 #define __unreachable						__builtin_unreachable()
 
-/* Maro function definations */
+/* Maro function definitions */
 
 #define print_log(msg, ...)																\
 {																									\
@@ -336,9 +336,6 @@ typedef struct {
 	double gyroX;
 	double gyroY;
 	double gyroZ;
-	double magnetX;
-	double magnetY;
-	double magnetZ;
 } IMUData;
 
 /*****************************************************************************/
@@ -390,6 +387,7 @@ extern ModelButton modelButton;
 
 /* GPS map shared widgets and variables */
 
+extern ShumateMarkerLayer *gpsMarkerLayer;
 extern GPSData gpsData;
 
 /* Nagivation shared widgets and variables */
@@ -441,6 +439,7 @@ extern void nav_plot_area(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 
 extern void gps_map(GtkBox *, gpointer);
 extern void gps_map_area(GtkBox *, gpointer);
+extern void gps_map_area_markers(ShumateMarkerLayer *, double, double);
 
 /* Database function prototypes */
 

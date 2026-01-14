@@ -86,8 +86,8 @@ for i, line in enumerate(lines):
    temperature[i] = values[1]
    raw_data[i, :] = values[:]
    
-print(f"Raw data shape : ({raw_data.shape})")
-print(f"Target shape   : ({temperature.shape})")
+print(f"Raw data shape : {raw_data.shape}")
+print(f"Target shape   : {temperature.shape}")
 
 # Split the raw data into train, validation and test groups.
 

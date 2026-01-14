@@ -1,17 +1,18 @@
-2026-01-11 19:20:30.484119: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-11 19:20:31.709074: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-11 19:20:32.732094: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-2026-01-11 19:20:33.407433: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-2026-01-11 19:20:33.663148: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-2026-01-11 19:20:35.851871: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+2026-01-14 11:54:16.752008: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-01-14 11:54:17.856812: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-01-14 11:54:18.513998: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-01-14 11:54:19.121632: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-01-14 11:54:19.304945: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-01-14 11:54:21.430418: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
 To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2026-01-11 19:20:49.629961: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2026-01-14 11:54:35.389380: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2026-01-14 11:54:53.860957: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
 
-Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 64 units per layer, 50 epochs, and 16 batch size as 'jena_climate.keras' in the script directory.
+Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 64 units per layer, 20 epochs, and 16 batch size as 'jena_climate.keras' in the script directory.
 
 Found 420451 samples and 15 data in each sample.
-Raw data shape : ((420451, 14))
-Target shape   : ((420451,))
+Raw data shape : (420451, 14)
+Target shape   : (420451,)
 
 Splitted the raw data into train (210225 samples), validation (105112 samples) and test (105114 samples) groups.
 
@@ -35,9 +36,43 @@ Model: "functional_1"
 
 Fitting the model with common datasets:
 
-Epoch 1/50
-2026-01-11 19:21:10.663846: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
-819/819 - 1114s - 1s/step - loss: 14.7942 - mae: 2.8969 - val_loss: 8.9842 - val_mae: 2.3291
-Epoch 2/50
-819/819 - 931s - 1s/step - loss: 9.2276 - mae: 2.3754 - val_loss: 9.0814 - val_mae: 2.3336
-Epoch 3/50
+Epoch 1/20
+2026-01-14 11:54:55.221468: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+819/819 - 818s - 998ms/step - loss: 14.5090 - mae: 2.8711 - val_loss: 9.0047 - val_mae: 2.3342
+Epoch 2/20
+819/819 - 786s - 960ms/step - loss: 9.0989 - mae: 2.3540 - val_loss: 10.0289 - val_mae: 2.4843
+Epoch 3/20
+819/819 - 801s - 978ms/step - loss: 7.7404 - mae: 2.1684 - val_loss: 9.7643 - val_mae: 2.4475
+Epoch 4/20
+819/819 - 826s - 1s/step - loss: 6.6798 - mae: 2.0144 - val_loss: 10.5938 - val_mae: 2.5386
+Epoch 5/20
+819/819 - 848s - 1s/step - loss: 5.9011 - mae: 1.8907 - val_loss: 11.1701 - val_mae: 2.6185
+Epoch 6/20
+819/819 - 769s - 939ms/step - loss: 5.2782 - mae: 1.7861 - val_loss: 11.4062 - val_mae: 2.6420
+Epoch 7/20
+819/819 - 766s - 936ms/step - loss: 4.8029 - mae: 1.7031 - val_loss: 11.3547 - val_mae: 2.6377
+Epoch 8/20
+819/819 - 769s - 939ms/step - loss: 4.4126 - mae: 1.6321 - val_loss: 11.7216 - val_mae: 2.6730
+Epoch 9/20
+819/819 - 816s - 996ms/step - loss: 4.1503 - mae: 1.5818 - val_loss: 11.8485 - val_mae: 2.6895
+Epoch 10/20
+819/819 - 816s - 996ms/step - loss: 3.8568 - mae: 1.5244 - val_loss: 12.2722 - val_mae: 2.7318
+Epoch 11/20
+819/819 - 802s - 979ms/step - loss: 3.6849 - mae: 1.4881 - val_loss: 12.1170 - val_mae: 2.7136
+Epoch 12/20
+819/819 - 1092s - 1s/step - loss: 3.4991 - mae: 1.4496 - val_loss: 12.0648 - val_mae: 2.7183
+Epoch 13/20
+819/819 - 1161s - 1s/step - loss: 3.3358 - mae: 1.4161 - val_loss: 12.2009 - val_mae: 2.7315
+Epoch 14/20
+819/819 - 907s - 1s/step - loss: 3.2106 - mae: 1.3875 - val_loss: 12.3007 - val_mae: 2.7431
+Epoch 15/20
+819/819 - 821s - 1s/step - loss: 3.0942 - mae: 1.3615 - val_loss: 12.3094 - val_mae: 2.7529
+Epoch 16/20
+819/819 - 995s - 1s/step - loss: 3.0071 - mae: 1.3415 - val_loss: 12.9083 - val_mae: 2.8181
+Epoch 17/20
+819/819 - 1104s - 1s/step - loss: 2.9066 - mae: 1.3190 - val_loss: 12.5251 - val_mae: 2.7738
+Epoch 18/20
+819/819 - 783s - 956ms/step - loss: 2.8386 - mae: 1.3023 - val_loss: 12.5541 - val_mae: 2.7784
+Epoch 19/20
+819/819 - 755s - 922ms/step - loss: 2.7565 - mae: 1.2830 - val_loss: 12.4017 - val_mae: 2.7615
+Epoch 20/20

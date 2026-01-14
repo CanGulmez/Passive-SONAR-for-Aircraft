@@ -504,5 +504,16 @@ void on_nav_button_clicked(GtkButton *button, gpointer data)
 
 void on_gps_button_clicked(GtkButton *button, gpointer data)
 {
+	int i;
+	const char *label;
 
+	label = gtk_button_get_label(button);
+	print_log("%s(): '%s'", __func, label);
+
+	/* Put the markers into map area. */
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9784);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9884);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9984);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0000);
 }
+ 

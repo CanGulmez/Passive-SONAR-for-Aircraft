@@ -114,15 +114,23 @@ void mic_plot_car_data(cairo_t *cr, int width, int height)
 
 	/* Get the middle point and step interval. */
 	middle = (MIC_PLOT_MARGIN / 2) + 
-		((height - (MIC_PLOT_MARGIN * 3/2)) / 2);
-	step = (width - (MIC_PLOT_MARGIN * 3/2)) / (DATA_SIZE - 1);
+				 ((height - (MIC_PLOT_MARGIN * 3 / 2)) / 2);
+	step = (width - (MIC_PLOT_MARGIN * 3 / 2)) / (DATA_SIZE - 1);
 	
 	/* Draw the sensor data itself. */
 	cairo_move_to(cr, MIC_PLOT_MARGIN + 2, middle);
-	for (i = 1; i <= DATA_SIZE; i++) 
+	for (i = 1; i <= (width - MIC_PLOT_MARGIN * 3 / 2) - 2; i++) 
 	{
-		cairo_line_to(cr, MIC_PLOT_MARGIN + (step * i) + 2, 
-			middle - micSensorData.data[i - 1]);
+		if (i >= DATA_SIZE)
+		{
+			cairo_line_to(cr, MIC_PLOT_MARGIN + (step * i) + 2, 
+				middle);	
+		}
+		else
+		{
+			cairo_line_to(cr, MIC_PLOT_MARGIN + (step * i) + 2, 
+				middle - micSensorData.data[i - 1]);
+		}
 	}
 	cairo_stroke(cr);
 }
@@ -166,7 +174,7 @@ void mic_plot_polar_frame(cairo_t *cr, int width, int height)
 	cairo_arc(cr, center_x, center_y, radius, -M_PI, M_PI);
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);		/* inner arch circulars */
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);	/* inner arch circles */
 	cairo_set_line_width(cr, 3.0);	
 
 	for (i = 1; i < 5; i++) 
@@ -176,7 +184,7 @@ void mic_plot_polar_frame(cairo_t *cr, int width, int height)
 	}
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);		/* sector lines */
+	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);	/* sector lines */
 	cairo_set_line_width(cr, 3.0);
 
 	cairo_move_to(cr, center_x, center_y);
@@ -281,8 +289,9 @@ void mic_plot_polar(GtkDrawingArea *area, cairo_t *cr, int width,
 	/* Set the background of plot area */
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);	/* white background */
 	cairo_paint(cr);
-
+	
 	mic_plot_polar_frame(cr, width, height);	
 	mic_plot_polar_label(cr, width, height);
-	mic_plot_polar_fill(cr, width, height, 0, 46);
+	mic_plot_polar_fill(cr, width, height, 90, 135);
 }
+ 

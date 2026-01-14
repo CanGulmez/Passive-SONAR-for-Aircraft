@@ -2,7 +2,7 @@
 
 CC				:= gcc
 PIO			:= pio
-CFLAGS		:= -lm -g3 -lsqlite3
+CFLAGS		:= -lm -g3 -lsqlite3 -ldsp -L./lib
 
 SRC			:= ./src/*.h ./src/*.c
 DEPENDS		:= gtk4 libadwaita-1 shumate-1.0
