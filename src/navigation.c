@@ -66,14 +66,14 @@ void navigation(GtkBox *imuBox, gpointer data)
 {
 	GtkWidget *leftBox, *separator, *rightBox;
 	GtkWidget *accelGroup, *gyroGroup, *magnetGroup;	
-	GtkWidget *navPlot, *propertyBox;
-	GtkWidget *navGroup, *navRow;
+	GtkWidget *navPlotArea;
+	GtkWidget *navGroup, *navRow, *propertyBox;
 	GtkWidget *scrolledWin, *startBtn;
 
 	/* Put the required boxes. */
 	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
 	separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	propertyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
 	scrolledWin = gtk_scrolled_window_new();
 
@@ -95,7 +95,7 @@ void navigation(GtkBox *imuBox, gpointer data)
 	navGroup = __generic_group_new(
 		"IMU Module", "Show the used IMU sensor information"
 	);
-	navRow = __generic_action_row_new("IMU series", "Null");
+	navRow = __generic_action_row_new("Sensor Series", "Null");
 	__generic_group_add(navGroup, navRow);
 
 	/* Put the accelerometer, gyroscope and gyroscope groups. */
@@ -107,14 +107,14 @@ void navigation(GtkBox *imuBox, gpointer data)
 	startBtn = __generic_button_new("Start", "suggested-action");
 	button_signal(startBtn, on_nav_button_clicked);
 
-	/* Put the plot area. */
-	navPlot = gtk_drawing_area_new();
-	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(navPlot), 
+	/* Put the plot areas. */
+	navPlotArea = gtk_drawing_area_new();
+	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(navPlotArea), 
 		nav_plot_area, NULL, NULL);
 
-	gtk_widget_set_hexpand(navPlot, TRUE);
-	gtk_widget_set_vexpand(navPlot, TRUE);
-	gtk_widget_set_size_request(navPlot, 900, 600);
+	gtk_widget_set_hexpand(navPlotArea, TRUE);
+	gtk_widget_set_vexpand(navPlotArea, TRUE);
+	gtk_widget_set_size_request(navPlotArea, 900, -1);
 
 	/* Append the all groups and widgets to main box. */
 	gtk_box_append(GTK_BOX(propertyBox), navGroup);
@@ -124,7 +124,7 @@ void navigation(GtkBox *imuBox, gpointer data)
 
 	gtk_box_append(GTK_BOX(leftBox), scrolledWin);
 	gtk_box_append(GTK_BOX(leftBox), startBtn);
-	gtk_box_append(GTK_BOX(rightBox), navPlot);
+	gtk_box_append(GTK_BOX(rightBox), navPlotArea);
 
 	gtk_box_append(imuBox, leftBox);
 	gtk_box_append(imuBox, separator);

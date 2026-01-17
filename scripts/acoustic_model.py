@@ -31,7 +31,8 @@ $ python3 acoustic_model.py [-h] dataset output_model layer units \
 import os , sys, time, argparse
 import numpy as np
 import pandas as pd
-import tensorflow.keras as keras
+# import tensorflow.keras as keras
+import keras
 
 # Parse the command-line aeguments.
 
@@ -167,7 +168,6 @@ def build_model() -> keras.Model:
  
 	return model
 
-
 model = build_model()
 
 # Set the callback functions.
@@ -177,9 +177,10 @@ callbacks = [
       save_best_only=True, monitor="val_loss")
 ]
 if EARLY_STOPPING:
-	callbacks.append(keras.callbacks.EarlyStopping(monitor="val_loss", patience=3))
+	callbacks.append(keras.callbacks.EarlyStopping(monitor="val_loss", patience=5))
  
 # Compile the model.
+
 model.compile(optimizer="rmsprop", loss="mse", metrics=["mae"])
 model.summary()
 

@@ -76,7 +76,7 @@ void mic_plot_car_label_x(cairo_t *cr, int width, int height)
 	cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);	/* black indices */
 	cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, 
 		CAIRO_FONT_WEIGHT_NORMAL);
-   cairo_set_font_size(cr, 15.0);	
+   cairo_set_font_size(cr, 15.0);
 
 	cairo_move_to(cr, 250, height - MIC_PLOT_MARGIN + 20);
 	

@@ -114,8 +114,8 @@ extern "C" {
 #define MODEL_PREDICT_SCRIPT				"scripts/predicting_acoustic_model.py"
 #define MODEL_LOG_PATH						"./logs/keras-output.log"
 
-#define NAV_PLOT_MARGIN						40		/* pixel */
-#define NAV_PLOT_GRID						30		/* pixel */
+#define NAV_PLOT_MARGIN						0		/* pixel */
+#define NAV_PLOT_GRID						20		/* pixel */
 #define NAV_PLOT_INDICE						100	/* pixel */
 
 #define TIMEOUT_DEVICE_READ				1000	/* ms */
@@ -146,7 +146,7 @@ extern "C" {
 	sprintf(buffer, "[PID=%d][%s] " msg "\n", getpid(), 							\
 			  get_current_time(TIME_FORMAT), ##__VA_ARGS__);						\
 																									\
-	write_system_log(buffer, strlen(buffer));		/* write the logs */			\
+	logging(buffer, strlen(buffer));		/* write the logs */						\
 	printf("%s", buffer);		/* print the log buffer to "stdout" */			\
 }
 
@@ -199,14 +199,16 @@ extern "C" {
 
 /* General enumerations and structures */
 
-typedef enum {
+typedef enum _CurrentPage 
+{
 	PAGE_MICROPHONE,
 	PAGE_AI_MODEL,
 	PAGE_NAVIGATION,
 	PAGE_GPS_MAP
 } CurrentPage;
 
-typedef enum {
+typedef enum _HeaderButton 
+{
 	HEADER_BUTTON_NEW,
 	HEADER_BUTTON_SAVE_AS,
 	HEADER_BUTTON_TRASH,
@@ -215,19 +217,22 @@ typedef enum {
 	HEADER_BUTTON_AVATAR
 } HeaderButton;
 
-typedef enum {
+typedef enum _Database
+{
 	DATABASE_SENSOR_DATA,
 } Database;
 
 /* Microphone enumerations and structures */
 
-typedef enum {
+typedef enum _MicChannel
+{
 	MIC_CHANNEL_UART,
 	MIC_CHANNEL_USB,
 	MIC_CHANNEL_WIFI
 } MicChannel;
 
-typedef enum {
+typedef enum _MicBaudRate
+{
 	MIC_BAUD_RATE_9600,
 	MIC_BAUD_RATE_14400,
 	MIC_BAUD_RATE_19200,
@@ -237,14 +242,16 @@ typedef enum {
 	MIC_BAUD_RATE_115200
 } MicBaudRate;
 
-typedef enum {
+typedef enum _MicDataBits
+{
 	MIC_DATA_BITS_5,
 	MIC_DATA_BITS_6,
 	MIC_DATA_BITS_7,
 	MIC_DATA_BITS_8
 } MicDataBits;
 
-typedef enum {
+typedef enum _MicParityBit
+{
 	MIC_PARITY_BIT_NONE,
 	MIC_PARITY_BIT_EVEN,
 	MIC_PARITY_BIT_ODD,
@@ -252,35 +259,42 @@ typedef enum {
 	MIC_PARITY_BIT_SPACE
 } MicParityBit;
 
-typedef enum {
+typedef enum _MicStopBits
+{
 	MIC_STOP_BITS_1,
 	MIC_STOP_BITS_2
 } MicStopBits;
 
-typedef enum {
+typedef enum _MicFlowControl
+{
 	MIC_FLOW_CONTROL_NONE,
 	MIC_FLOW_CONTROL_HARDWARE,
 	MIC_FLOW_CONTROL_SOFTWARE
 } MicFlowControl;
 
-typedef enum {
+typedef enum _MicButton
+{
 	MIC_BUTTON_START,
 	MIC_BUTTON_ANALYZE,
 	MIC_BUTTON_STOP
 } MicButton;
 
-typedef struct __packed {
+typedef struct __packed _MicSensorData 
+{
 	int8_t ID;
 	int8_t data[DATA_SIZE];
 } MicSensorData;
 
 /* AI model enumerations and structures */
-typedef enum {
+
+typedef enum _ModelLayerType
+{
 	MODEL_LAYER_TYPE_LSTM,
 	MODEL_LAYER_TYPE_GRU
 } ModelLayerType;
 
-typedef enum {
+typedef enum _ModelBatchSize
+{
 	MODEL_BATCH_SIZE_16,
 	MODEL_BATCH_SIZE_32,
 	MODEL_BATCH_SIZE_64,
@@ -289,19 +303,22 @@ typedef enum {
 	MODEL_BATCH_SIZE_512
 } ModelBatchSize;
 
-typedef enum {
+typedef enum _ModelEarlyStopping
+{
 	MODEL_EARLY_STOPPING_TRUE,
 	MODEL_EARLY_STOPPING_FALSE
 } ModelEarlyStopping;
 
-typedef enum {
+typedef enum _ModelButton
+{
 	MODEL_BUTTON_FIT,
 	MODEL_BUTTON_ABORT,
 	MODEL_BUTTON_EVALUATE,
 	MODEL_BUTTON_PREDICT
 } ModelButton;
 
-typedef struct {
+typedef struct _ModelParams
+{
 	const char *dataset;
 	const char *outputModel;
 	const char *layer;
@@ -313,8 +330,8 @@ typedef struct {
 } ModelParams;
 
 /* GPS map enumerations and structures */
-typedef struct {
-	uint8_t ID;
+typedef struct _GPSData
+{
 	const char *UTCTime;
 	const char *latitude;
 	const char *longitude;
@@ -329,14 +346,35 @@ typedef struct {
 
 /* Navigation enumerations and structures */
 
-typedef struct {
+typedef enum _NavAccel
+{
+	NAV_ACCEL_X_PLUS,
+	NAV_ACCEL_X_MINUS,
+	NAV_ACCEL_Y_PLUS,
+	NAV_ACCEL_Y_MINUS,
+	NAV_ACCEL_Z_PLUS,
+	NAV_ACCEL_Z_MINUS
+} NavAccel;
+
+typedef enum _NavGyro
+{
+	NAV_GYRO_X_PLUS,
+	NAV_GYRO_X_MINUS,
+	NAV_GYRO_Y_PLUS,
+	NAV_GYRO_Y_MINUS,
+	NAV_GYRO_Z_PLUS,
+	NAV_GYRO_Z_MINUS
+} NavGyro;
+
+typedef struct _NavIMUData
+{
 	double accelX;
 	double accelY;
 	double accelZ;
 	double gyroX;
 	double gyroY;
 	double gyroZ;
-} IMUData;
+} NavIMUData;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -392,7 +430,9 @@ extern GPSData gpsData;
 
 /* Nagivation shared widgets and variables */
 
-extern IMUData imuData;
+extern NavAccel navAccel;
+extern NavGyro navGyro;
+extern NavIMUData navIMUData;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -452,7 +492,7 @@ extern void database_close(struct sqlite3 *);
 /* Common utility function prototypes */
 
 extern char *get_host_name(void);
-extern void write_system_log(const char *, size_t);
+extern void logging(const char *, size_t);
 extern char *get_current_time(const char *);
 extern int get_mic_device_nodes(MicChannel);
 extern int get_camera_USB_nodes(void);

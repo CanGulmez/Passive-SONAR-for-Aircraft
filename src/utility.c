@@ -33,7 +33,7 @@ char *get_host_name(void)
 /**
  * Write the system logs into required file.
  */
-void write_system_log(const char* buffer, size_t size)
+void logging(const char* buffer, size_t size)
 {
 	int fd;
 

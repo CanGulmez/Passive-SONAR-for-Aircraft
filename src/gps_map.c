@@ -35,7 +35,7 @@ void gps_map_area_markers(ShumateMarkerLayer *gpsMarkerLayer,
 	image = gtk_image_new_from_icon_name("process-stop");
 	marker = shumate_marker_new();
 	
-	gtk_image_set_pixel_size(GTK_IMAGE(image), 32);
+	gtk_image_set_pixel_size(GTK_IMAGE(image), 24);
 	gtk_widget_set_valign(GTK_WIDGET(marker), GTK_ALIGN_CENTER);
 	gtk_widget_set_halign(GTK_WIDGET(marker), GTK_ALIGN_CENTER);
 	
