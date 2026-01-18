@@ -18,19 +18,6 @@
 #include "main.h"
 
 /**
- * Get the host name to show the who runs this program.
- */
-char *get_host_name(void)
-{
-	static char buffer[32];
-
-	if (gethostname(buffer, 32) == -1)
-		syscall_error();
-
-	return buffer;
-}
-
-/**
  * Write the system logs into required file.
  */
 void logging(const char* buffer, size_t size)
@@ -98,7 +85,6 @@ void set_serial_attributes(int fd, struct termios *tty)
 		syscall_error();
 }
 
-/*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -219,7 +205,6 @@ void read_mic_device_node(MicChannel channel, const char* node)
 	}
 }
 
-/*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 

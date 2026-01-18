@@ -2,7 +2,7 @@
  ******************************************************************************
  * @file 	main.h
  * @author 	Ahmet Can GULMEZ
- * @brief 	Passive SONAR implementation for aircraft.
+ * @brief 	Passive acoustic surveillance system for aircraft.
  * 
  ******************************************************************************
  * @attention
