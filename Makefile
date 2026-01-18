@@ -1,4 +1,4 @@
-# Smart Ballistic Protection
+# Passive Acoustic Surveillance System
 
 CC				:= gcc
 PIO			:= pio
