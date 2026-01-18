@@ -28,7 +28,7 @@ void __parse_nmea_sentences(uint8_t *sentences, GPSData *result)
 	sentence = strtok(sentences, "\n");
 	while (sentence != NULL)
 	{
-		if (strncmp(sentence, "$GPGGA", 6))
+		if (strncmp(sentence, "$GPGGA", 6) == 0)
 		{
 			/* Get the remaining string and then parse. */
 			token = strchr(sentence, sentence[7]);
@@ -136,7 +136,9 @@ uint8_t __read_from_imu_reg(uint8_t reg)
 		HAL_MAX_DELAY);
 	if (status != HAL_OK)
 	{
-		printError(status, "Failed to read data from IMU register!")
+		printError(status, "Failed to read data from IMU register!");
 	}
 	IMU_NSS_HIGH();
+
+	return rx_data[1];
 }

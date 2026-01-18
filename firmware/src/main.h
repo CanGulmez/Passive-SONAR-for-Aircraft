@@ -43,11 +43,11 @@
 
 /* Global and General Definitions */
 
-#define BUFFER_SIZE							512
-#define DATA_SIZE								BUFFER_SIZE					
-#define MIC_CHANNEL							4
+#define BUFFER_SIZE							64
+#define DATA_SIZE								512
+#define SAMPLE_SIZE							1024				
+#define CHANNEL_COUNT						4
 #define MIC_COUNT								(CHANNEL_COUNT * 2)
-#define SAMPLE_SIZE							1024
 
 #define SENSOR_MIC_ID						0x01
 #define SENSOR_GPS_ID						0x02
@@ -77,15 +77,15 @@
 #define TASK_LED_NAME						"LEDUpdating"
 #define TASK_WATCHDOG_NAME					"WatchDogTiming"
 
-#define TASK_MIC_STACK						256
-#define TASK_GPS_STACK						256
-#define TASK_IMU_STACK						256
-#define TASK_SD_STACK						256
-#define TASK_SERVO_STACK					256
-#define TASK_LORA_STACK						256
-#define TASK_SYSTEM_STACK					256
-#define TASK_LED_STACK						256
-#define TASK_WATCHDOG_STACK				256
+#define TASK_MIC_STACK						8192
+#define TASK_GPS_STACK						8192
+#define TASK_IMU_STACK						8192
+#define TASK_SD_STACK						8192
+#define TASK_SERVO_STACK					8192
+#define TASK_LORA_STACK						8192
+#define TASK_SYSTEM_STACK					8192
+#define TASK_LED_STACK						8192
+#define TASK_WATCHDOG_STACK				8192
 
 #define TASK_MIC_PRIORITY					1
 #define TASK_GPS_PRIORITY					1
@@ -99,24 +99,20 @@
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
-/* Oscillator and Clock Definitions 
-
-PLL1_M: 5					(25MHz / 5 = 5MHz)
-PLL1_N: 80					(5MHz × 80 = 400MHz)
-PLL1_P: 4					(400MHz / 4 = 100MHz) → SYSCLK
-PLL1_Q: 8					(400MHz / 8 = 50MHz)  → For SDMMC, USB, RNG
-PLL1_R: 8					(400MHz / 8 = 50MHz)  → For SPI, I2S
-
-System Clock Mux: PLL1_P (100MHz)
-
-AHB Prescaler: 1			HCLK = 100MHz
-APB1 Prescaler: 2			PCLK1 = 50MHz** (low-speed peripherals)
-APB2 Prescaler: 2			PCLK2 = 50MHz** (high-speed peripherals)
-APB3 Prescaler: 2			PCLK3 = 50MHz**
-APB4 Prescaler: 2			PCLK4 = 50MHz**
-*/
+/**
+ * PLL1_M: 5					(25MHz / 5 = 5MHz)
+ * PLL1_N: 80					(5MHz × 80 = 400MHz)
+ * PLL1_P: 4					(400MHz / 4 = 100MHz) → SYSCLK
+ * PLL1_Q: 8					(400MHz / 8 = 50MHz)  → For SDMMC, USB, RNG
+ * PLL1_R: 8					(400MHz / 8 = 50MHz)  → For SPI, I2S
+ * 
+ * AHB Prescaler: 1			HCLK = 100MHz
+ * APB1 Prescaler: 2			PCLK1 = 50MHz
+ * APB2 Prescaler: 2			PCLK2 = 50MHz
+ * APB3 Prescaler: 2			PCLK3 = 50MHz
+ * APB4 Prescaler: 2			PCLK4 = 50MHz
+ */
 
 #define OSC_TYPE								RCC_OSCILLATORTYPE_HSE
 #define OSC_HSE_STATE						RCC_HSE_ON
@@ -248,12 +244,19 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 #define IMU_FIRSTBIT							SPI_FIRSTBIT_MSB
 #define IMU_TIMODE							SPI_TIMODE_DISABLE
 
+#define IMU_REG_WHO_AM_I					0x0F
+
 #define IMU_NSS_LOW()						(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, RESET))
 #define IMU_NSS_HIGH()						(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, SET))
 
-#define IMU_REG_WHO_AM_I					0x0F
-
 /* Microhone Sensor Definitions */
+
+/**
+ * System Clock:								100 MHz
+ * DFSDM Clock:								100 MHz / DIVIDER = 3.125 MHz
+ * Filter Output Rate:						3.125 MHz / OVERSAMPLING = 48.828 kHz
+ * Actual Audio Rate:						48.828 kHz / (ORDER + 1) = 12.207 kHz
+ */
 
 #define MIC_PIN_DATAIN0						GPIO_PIN_1	/* GPIOC - DFSDM1 */ 
 #define MIC_PIN_DATAIN1						GPIO_PIN_1	/* GPIOB - DFSDM1 */
@@ -289,10 +292,9 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /**
- * Transmit the logs from MCU to PC over serial UAR line.
+ * Transmit the logs from MCU to PC over serial UART line.
  */
 #define printLog(format, ...)																	\
 {																										\
@@ -303,7 +305,7 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 }
 
 /**
- * Transmit the error from MCU to PC over serial UAR line.
+ * Transmit the HAL error from MCU to PC over serial UART line.
  */
 #define printError(status, format, ...)													\
 {																										\
@@ -315,7 +317,7 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 }
 
 /**
- * Transmit the kernel error from MCU to PC over serial UAR line.
+ * Transmit the kernel error from MCU to PC over serial UART line.
  */
 #define printKernel(format, ...)																\
 {																										\
@@ -326,7 +328,6 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 	HAL_UART_Transmit(&huart4, buffer, strlen(buffer), HAL_MAX_DELAY);			\
 }
 
-/*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -491,7 +492,6 @@ APB4 Prescaler: 2			PCLK4 = 50MHz**
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /* Data structures and enumerations */
 
@@ -509,27 +509,27 @@ typedef enum _IMUGyroScale {
 	IMU_GYRO_SCALE_2000DPS = 3
 } IMUGyroScale;
 typedef struct _MicData {
-	int8_t north[DATA_SIZE];
-	int8_t northEast[DATA_SIZE];
-	int8_t east[DATA_SIZE];
-	int8_t southEast[DATA_SIZE];
-	int8_t south[DATA_SIZE];
-	int8_t southWest[DATA_SIZE];
-	int8_t west[DATA_SIZE];
-	int8_t northWest[DATA_SIZE];
+	int32_t north[DATA_SIZE];
+	int32_t northEast[DATA_SIZE];
+	int32_t east[DATA_SIZE];
+	int32_t southEast[DATA_SIZE];
+	int32_t south[DATA_SIZE];
+	int32_t southWest[DATA_SIZE];
+	int32_t west[DATA_SIZE];
+	int32_t northWest[DATA_SIZE];
 } MicData;
 
 typedef struct _GPSData {
-	uint8_t *UTCTime;
-	uint8_t *latitude;
-	uint8_t *longitude;
-	uint8_t *quality;
-	uint8_t *numSat;
-	uint8_t *altitude;
-	uint8_t *status;
-	uint8_t *speed;		/* knots */
-	uint8_t *course;		/* degrees */
-	uint8_t *date;
+	uint8_t UTCTime[BUFFER_SIZE];
+	uint8_t latitude[BUFFER_SIZE];
+	uint8_t longitude[BUFFER_SIZE];
+	uint8_t quality[BUFFER_SIZE];
+	uint8_t numSat[BUFFER_SIZE];
+	uint8_t altitude[BUFFER_SIZE];
+	uint8_t status[BUFFER_SIZE];
+	uint8_t speed[BUFFER_SIZE];		/* knots */
+	uint8_t course[BUFFER_SIZE];		/* degrees */
+	uint8_t date[BUFFER_SIZE];
 } GPSData;
 
 typedef struct _IMUData {
@@ -549,7 +549,6 @@ typedef struct _DataPackage {
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /* Global static definitions */
 
@@ -561,10 +560,13 @@ extern UART_HandleTypeDef huart5;									/* LoRa Module */
 extern UART_HandleTypeDef huart7;									/* GPS Module */
 extern SPI_HandleTypeDef hspi1;										/* IMU Sensor */
 extern SD_HandleTypeDef	hsdmmc1;										/* SD Card */
-extern DFSDM_Channel_HandleTypeDef hdfsdm1c[MIC_CHANNEL];	/* Mic Sensor */
-extern DFSDM_Filter_HandleTypeDef hdfsdm1f[MIC_CHANNEL];		/* Mic Sensor */
+extern DFSDM_Channel_HandleTypeDef hdfsdm1c[CHANNEL_COUNT];	/* Mic Sensor */
+extern DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT];	/* Mic Sensor */
 
 extern volatile DataPackage dataPackage;
+
+/*****************************************************************************/
+/*****************************************************************************/
 
 /* Function prototypes */
 

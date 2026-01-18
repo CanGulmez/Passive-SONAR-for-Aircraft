@@ -292,6 +292,6 @@ void mic_plot_polar(GtkDrawingArea *area, cairo_t *cr, int width,
 	
 	mic_plot_polar_frame(cr, width, height);	
 	mic_plot_polar_label(cr, width, height);
-	mic_plot_polar_fill(cr, width, height, 90, 135);
+	mic_plot_polar_fill(cr, width, height, 70, 110);
 }
  

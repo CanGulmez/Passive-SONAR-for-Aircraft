@@ -19,16 +19,16 @@
 
 /* Global and shared objects */
 
-RCC_OscInitTypeDef iosc	= {0};	/* Clock */
-RCC_ClkInitTypeDef iclk	= {0};	/* Oscillator */
+RCC_OscInitTypeDef iosc	= {0};	/* Oscillator */
+RCC_ClkInitTypeDef iclk	= {0};	/* Clk */
 GPIO_InitTypeDef igpio = {0};		/* Generic IO */
 UART_HandleTypeDef huart4 = {0};	/* Debug Port */
 UART_HandleTypeDef huart5 = {0};	/* LoRa Module Port */
 UART_HandleTypeDef huart7 = {0};	/* GPS ModulePort */
 SPI_HandleTypeDef	hspi1 = {0};	/* IMU Sensor Port */
 SD_HandleTypeDef hsdmmc1 = {0};	/* SD Card Port */
-DFSDM_Channel_HandleTypeDef hdfsdm1c[MIC_CHANNEL] = {0};
-DFSDM_Filter_HandleTypeDef hdfsdm1f[MIC_CHANNEL] = {0};
+DFSDM_Channel_HandleTypeDef hdfsdm1c[CHANNEL_COUNT] = {0};
+DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT] = {0};
 
 /**
  * Configurate the oscillator and clock sources.
@@ -143,7 +143,7 @@ void configMicSensors(void)
 	HAL_GPIO_Init(MIC_PORTC, &igpio);
 
 	/* Initialize the DFSDM1 peripheral. */
-	for (i = 0; i < MIC_CHANNEL; i++)
+	for (i = 0; i < CHANNEL_COUNT; i++)
 	{
 		/* Initialize the channel. */
 		initDFSDMChannel(hdfsdm1c, i, MIC_DIVIDER, MIC_FILTER_TYPE, 
@@ -166,7 +166,7 @@ void configMicSensors(void)
 		
 		/* Assign the the filter to the channel. */
 		status = HAL_DFSDM_FilterConfigRegChannel(&hdfsdm1f[i], i, 
-			DFSDM_CONTINUOUS_CONV_OFF);
+			DFSDM_CONTINUOUS_CONV_ON);
 		if (status != HAL_OK)
 		{
 			printError(status, "Failed to assign the filter to channel!");

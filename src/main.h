@@ -90,6 +90,7 @@ extern "C" {
 #define MAX_MODEL_DATASET					128
 #define MAX_MODEL_UNITS						1024
 #define MAX_MODEL_EPOCHS					100
+#define MAX_MODEL_LAYER_NUMBER			48
 #define MAX_CAMERA_FILE						16	
 
 #define BUTTON_WIDTH							100 	/* pixel */	
@@ -193,7 +194,6 @@ extern "C" {
 
 #define cmp(fstring, sstring)	(strcmp(fstring, sstring) == 0)
 
-/*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -303,11 +303,11 @@ typedef enum _ModelBatchSize
 	MODEL_BATCH_SIZE_512
 } ModelBatchSize;
 
-typedef enum _ModelEarlyStopping
+typedef enum _ModelEarlyStop
 {
-	MODEL_EARLY_STOPPING_TRUE,
-	MODEL_EARLY_STOPPING_FALSE
-} ModelEarlyStopping;
+	MODEL_EARLY_STOP_TRUE,
+	MODEL_EARLY_STOP_FALSE
+} ModelEarlyStop;
 
 typedef enum _ModelButton
 {
@@ -321,11 +321,12 @@ typedef struct _ModelParams
 {
 	const char *dataset;
 	const char *outputModel;
-	const char *layer;
+	const char *layerType;
+	const char *layerNumber;
 	const char *units;
 	const char *epochs;
 	const char *batchSize;
-	const char *earlyStopping;
+	const char *earlyStop;
 	const char *dropout;
 } ModelParams;
 
@@ -378,7 +379,6 @@ typedef struct _NavIMUData
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /* General shared widgets and variables */
 
@@ -415,11 +415,12 @@ extern guint modelTimeout;
 extern GtkWidget *modelTextView;
 extern GtkTextBuffer *modelTextBuffer;
 extern ModelLayerType modelLayerType;
+extern guint modelLayerNumber;
 extern guint modelUnits;
 extern guint modelEpochs;
 extern gdouble modelDropout;
 extern ModelBatchSize modelBatchSize;
-extern ModelEarlyStopping modelEarlyStopping;
+extern ModelEarlyStop modelEarlyStop;
 extern char *modelOutputName;
 extern ModelButton modelButton;
 
@@ -434,7 +435,6 @@ extern NavAccel navAccel;
 extern NavGyro navGyro;
 extern NavIMUData navIMUData;
 
-/*****************************************************************************/
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -531,7 +531,6 @@ extern GtkWidget *__generic_button_new(const char *, const char *);
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /* General signal handler prototypes */
 
@@ -557,7 +556,8 @@ extern void on_recurrent_dropout_changed(GObject *, GParamSpec *, gpointer);
 extern void on_units_changed(GObject *, GParamSpec *, gpointer);
 extern void on_batch_size_selected(GObject *, GParamSpec *, gpointer);
 extern void on_epochs_changed(GObject *, GParamSpec *, gpointer);
-extern void on_early_stopping_switched(GObject *, GParamSpec *, gpointer);
+extern void on_layer_number_changed(GObject *, GParamSpec *, gpointer);
+extern void on_early_stop_switched(GObject *, GParamSpec *, gpointer);
 extern void on_output_model_texted(GObject *, GParamSpec *, gpointer);
 extern void on_model_button_clicked(GtkButton *, gpointer);
 

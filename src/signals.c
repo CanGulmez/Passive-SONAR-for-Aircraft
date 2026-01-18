@@ -292,8 +292,14 @@ void on_recurrent_dropout_changed(GObject *gobject, GParamSpec *pspec, gpointer 
 
 void on_units_changed(GObject *gobject, GParamSpec *pspec, gpointer data)
 {
-	/* Call the generic combo row signal and get the selected item. */
+	/* Call the generic spin row signal and get the selected item. */
 	modelUnits = __generic_row_changed(gobject, pspec, data, __func);
+}
+
+void on_layer_number_changed(GObject *gobject, GParamSpec *pspec, gpointer data)
+{
+	/* Call the generic spin row signal and get the selected item. */
+	modelLayerNumber = __generic_row_changed(gobject, pspec, data, __func);
 }
 
 void on_batch_size_selected(GObject *gobject, GParamSpec *pspec, gpointer data)
@@ -318,11 +324,11 @@ void on_batch_size_selected(GObject *gobject, GParamSpec *pspec, gpointer data)
 
 void on_epochs_changed(GObject *gobject, GParamSpec *pspec, gpointer data)
 {
-	/* Call the generic combo row signal and get the selected item. */
+	/* Call the generic spin row signal and get the selected item. */
 	modelEpochs = __generic_row_changed(gobject, pspec, data, __func);
 }
 
-void on_early_stopping_switched(GObject *gobject, GParamSpec *pspec, gpointer data)
+void on_early_stop_switched(GObject *gobject, GParamSpec *pspec, gpointer data)
 {
 	gboolean isActive;
 
@@ -331,8 +337,8 @@ void on_early_stopping_switched(GObject *gobject, GParamSpec *pspec, gpointer da
 
 	switch (isActive) 
 	{
-		case 0:	modelEarlyStopping = MODEL_EARLY_STOPPING_FALSE;	break;
-		case 1:	modelEarlyStopping = MODEL_EARLY_STOPPING_TRUE;		break;
+		case 0:	modelEarlyStop = MODEL_EARLY_STOP_FALSE;	break;
+		case 1:	modelEarlyStop = MODEL_EARLY_STOP_TRUE;	break;
 		default:
 			custom_error("Unknown combo row selection");
 	}
@@ -515,5 +521,10 @@ void on_gps_button_clicked(GtkButton *button, gpointer data)
 	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9884);
 	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9984);
 	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0000);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0100);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0200);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0300);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0400);
+	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0500);
 }
  

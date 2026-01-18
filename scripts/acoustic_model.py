@@ -12,18 +12,18 @@ The model parameters that come from ground station:
 + Dataset
 + Output Model
 + Layer Type
++ Layer Number
 + Units
 + Epochs
 + Batch Size
-+ Early Stopping
++ Early Stop
 + Dropout
 
 The ground station will run this command so that parse the command-
 line arguments in this format:
 
-$ python3 acoustic_model.py [-h] dataset output_model layer units \
-	epochs batch_size early_stopping dropout
-
+$ python3 acoustic_model.py [-h] dataset output_model layer_type \
+   layer_number units epochs batch_size early_stop dropout
 """
 
 # Import the libraries.
@@ -31,8 +31,7 @@ $ python3 acoustic_model.py [-h] dataset output_model layer units \
 import os , sys, time, argparse
 import numpy as np
 import pandas as pd
-# import tensorflow.keras as keras
-import keras
+import tensorflow.keras as keras
 
 # Parse the command-line aeguments.
 
@@ -45,27 +44,30 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument("dataset", type=str)
 parser.add_argument("output_model", type=str)
-parser.add_argument("layer", type=str)
+parser.add_argument("layer_type", type=str)
+parser.add_argument("layer_number", type=str)
 parser.add_argument("units", type=str)
 parser.add_argument("epochs", type=str)
 parser.add_argument("batch_size", type=str)
-parser.add_argument("early_stopping", type=str)
+parser.add_argument("early_stop", type=str)
 parser.add_argument("dropout", type=str)
 args = parser.parse_args()
 
 DATASET			= args.dataset
 OUTPUT_MODEL	= args.output_model
-LAYER				= args.layer
+LAYER_TYPE		= args.layer_type
+LAYER_NUMBER	= int(args.layer_number)
 UNITS				= int(args.units)
 EPOCHS			= int(args.epochs)
 BATCH_SIZE		= int(args.batch_size)
-EARLY_STOPPING	= int(args.early_stopping)
+EARLY_STOP		= int(args.early_stop)
 DROPOUT			= float(args.dropout.replace(",", "."))
 
 print(
-   f"\nProcessing '{DATASET}' dataset with {LAYER} layer type, {UNITS}"
-   f" units per layer, {EPOCHS} epochs, and {BATCH_SIZE} batch size as"
-   f" '{OUTPUT_MODEL}.keras' in the script directory."
+   f"\nProcessing '{DATASET}' dataset with {LAYER_TYPE} layer type, "
+   f"{LAYER_NUMBER} layer number, {UNITS} units per layer, {EPOCHS} "
+   f"epochs, and {BATCH_SIZE} batch size as '{OUTPUT_MODEL}.keras' "
+   f"in the script directory."
 )
 
 # After the parsed the command-line arguments, get the dataset file
@@ -113,7 +115,7 @@ raw_data /= std
 sampling_rate = 6
 sequence_length = 120
 delay = sampling_rate * (sequence_length + 24 - 1)
-batch_size = 256
+batch_size = BATCH_SIZE
 
 train_dataset = keras.utils.timeseries_dataset_from_array(
 	data=raw_data[:-delay],
@@ -140,6 +142,7 @@ val_dataset = keras.utils.timeseries_dataset_from_array(
 test_dataset = keras.utils.timeseries_dataset_from_array(
 	data=raw_data[:-delay],
 	targets=temperature[delay:],
+	sampling_rate=sampling_rate,
 	sequence_length=sequence_length,
 	shuffle=True,
 	batch_size=batch_size,
@@ -152,23 +155,35 @@ test_dataset = keras.utils.timeseries_dataset_from_array(
 def build_model() -> keras.Model:
 	# Set the parameters.
 	inputs = keras.Input(shape=(sequence_length, raw_data.shape[-1]))
-	if LAYER == "LSTM":
+ 
+	if LAYER_TYPE == "LSTM":
 		x = keras.layers.LSTM(units=UNITS, recurrent_dropout=DROPOUT,
-         	return_sequences=True)(inputs)
+         return_sequences=True)(inputs)
+		# Each intermediate RNN layer should return whole sequences.
+		for i in range(LAYER_NUMBER - 2):
+			x = keras.layers.LSTM(units=UNITS, recurrent_dropout=DROPOUT,
+         	return_sequences=True)(x)
+		# Last RNN layer should return the last sequence.
 		x = keras.layers.LSTM(units=UNITS, recurrent_dropout=DROPOUT)(x)
-	elif LAYER == "GRU":
-		x = keras.layers.LSTM(units=UNITS, recurrent_dropout=DROPOUT,
+  
+	elif LAYER_TYPE == "GRU":
+		x = keras.layers.GRU(units=UNITS, recurrent_dropout=DROPOUT,
          	return_sequences=True)(inputs)
-		x = keras.layers.LSTM(units=UNITS, recurrent_dropout=DROPOUT)(x)
+		# Each intermediate RNN layer should return whole sequences.
+		for i in range(LAYER_NUMBER - 2):
+			x = keras.layers.GRU(units=UNITS, recurrent_dropout=DROPOUT,
+            return_sequences=True)(x)
+		# Last RNN layer should return the last sequence.
+		x = keras.layers.GRU(units=UNITS, recurrent_dropout=DROPOUT)(x)
 	else:
 		pass
+
+	# Putting the dropout layer lastly is the good practice.
 	x = keras.layers.Dropout(rate=DROPOUT)(x)
 	outputs = keras.layers.Dense(units=1)(x)
-	model = keras.Model(inputs, outputs)
- 
-	return model
+	model = keras.Model(inputs, outputs, name=OUTPUT_MODEL)
 
-model = build_model()
+	return model
 
 # Set the callback functions.
 
@@ -176,11 +191,12 @@ callbacks = [
 	keras.callbacks.ModelCheckpoint(filepath=f"./scripts/{OUTPUT_MODEL}.keras", 
       save_best_only=True, monitor="val_loss")
 ]
-if EARLY_STOPPING:
+if EARLY_STOP:
 	callbacks.append(keras.callbacks.EarlyStopping(monitor="val_loss", patience=5))
  
 # Compile the model.
 
+model = build_model()
 model.compile(optimizer="rmsprop", loss="mse", metrics=["mae"])
 model.summary()
 
@@ -188,7 +204,7 @@ model.summary()
 
 print("\nFitting the model with common datasets:\n")
 model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset,
-          verbose=2, callbacks=callbacks, batch_size=BATCH_SIZE)
+          verbose=2, callbacks=callbacks)
 
 # Evaluate the fitted model.
 

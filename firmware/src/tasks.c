@@ -26,13 +26,36 @@ volatile DataPackage dataPackage = {0};
  */
 void taskMicReadingNorth(void *pvParams)
 {
+	uint8_t i;
+	int32_t samples[SAMPLE_SIZE];
+	HAL_StatusTypeDef status;
+
+	printLog("I'm taskMicReadingNorth() task!");
+	/* Start the regular DFSDM filter conversion. */
+	status = HAL_DFSDM_FilterRegularStart(&hdfsdm1f[0]);
+	if (status != HAL_OK)
+	{
+		printError(status, "Failed to start DFSDM conversion!");
+	}
+
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-		
-		printLog("I'm taskMicReadingNorth() task!");
+		/* Poll the regular conversion simultaneously. */
+		for (i = 0; i < SAMPLE_SIZE; i++)
+		{
+			status = HAL_DFSDM_FilterPollForRegConversion(&hdfsdm1f[0],
+				HAL_MAX_DELAY);
+			if (status != HAL_OK)
+			{
+				printError(status, "Failed to poll DFSDM conversion!");
+			}
 
-		taskEXIT_CRITICAL();		/* exit from critical code section */
+			/* Get the digital MEMS mic data and then shift it. */
+			samples[i] = HAL_DFSDM_FilterGetRegularValue(&hdfsdm1f[0], 0);
+			samples[i] = samples[i] >> 8;	/* 24-bit data */
+
+			printLog("#%i:		%d", i, samples[i]);
+		}
 	}	
 	vTaskDelete(NULL);
 }
@@ -44,12 +67,8 @@ void taskMicReadingEast(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-		
 		printLog("I'm taskMicReadingEast() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
-	}	
+	}
 	vTaskDelete(NULL);
 }
 
@@ -60,11 +79,7 @@ void taskMicReadingSouth(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskMicReadingSouth() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -76,11 +91,7 @@ void taskMicReadingWest(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskMicReadingWest() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -92,11 +103,7 @@ void taskGPSReading(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskGPSReading() task!");
-		
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -108,11 +115,7 @@ void taskIMUReading(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskIMUReading() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -124,11 +127,7 @@ void taskSDCardWriting(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskSDCardWriting() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -140,11 +139,7 @@ void taskServoDriving(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskServoDriving() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -156,11 +151,7 @@ void taskLoRaTransmitting(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskLoRaTransmitting() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -172,11 +163,7 @@ void taskSystemChecking(void *pvParams)
 {
 	for (;;)
 	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-
 		printLog("I'm taskSystemChecking() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -187,12 +174,8 @@ void taskSystemChecking(void *pvParams)
 void taskLEDUpdating(void *pvParams)
 {
 	for (;;)
-	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-		
+	{		
 		printLog("I'm taskLEDUpdating() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);
 }
@@ -203,12 +186,8 @@ void taskLEDUpdating(void *pvParams)
 void taskWatchdogTiming(void *pvParams)
 {
 	for (;;)
-	{
-		taskENTER_CRITICAL();	/* enter into critical code section */
-		
+	{		
 		printLog("I'm taskWatchDogTiming() task!");
-
-		taskEXIT_CRITICAL();		/* exit from critical code section */
 	}	
 	vTaskDelete(NULL);	
 }

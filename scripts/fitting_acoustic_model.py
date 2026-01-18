@@ -1,1 +1,0 @@
-""" Fitting Acoustic Sensor Model """

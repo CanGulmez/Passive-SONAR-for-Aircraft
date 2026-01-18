@@ -27,11 +27,12 @@ GtkWidget *modelTextView;
 GtkTextBuffer *modelTextBuffer;
 guint modelTimeout = 0;
 ModelLayerType modelLayerType = MODEL_LAYER_TYPE_LSTM;
+guint modelLayerNumber = 2;
 guint modelUnits = 1;
 guint modelEpochs = 1;
 gdouble modelDropout = 0.1;
 ModelBatchSize modelBatchSize = MODEL_BATCH_SIZE_16;
-ModelEarlyStopping modelEarlyStopping = MODEL_EARLY_STOPPING_FALSE;
+ModelEarlyStop modelEarlyStop = MODEL_EARLY_STOP_FALSE;
 char *modelOutputName = NULL;
 ModelButton modelButton;
 
@@ -60,21 +61,28 @@ void model_group_dataset(GtkWidget *datasetGroup)
 void model_group_model(GtkWidget *modelGroup)
 {
 	int i;
-	GtkWidget *layerRow, *unitsRow, *useBiasRow, *epochsRow, 
-		*batchSizeRow, *earlyStoppingRow, *dropoutRow, 
-		*outputModelRow;
+	GtkWidget *layerTypeRow, *unitsRow, *useBiasRow, *epochsRow, 
+		*batchSizeRow, *earlyStopRow, *dropoutRow, *outputModelRow,
+		*layerNumberRow;
 
 	/* Output Model Name */
 	outputModelRow = __generic_entry_row_new("Output Model");
 	__generic_group_add(modelGroup, outputModelRow);
 	entry_row_signal(outputModelRow, on_output_model_texted);
 	
-	/* Layer */
-	layerRow = __generic_combo_row_new(
+	/* Layer Type */
+	layerTypeRow = __generic_combo_row_new(
 		"Layer Type", (const char *[]) {"LSTM", "GRU", NULL}, 0
 	);
-	__generic_group_add(modelGroup, layerRow);
-	combo_row_signal(layerRow, on_layer_type_selected);
+	__generic_group_add(modelGroup, layerTypeRow);
+	combo_row_signal(layerTypeRow, on_layer_type_selected);
+
+	/* Layer Number */
+	layerNumberRow = __generic_spin_row_new(
+		"Layer Number", 2, 2, MAX_MODEL_LAYER_NUMBER, 1, 0
+	);
+	__generic_group_add(modelGroup, layerNumberRow);
+	spin_row_signal(layerNumberRow, on_layer_number_changed);
 
 	/* Units */  
 	unitsRow = __generic_spin_row_new(
@@ -98,9 +106,9 @@ void model_group_model(GtkWidget *modelGroup)
 	combo_row_signal(batchSizeRow, on_batch_size_selected);
 
 	/* Early Stopping */ 
-	earlyStoppingRow = __generic_switch_row_new("Early Stopping");
-	__generic_group_add(modelGroup, earlyStoppingRow);
-	switch_row_signal(earlyStoppingRow, on_early_stopping_switched);
+	earlyStopRow = __generic_switch_row_new("Early Stop");
+	__generic_group_add(modelGroup, earlyStopRow);
+	switch_row_signal(earlyStopRow, on_early_stop_switched);
 
 	/* Recurrent Dropout */
 	dropoutRow = __generic_spin_row_new(

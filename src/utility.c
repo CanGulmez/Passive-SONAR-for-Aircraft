@@ -275,7 +275,7 @@ int get_model_datasets(void)
 void set_keras_script_params(ModelParams *modelParams)
 {
 	char dataset[BUFFER_SIZE];
-	char units[4], epochs[4], dropout[8];
+	char layerNumber[4], units[4], epochs[4], dropout[8];
 
 	/* Build the dataset path. */
 	strcpy(dataset, MODEL_DATASET_PATH);
@@ -292,9 +292,11 @@ void set_keras_script_params(ModelParams *modelParams)
 	modelParams->dropout = dropout;					/* recurrent dropout */
 	switch (modelLayerType)								/* layer type */
 	{
-		case MODEL_LAYER_TYPE_LSTM: modelParams->layer = "LSTM"; break;
-		case MODEL_LAYER_TYPE_GRU:  modelParams->layer = "GRU";  break;
+		case MODEL_LAYER_TYPE_LSTM: modelParams->layerType = "LSTM"; break;
+		case MODEL_LAYER_TYPE_GRU:  modelParams->layerType = "GRU";  break;
 	}
+	snprintf(layerNumber, 4, "%d", modelLayerNumber);
+	modelParams->layerNumber = layerNumber;
 	switch (modelBatchSize)								/* batch size */
 	{
 		case MODEL_BATCH_SIZE_16:	modelParams->batchSize = "16";  break;
@@ -304,10 +306,10 @@ void set_keras_script_params(ModelParams *modelParams)
 		case MODEL_BATCH_SIZE_256:	modelParams->batchSize = "256"; break;
 		case MODEL_BATCH_SIZE_512:	modelParams->batchSize = "512"; break;
 	}
-	switch (modelEarlyStopping) 						/* early stopping */
+	switch (modelEarlyStop) 						/* early stop */
 	{
-		case MODEL_EARLY_STOPPING_FALSE: modelParams->earlyStopping = "0"; break;
-		case MODEL_EARLY_STOPPING_TRUE:  modelParams->earlyStopping = "1"; break;
+		case MODEL_EARLY_STOP_FALSE: modelParams->earlyStop = "0"; break;
+		case MODEL_EARLY_STOP_TRUE:  modelParams->earlyStop = "1"; break;
 	}	
 }
 
@@ -352,10 +354,11 @@ int run_keras_script(const char *script)
 			execl(
 				INTERPRETER, 						/* python 3 interpreter */
 				INTERPRETER, scriptFile, modelParams.dataset,
-				modelParams.outputModel, modelParams.layer,
-				modelParams.units, modelParams.epochs, 
-				modelParams.batchSize, modelParams.earlyStopping, 
-				modelParams.dropout, NULL		/* command-line options */
+				modelParams.outputModel, modelParams.layerType,
+				modelParams.layerNumber, modelParams.units, 
+				modelParams.epochs, modelParams.batchSize, 
+				modelParams.earlyStop, modelParams.dropout, 
+				NULL									/* command-line options */
 			);	
 			_exit(EXIT_SUCCESS);					/* NEVER should come here */
 		
