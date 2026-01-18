@@ -22,7 +22,7 @@ COMMAND		:= "program $(FIRMWARE) verify reset exit"
 # Building and flashing the firmware
 firmware:
 	@echo "Building embedded firmware..."
-	@cd ./firmware/ex ; $(PIO) run ; cd ..
+	@cd ./firmware ; $(PIO) run ; cd ..
 	@echo " "
 	@echo "Uploading embedded firmware..."
 	@cd $(FRM_DIR) ; openocd -f $(INTERFACE) -f $(TARGET) -c $(COMMAND)

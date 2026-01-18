@@ -143,7 +143,7 @@ void taskIMUReading(void *pvParams)
 	printLog("I'm taskIMUReading() task!");
 
 	/* Confirm that IMU sensor is registered. */
-	whoami = __read_from_imu_reg(IMU_REG_WHO_AM_I);
+	whoami = __read_reg_from_imu(IMU_REG_WHO_AM_I);
 	if (whoami != 0x6A)
 	{
 		printLog("Failed to confirm the IMU sensor!");
