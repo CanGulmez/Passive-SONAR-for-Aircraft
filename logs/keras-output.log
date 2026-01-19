@@ -1,13 +1,13 @@
-2026-01-18 13:59:04.791997: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-18 13:59:06.297297: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-18 13:59:07.499494: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-2026-01-18 13:59:08.374370: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-2026-01-18 13:59:09.068890: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-2026-01-18 13:59:10.893183: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+2026-01-19 12:13:16.261183: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-01-19 12:13:16.267102: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-01-19 12:13:16.286619: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-01-19 12:13:16.319935: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-01-19 12:13:16.329882: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-01-19 12:13:16.354552: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
 To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2026-01-18 13:59:22.527607: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2026-01-19 12:13:18.751976: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
 
-Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 5 layer number, 16 units per layer, 20 epochs, and 16 batch size as 'passive_acoustic_survellience_model.keras' in the script directory.
+Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 5 layer number, 16 units per layer, 25 epochs, and 128 batch size as 'passive_acoustic_surveillance.keras' in the script directory.
 
 Found 420451 samples and 15 data in each sample.
 Raw data shape : (420451, 14)
@@ -15,7 +15,7 @@ Target shape   : (420451,)
 
 Splitted the raw data into train (210225 samples), validation (105112 samples) and test (105114 samples) groups.
 
-Model: "passive_acoustic_survellience_model"
+Model: "passive_acoustic_surveillance"
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
@@ -41,5 +41,4 @@ Model: "passive_acoustic_survellience_model"
 
 Fitting the model with common datasets:
 
-Epoch 1/20
-2026-01-18 13:59:39.554654: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+Epoch 1/25

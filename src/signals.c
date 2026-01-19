@@ -501,7 +501,11 @@ void on_model_button_clicked(GtkButton *button, gpointer data)
 
 void on_nav_button_clicked(GtkButton *button, gpointer data)
 {
-	
+	int i;
+	const char *label;
+
+	label = gtk_button_get_label(button);
+	print_log("%s(): '%s'", __func, label);	
 }
 
 void on_gps_button_clicked(GtkButton *button, gpointer data)

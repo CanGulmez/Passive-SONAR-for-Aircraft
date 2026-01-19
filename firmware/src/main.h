@@ -70,6 +70,76 @@
 /*****************************************************************************/
 /*****************************************************************************/
 
+/* Peripheral Handlers */
+
+extern RCC_OscInitTypeDef iosc;										/* Oscillator */
+extern RCC_ClkInitTypeDef iclk;										/* Clock */
+extern GPIO_InitTypeDef	igpio;										/* Generic IO */
+extern UART_HandleTypeDef huart4;									/* Debug Port */
+extern UART_HandleTypeDef huart5;									/* LoRa Module */
+extern UART_HandleTypeDef huart7;									/* GPS Module */
+extern SPI_HandleTypeDef hspi1;										/* IMU Sensor */
+extern SD_HandleTypeDef	hsdmmc1;										/* SD Card */
+extern DFSDM_Channel_HandleTypeDef hdfsdm1c[CHANNEL_COUNT];	/* Mic Sensor */
+extern DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT];	/* Mic Sensor */
+
+/*****************************************************************************/
+/*****************************************************************************/
+
+/* Data Structures and Enumerations */
+
+typedef struct PACKED _MicData 
+{
+	int32_t north[DATA_SIZE];
+	int32_t northEast[DATA_SIZE];
+	int32_t east[DATA_SIZE];
+	int32_t southEast[DATA_SIZE];
+	int32_t south[DATA_SIZE];
+	int32_t southWest[DATA_SIZE];
+	int32_t west[DATA_SIZE];
+	int32_t northWest[DATA_SIZE];
+} MicData;
+
+typedef struct PACKED _GPSData 
+{
+	uint8_t UTCTime[BUFFER_SIZE];
+	uint8_t latitude[BUFFER_SIZE];
+	uint8_t longitude[BUFFER_SIZE];
+	uint8_t quality[BUFFER_SIZE];
+	uint8_t numSat[BUFFER_SIZE];
+	uint8_t altitude[BUFFER_SIZE];
+	uint8_t status[BUFFER_SIZE];
+	uint8_t speed[BUFFER_SIZE];		/* knots */
+	uint8_t course[BUFFER_SIZE];		/* degrees */
+	uint8_t date[BUFFER_SIZE];
+} GPSData;
+
+typedef struct PACKED _IMUData 
+{
+	double accelX;		/* mg */
+	double accelY;		/* mg */
+	double accelZ;		/* mg */
+	double gyroX;		/* dps */
+	double gyroY;		/* dps */
+	double gyroZ;		/* dps */
+	double temp;		/* C */ 
+} IMUData;
+
+typedef struct PACKED _DataPackage 
+{
+	MicData MicData;
+	GPSData GPSData;
+	IMUData IMUData;
+} DataPackage;
+
+extern MicData micData;
+extern GPSData gpsData;
+extern IMUData imuData;
+extern DataPackage dataPackage;
+
+/*****************************************************************************/
+/*****************************************************************************/
+
 /**
  * Transmit the logs from MCU to PC over serial UART line.
  */
@@ -266,76 +336,6 @@
 	handle[i].Init.FilterParam.Oversampling = oversampling;							\
 	handle[i].Init.FilterParam.IntOversampling = 1;										\
 }
-
-/*****************************************************************************/
-/*****************************************************************************/
-
-/* Data Structures and Enumerations */
-
-typedef struct PACKED _MicData 
-{
-	int32_t north[DATA_SIZE];
-	int32_t northEast[DATA_SIZE];
-	int32_t east[DATA_SIZE];
-	int32_t southEast[DATA_SIZE];
-	int32_t south[DATA_SIZE];
-	int32_t southWest[DATA_SIZE];
-	int32_t west[DATA_SIZE];
-	int32_t northWest[DATA_SIZE];
-} MicData;
-
-typedef struct PACKED _GPSData 
-{
-	uint8_t UTCTime[BUFFER_SIZE];
-	uint8_t latitude[BUFFER_SIZE];
-	uint8_t longitude[BUFFER_SIZE];
-	uint8_t quality[BUFFER_SIZE];
-	uint8_t numSat[BUFFER_SIZE];
-	uint8_t altitude[BUFFER_SIZE];
-	uint8_t status[BUFFER_SIZE];
-	uint8_t speed[BUFFER_SIZE];		/* knots */
-	uint8_t course[BUFFER_SIZE];		/* degrees */
-	uint8_t date[BUFFER_SIZE];
-} GPSData;
-
-typedef struct PACKED _IMUData 
-{
-	double accelX;		/* mg */
-	double accelY;		/* mg */
-	double accelZ;		/* mg */
-	double gyroX;		/* dps */
-	double gyroY;		/* dps */
-	double gyroZ;		/* dps */
-	double temp;		/* C */ 
-} IMUData;
-
-typedef struct PACKED _DataPackage 
-{
-	MicData MicData;
-	GPSData GPSData;
-	IMUData IMUData;
-} DataPackage;
-
-/*****************************************************************************/
-/*****************************************************************************/
-
-/* Global and Shared Variables */
-
-extern MicData micData;
-extern GPSData gpsData;
-extern IMUData imuData;
-extern DataPackage dataPackage;
-
-extern RCC_OscInitTypeDef iosc;										/* Oscillator */
-extern RCC_ClkInitTypeDef iclk;										/* Clock */
-extern GPIO_InitTypeDef	igpio;										/* Generic IO */
-extern UART_HandleTypeDef huart4;									/* Debug Port */
-extern UART_HandleTypeDef huart5;									/* LoRa Module */
-extern UART_HandleTypeDef huart7;									/* GPS Module */
-extern SPI_HandleTypeDef hspi1;										/* IMU Sensor */
-extern SD_HandleTypeDef	hsdmmc1;										/* SD Card */
-extern DFSDM_Channel_HandleTypeDef hdfsdm1c[CHANNEL_COUNT];	/* Mic Sensor */
-extern DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT];	/* Mic Sensor */
 
 /*****************************************************************************/
 /*****************************************************************************/

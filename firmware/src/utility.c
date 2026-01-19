@@ -17,7 +17,40 @@
 
 #include "main.h"
 
-/* Global and shared variables */
+/**
+ * Parse the NMEA sentences coming from GPS module.
+ */
+void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
+{
+	int length;
+	uint8_t *sentence, *token;
+	
+	/* Tokenize the each sentence in buffer. */
+	sentence = strtok(buffer, "\n");
+	while (sentence != NULL)
+	{
+		if (strncmp(sentence, "$GPGGA", 6) == 0)
+		{
+			token = strchr(sentence, sentence[7]);
+
+			/* Get the UTC time (123519 --> 12:35:19). */
+			strncpy(gpsData->UTCTime, token, 6);
+
+			/* Get the latitude (4807.038 --> 48^ 07.038' N). */
+			
+		}
+		else if (strncmp(sentence, "$GPRCM", 6) == 0)
+		{
+			token = strchr(sentence, sentence[7]);
+		}
+		else
+		{
+			continue;
+		}
+		/* Proceed to the next sentence. */
+		strtok(NULL, "\n");
+	}
+}
 
 /**
  * Parse the NMEA sentences into sentences.
@@ -106,14 +139,6 @@
 // 		sentence = strtok(NULL, "\n");
 // 	}
 // }
-
-/**
- * Parse the NMEA sentences coming from GPS module.
- */
-void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
-{
-	
-}
 
 /**
  * Write the data to IMU sensor registers.

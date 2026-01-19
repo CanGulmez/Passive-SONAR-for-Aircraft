@@ -473,6 +473,9 @@ extern void navigation(GtkBox *, gpointer);
 extern GtkWidget *navigation_accel_group(gpointer);
 extern GtkWidget *navigation_gyro_group(gpointer);
 extern GtkWidget *navigation_magnet_group(gpointer);
+extern void nav_plot_area_grid(cairo_t *, int, int);
+extern void nav_plot_area_axes(cairo_t *, int, int);
+extern void nav_plot_area_labels(cairo_t *, int, int);
 extern void nav_plot_area(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 
 /* GPS map function prototypes */

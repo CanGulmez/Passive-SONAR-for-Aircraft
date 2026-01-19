@@ -111,7 +111,7 @@ void nav_plot_area_device(cairo_t *cr, int width, int height)
 void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 								NavGyro navGyro)
 {
-		
+	
 }
 
 void nav_plot_area_accel(cairo_t *cr, int width, int height,
