@@ -93,8 +93,8 @@ void microphone_row_parity_bit(GtkWidget *propertyGroup)
 	GtkWidget *parityBitRow;
 
 	parityBitRow = __generic_combo_row_new(
-		"Parity Bit", (const char *[]) {"None (N)", "Even (E)", "Odd (O)", 
-		"Mark (M)", "Space (S)", NULL}, 0
+		"Parity Bit", (const char *[]) {"None", "Even", "Odd", 
+		"Mark", "Space", NULL}, 0
 	);
 	__generic_group_add(propertyGroup, parityBitRow);
 	combo_row_signal(parityBitRow, on_parity_bit_selected);

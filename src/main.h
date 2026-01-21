@@ -117,7 +117,8 @@ extern "C" {
 
 #define NAV_PLOT_MARGIN						0		/* pixel */
 #define NAV_PLOT_GRID						20		/* pixel */
-#define NAV_PLOT_INDICE						100	/* pixel */
+#define NAV_PLOT_CAXIS						250	/* pixel */
+#define NAV_PLOT_VAXIS						300	/* pixel */
 
 #define TIMEOUT_DEVICE_READ				1000	/* ms */
 #define TIMEOUT_PLOT_REDRAW				1000	/* ms */
@@ -476,6 +477,8 @@ extern GtkWidget *navigation_magnet_group(gpointer);
 extern void nav_plot_area_grid(cairo_t *, int, int);
 extern void nav_plot_area_axes(cairo_t *, int, int);
 extern void nav_plot_area_labels(cairo_t *, int, int);
+extern void nav_plot_area_accel(cairo_t *, int, int, NavAccel);
+extern void nav_plot_area_gyro(cairo_t *, int, int, NavGyro);
 extern void nav_plot_area(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 
 /* GPS map function prototypes */

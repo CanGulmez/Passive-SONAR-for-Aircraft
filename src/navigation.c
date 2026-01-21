@@ -22,7 +22,7 @@ GtkWidget *navigation_accel_group(gpointer data)
 	GtkWidget *accelGroup, *status, *output;
 
 	accelGroup = __generic_group_new(
-		"Acceloremeter", "Show the acceloremeter status and data"
+		"Accelerometer", "Show the accelerometer status and data"
 	);
 	status = __generic_action_row_new("Status", "Not Running");
 	__generic_group_add(accelGroup, status);
@@ -62,10 +62,23 @@ GtkWidget *navigation_magnet_group(gpointer data)
 	return magnetGroup;
 }
 
+GtkWidget *navigation_temp_group(gpointer data)
+{
+	GtkWidget *tempGroup, *output;
+
+	tempGroup = __generic_group_new(
+		"Temperature", "Show the temperature data"
+	);
+	output = __generic_action_row_new("Output", "Null");
+	__generic_group_add(tempGroup, output);
+
+	return tempGroup;
+}
+
 void navigation(GtkBox *imuBox, gpointer data)
 {
 	GtkWidget *leftBox, *separator, *rightBox;
-	GtkWidget *accelGroup, *gyroGroup, *magnetGroup;	
+	GtkWidget *accelGroup, *gyroGroup, *magnetGroup, *tempGroup;	
 	GtkWidget *navPlotArea;
 	GtkWidget *navGroup, *navRow, *propertyBox;
 	GtkWidget *scrolledWin, *startBtn;
@@ -102,6 +115,7 @@ void navigation(GtkBox *imuBox, gpointer data)
 	accelGroup = navigation_accel_group(NULL);
 	gyroGroup = navigation_gyro_group(NULL);
 	magnetGroup = navigation_magnet_group(NULL);
+	tempGroup = navigation_temp_group(NULL);
 
 	/* Put the required buttons. */
 	startBtn = __generic_button_new("Start", "suggested-action");
@@ -121,6 +135,7 @@ void navigation(GtkBox *imuBox, gpointer data)
 	gtk_box_append(GTK_BOX(propertyBox), accelGroup);
 	gtk_box_append(GTK_BOX(propertyBox), gyroGroup);
 	gtk_box_append(GTK_BOX(propertyBox), magnetGroup);
+	gtk_box_append(GTK_BOX(propertyBox), tempGroup);
 
 	gtk_box_append(GTK_BOX(leftBox), scrolledWin);
 	gtk_box_append(GTK_BOX(leftBox), startBtn);
