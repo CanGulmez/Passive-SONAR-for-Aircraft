@@ -83,7 +83,6 @@ extern "C" {
 
 #define MAX_COMM_CHANNEL					3
 #define MAX_BUFFER_SIZE						( BUFFER_SIZE * 200 )
-#define MAX_ANALYSIS							11
 #define MAX_DEVICE_NODE						64
 #define MAX_BALLISTIC_LAYER				10
 #define MAX_LAYER_THICKNESS				200
@@ -286,6 +285,25 @@ typedef struct __packed _MicSensorData
 	int8_t data[DATA_SIZE];
 } MicSensorData;
 
+typedef struct _MicSignal
+{
+	const char *max;
+	const char *min;
+	const char *mean;
+	const char *stddev;
+	const char *energy;
+	const char *rms;
+	const char *power;
+	const char *crest;
+	const char *skewness;
+	const char *kurtosis;
+	const char *variance;
+	const char *doa;
+	const char *distance;
+	const char *coordinate;
+	const char *target;
+} MicSignal;
+
 /* AI model enumerations and structures */
 
 typedef enum _ModelLayerType
@@ -332,6 +350,7 @@ typedef struct _ModelParams
 } ModelParams;
 
 /* GPS map enumerations and structures */
+
 typedef struct _GPSData
 {
 	const char *UTCTime;
@@ -392,8 +411,7 @@ extern char *micDeviceNodes[MAX_DEVICE_NODE];
 extern GtkWidget *micUARTGroup;
 extern GtkWidget *micUSBGroup;
 extern GtkWidget *micWiFiGroup;
-extern GtkWidget *micAnalysisLabels[MAX_ANALYSIS];
-extern GtkWidget *micAnalysisRows[MAX_ANALYSIS];
+extern GtkWidget *analysisGroup;
 extern MicChannel micChannel;
 extern char *micDeviceNode;
 extern MicBaudRate micBaudRate;
@@ -405,6 +423,7 @@ extern guint micTimeout;
 extern guint recordTimeout;
 extern MicButton micButton;
 extern MicSensorData micSensorData;
+extern MicSignal micSignal;
 
 /* AI model shared widgets and variables */
 
@@ -428,6 +447,7 @@ extern ModelButton modelButton;
 /* GPS map shared widgets and variables */
 
 extern ShumateMarkerLayer *gpsMarkerLayer;
+extern ShumateMap *gpsMap;
 extern GPSData gpsData;
 
 /* Nagivation shared widgets and variables */
@@ -451,6 +471,7 @@ extern void microphone_row_flow_control(GtkWidget *);
 extern void microphone_group_UART(gpointer);
 extern void microphone_group_USB(gpointer);
 extern void microphone_group_WiFi(gpointer);
+void microphone_signal_analysis(GtkWidget *, MicSignal *);
 extern void mic_plot_car(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_car_frame(cairo_t *, int, int);	
 extern void mic_plot_car_grid(cairo_t *, int, int);	
@@ -516,7 +537,7 @@ extern char *get_keras_script_logs(const char *);
 extern gboolean timeout_mic_device_node(gpointer);
 extern gboolean timeout_model_keras_log(gpointer);
 extern gboolean timeout_database_record(gpointer);
-extern gboolean timeout_mic_plot(gpointer);
+extern gboolean timeout_mic_plot_car(gpointer);
 
 /* Generic component function prototypes */
 

@@ -20,6 +20,7 @@
 /* GPS map shared widgets and variables */
 
 ShumateMarkerLayer *gpsMarkerLayer = {0};
+ShumateMap *gpsMap = {0};
 GPSData gpsData = {0};
 
 /**
@@ -55,26 +56,25 @@ void gps_map_area(GtkBox *rightBox, gpointer data)
 	ShumateViewport *viewport;
 	ShumateMapSourceRegistry *registry;
 	ShumateMapSource *mapSource;
-	ShumateMap *map;
 	ShumateLocation *location;
 	
 	simpleMap = shumate_simple_map_new();
-	map = shumate_simple_map_get_map(simpleMap);
+	gpsMap = shumate_simple_map_get_map(simpleMap);
 	viewport = shumate_simple_map_get_viewport(simpleMap);
 	
 	registry = shumate_map_source_registry_new_with_defaults();
 	mapSource = shumate_map_source_registry_get_by_id(registry,
 		SHUMATE_MAP_SOURCE_OSM_MAPNIK);
 	
-	shumate_map_center_on(map, 41.008, 28.9784);
+	shumate_map_center_on(gpsMap, 41.008, 28.9784);
 	shumate_simple_map_set_map_source(simpleMap, mapSource);
 	
 	shumate_viewport_set_reference_map_source(viewport, mapSource);
-	shumate_viewport_set_zoom_level(viewport, 10.0);
+	shumate_viewport_set_zoom_level(viewport, 12.0);
 
 	/* Create marker and path layers. */
 	gpsMarkerLayer = shumate_marker_layer_new(viewport);
-	shumate_map_add_layer(map, SHUMATE_LAYER(gpsMarkerLayer));
+	shumate_map_add_layer(gpsMap, SHUMATE_LAYER(gpsMarkerLayer));
 
 	/* Set the map area expandable as possible. */
 	gtk_widget_set_size_request(GTK_WIDGET(simpleMap), 

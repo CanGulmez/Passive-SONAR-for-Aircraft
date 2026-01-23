@@ -352,11 +352,6 @@ void on_output_model_texted(GObject *gobject, GParamSpec *pspec, gpointer data)
 /*****************************************************************************/
 /*****************************************************************************/
 
-
-
-/*****************************************************************************/
-/*****************************************************************************/
-
 void on_mic_button_clicked(GtkButton *button, gpointer data)
 {
 	int i;
@@ -517,14 +512,10 @@ void on_gps_button_clicked(GtkButton *button, gpointer data)
 	print_log("%s(): '%s'", __func, label);
 
 	/* Put the markers into map area. */
+	shumate_map_center_on(gpsMap, 41.008, 28.9784);
 	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9784);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9884);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9984);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0000);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0100);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0200);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0300);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0400);
+
+	shumate_map_center_on(gpsMap, 41.008, 29.0500);
 	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0500);
 }
  

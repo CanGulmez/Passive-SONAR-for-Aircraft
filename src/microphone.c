@@ -23,9 +23,7 @@ char *micDeviceNodes[MAX_DEVICE_NODE];
 GtkWidget *micUARTGroup;
 GtkWidget *micUSBGroup;
 GtkWidget *micWiFiGroup;
-GtkWidget *micAnalysisLabels[MAX_ANALYSIS];
-GtkWidget *micAnalysisRows[MAX_ANALYSIS];	/* max, min, mean, stddev, energy, RMS, 
-															power, variance, arrival, coor */
+GtkWidget *analysisGroup;
 MicChannel micChannel = MIC_CHANNEL_UART;
 char *micDeviceNode = NULL;
 MicBaudRate micBaudRate = MIC_BAUD_RATE_115200;
@@ -37,7 +35,10 @@ guint micTimeout = 0;
 guint recordTimeout = 0;
 MicButton micButton;
 
-MicSensorData micSensorData;
+MicSensorData micSensorData = {0};
+MicSignal micSignal = {"Null", "Null", "Null", "Null", "Null", 
+	"Null", "Null", "Null", "Null", "Null", "Null", "Null", 
+	"Null", "Null", "Null"};
 
 /**
  * Initialize the device node row.
@@ -176,6 +177,48 @@ void microphone_group_WiFi(gpointer data)
 }
 
 /**
+ * Update the signal analysis group.
+ */
+void microphone_signal_analysis(GtkWidget *analysisGroup, MicSignal *micSignal)
+{
+	GtkWidget *maxRow, *minRow, *meanRow, *stddevRow, *energyRow, *rmsRow,
+				 *powerRow, *crestRow, *skewnessRow, *kurtosisRow, *varianceRow,
+				 *doaRow, *distanceRow, *coordinateRow, *targetRow;
+
+	maxRow = __generic_action_row_new("Maximum", micSignal->max);
+	minRow = __generic_action_row_new("Minimum", micSignal->min);
+	meanRow = __generic_action_row_new("Mean", micSignal->mean);
+	stddevRow = __generic_action_row_new("Standard Deviation", micSignal->stddev);
+	energyRow = __generic_action_row_new("Energy", micSignal->energy);
+	rmsRow = __generic_action_row_new("RMS", micSignal->rms);
+	powerRow = __generic_action_row_new("Power (dB)", micSignal->power);
+	crestRow = __generic_action_row_new("Crest Factor", micSignal->crest);
+	skewnessRow = __generic_action_row_new("Skewness", micSignal->skewness);
+	kurtosisRow = __generic_action_row_new("Kurtosis", micSignal->kurtosis);
+	varianceRow = __generic_action_row_new("Variance", micSignal->variance);
+	doaRow = __generic_action_row_new("Direction of Angle", micSignal->doa);
+	distanceRow = __generic_action_row_new("Distance (m)", micSignal->distance);
+	coordinateRow = __generic_action_row_new("Coordinate", micSignal->coordinate);
+	targetRow = __generic_action_row_new("Estimated Target", micSignal->target);
+
+	__generic_group_add(analysisGroup, maxRow);
+	__generic_group_add(analysisGroup, minRow);
+	__generic_group_add(analysisGroup, meanRow);
+	__generic_group_add(analysisGroup, stddevRow);
+	__generic_group_add(analysisGroup, energyRow);
+	__generic_group_add(analysisGroup, rmsRow);
+	__generic_group_add(analysisGroup, powerRow);
+	__generic_group_add(analysisGroup, crestRow);
+	__generic_group_add(analysisGroup, skewnessRow);
+	__generic_group_add(analysisGroup, kurtosisRow);
+	__generic_group_add(analysisGroup, varianceRow);
+	__generic_group_add(analysisGroup, doaRow);
+	__generic_group_add(analysisGroup, distanceRow);
+	__generic_group_add(analysisGroup, coordinateRow);
+	__generic_group_add(analysisGroup, targetRow);
+}
+
+/**
  * Microphone Data Page
  */
 void microphone(GtkBox *micBox, gpointer data)
@@ -241,17 +284,8 @@ void microphone(GtkBox *micBox, gpointer data)
 	analysisGroup = __generic_group_new("Signal Analysis",
 		"Display the static signal analysis results");
 
-	const char *analysisNames[MAX_ANALYSIS] = {
-		"Maximum", "Minimum", "Mean", "Standard Deviation", "Energy", 
-		"RMS", "Power (dB)", "Direction of Angle", "Distance (m)", 
-		"Coordinate", "Estimated Target"
-	};
-	for (i = 0; i < MAX_ANALYSIS; i++) 
-	{
-		micAnalysisRows[i] = __generic_action_row_new(analysisNames[i], "Null");
-		__generic_group_add(analysisGroup, micAnalysisRows[i]);	
-	}
-
+	microphone_signal_analysis(analysisGroup, &micSignal);
+	
 	/* Put the buttons to manage the upper and lower plots. */
 	startBtn = __generic_button_new("Start", "suggested-action");
 	stopBtn = __generic_button_new("Stop", "destructive-action");
@@ -272,7 +306,7 @@ void microphone(GtkBox *micBox, gpointer data)
 	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(polarPlot),
 		mic_plot_polar, NULL, NULL);
 		
-	g_timeout_add(TIMEOUT_PLOT_REDRAW, timeout_mic_plot, carPlot);
+	g_timeout_add(TIMEOUT_PLOT_REDRAW, timeout_mic_plot_car, carPlot);
 	// g_timeout_add(PLOT_REDRAW_TIMEOUT, page_mic_data_plot_timeout, polarPlot);
 
 	gtk_widget_set_hexpand(carPlot, TRUE);

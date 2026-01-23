@@ -81,17 +81,17 @@ void nav_plot_area_axes(cairo_t *cr, int width, int height)
 
 	/* Draw the cross (X to -X) axis. */
 	cairo_move_to(cr, center_x, center_y);
-	cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, center_y - 
-		NAV_PLOT_CAXIS);
-	cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, center_y + 
-		NAV_PLOT_CAXIS);
+	cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
+							center_y - NAV_PLOT_CAXIS);
+	cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
+							center_y + NAV_PLOT_CAXIS);
 
 	/* Draw the cross (Y to -Y) axis. */
 	cairo_move_to(cr, center_x, center_y);
-	cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, center_y - 
-		NAV_PLOT_CAXIS);
-	cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, center_y + 
-		NAV_PLOT_CAXIS);
+	cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
+							center_y - NAV_PLOT_CAXIS);
+	cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
+							center_y + NAV_PLOT_CAXIS);
 	cairo_stroke(cr);
 }
 
@@ -114,20 +114,20 @@ void nav_plot_area_labels(cairo_t *cr, int width, int height)
 	cairo_move_to(cr, center_x - 5, center_y + NAV_PLOT_VAXIS + 20);
 	cairo_show_text(cr, "-Z");
 	cairo_move_to(cr, center_x + NAV_PLOT_CAXIS, 
-		center_y - NAV_PLOT_CAXIS - 5);
+							center_y - NAV_PLOT_CAXIS - 5);
 
 	/* Put the X and -X labels. */
 	cairo_show_text(cr, "X");
 	cairo_move_to(cr, center_x - NAV_PLOT_CAXIS - 20, 
-		center_y + NAV_PLOT_CAXIS + 20);
+							center_y + NAV_PLOT_CAXIS + 20);
 	cairo_show_text(cr, "-X");
 	cairo_move_to(cr, center_x - NAV_PLOT_CAXIS - 10, 
-		center_y - NAV_PLOT_CAXIS - 5);
+							center_y - NAV_PLOT_CAXIS - 5);
 
 	/* Put the Y and -Y labels. */
 	cairo_show_text(cr, "Y");
 	cairo_move_to(cr, center_x + NAV_PLOT_CAXIS + 5, 
-		center_y + NAV_PLOT_CAXIS + 20);
+							center_y + NAV_PLOT_CAXIS + 20);
 	cairo_show_text(cr, "-Y");	
 }
 
@@ -148,67 +148,69 @@ void nav_plot_area_accel(cairo_t *cr, int width, int height,
 		case NAV_ACCEL_X_PLUS:
 			/* Draw the arrow from center to +X axis. */
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_move_to(cr, center_x + NAV_PLOT_CAXIS - 15, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS + 15);
+									center_y - NAV_PLOT_CAXIS + 15);
 			break;
 
 		case NAV_ACCEL_Y_PLUS:
 			/* Draw the arrow from center to +Y axis. */
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS + 15);
+									center_y - NAV_PLOT_CAXIS + 15);
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS + 15, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			break;
 
 		case NAV_ACCEL_Z_PLUS:
 			/* Draw the arrow from center to +Z axis. */
 			cairo_line_to(cr, center_x, center_y - NAV_PLOT_VAXIS);
-			cairo_move_to(cr, center_x - 10, center_y - 240);
+			cairo_move_to(cr, center_x - 10, 
+									center_y - NAV_PLOT_VAXIS + 10);
 			cairo_line_to(cr, center_x, center_y - NAV_PLOT_VAXIS);
-			cairo_line_to(cr, center_x + 10, center_y - 240);
+			cairo_line_to(cr, center_x + 10, 
+									center_y - NAV_PLOT_VAXIS + 10);
 			break;
 
 		case NAV_ACCEL_X_MINUS:
 			/* Draw the arrow from center to -X axis. */
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);	
+									center_y + NAV_PLOT_CAXIS);	
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS - 15);
+									center_y + NAV_PLOT_CAXIS - 15);
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS + 15, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 			break;
 
 		case NAV_ACCEL_Y_MINUS:
 			/* Draw the arrow from center to -X axis. */
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);	
+									center_y + NAV_PLOT_CAXIS);	
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS - 15);
+									center_y + NAV_PLOT_CAXIS - 15);
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x - NAV_PLOT_CAXIS + 15, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 			break;
 
 		case NAV_ACCEL_Z_MINUS:
 			/* Draw the arrow from center to -Z axis. */
 			cairo_line_to(cr, center_x, center_y + NAV_PLOT_VAXIS);
 			cairo_move_to(cr, center_x - 10, 
-				center_y + NAV_PLOT_VAXIS - 10);
+									center_y + NAV_PLOT_VAXIS - 10);
 			cairo_line_to(cr, center_x, center_y + NAV_PLOT_VAXIS);
 			cairo_line_to(cr, center_x + 10, 
-				center_y + NAV_PLOT_VAXIS - 10);
+									center_y + NAV_PLOT_VAXIS - 10);
 			break;
 	}
 	cairo_stroke(cr);
@@ -232,9 +234,9 @@ void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 		case NAV_GYRO_X_PLUS:
 			/* Draw the rotation from -X to +X axis. */
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 
 			/* Draw the elliptical circle toward to left side. */
 			break;
@@ -242,9 +244,9 @@ void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 		case NAV_GYRO_X_MINUS:
 			/* Draw the rotation from -X to +X axis. */
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 
 			/* Draw the elliptical circle toward to right side. */
 			break;
@@ -252,9 +254,9 @@ void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 		case NAV_GYRO_Y_PLUS:
 			/* Draw the rotation from -Y to +Y axis. */
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 
 			/* Draw the elliptical circle toward to up side. */
 			break;
@@ -262,9 +264,9 @@ void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 		case NAV_GYRO_Y_MINUS:
 			/* Draw the rotation from -Y to +Y axis. */
 			cairo_move_to(cr, center_x - NAV_PLOT_CAXIS, 
-				center_y - NAV_PLOT_CAXIS);
+									center_y - NAV_PLOT_CAXIS);
 			cairo_line_to(cr, center_x + NAV_PLOT_CAXIS, 
-				center_y + NAV_PLOT_CAXIS);
+									center_y + NAV_PLOT_CAXIS);
 
 			/* Draw the elliptical circle toward to down side. */
 			break;
@@ -275,17 +277,17 @@ void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 			cairo_line_to(cr, center_x, center_y + NAV_PLOT_VAXIS);
 
 			/* Draw the elliptical circle toward to left side. */
-			cairo_move_to(cr, center_x + 30 - 10,
-				center_y - NAV_PLOT_VAXIS + 20 + 10);
-			cairo_line_to(cr, center_x + 30,
-				center_y - NAV_PLOT_VAXIS + 20);
-			cairo_line_to(cr, center_x + 30 + 10,
-				center_y - NAV_PLOT_VAXIS + 20 + 10);
-
 			cairo_move_to(cr, center_x + 30, 
-				center_y - NAV_PLOT_VAXIS + 20);
+									center_y - NAV_PLOT_VAXIS + 20);
 			cairo_arc(cr, center_x, center_y - NAV_PLOT_VAXIS + 20,
 				30, 0, -M_PI);
+
+			cairo_move_to(cr, center_x + 30 - 10,
+									center_y - NAV_PLOT_VAXIS + 20 + 10);
+			cairo_line_to(cr, center_x + 30,
+									center_y - NAV_PLOT_VAXIS + 20);
+			cairo_line_to(cr, center_x + 30 + 10,
+									center_y - NAV_PLOT_VAXIS + 20 + 10);
 			break;
 
 		case NAV_GYRO_Z_MINUS:
@@ -294,6 +296,18 @@ void nav_plot_area_gyro(cairo_t *cr, int width, int height,
 			cairo_line_to(cr, center_x, center_y + NAV_PLOT_VAXIS);
 
 			/* Draw the elliptical circle toward to right side. */
+			cairo_move_to(cr, center_x + 30, 
+									center_y - NAV_PLOT_VAXIS + 20);
+			cairo_arc(cr, center_x, center_y - NAV_PLOT_VAXIS + 20,
+						 30, 0, -M_PI);
+
+			cairo_move_to(cr, center_x - 30 - 10,
+									center_y - NAV_PLOT_VAXIS + 20 + 10);
+			cairo_line_to(cr, center_x - 30,
+									center_y - NAV_PLOT_VAXIS + 20);
+			cairo_line_to(cr, center_x - 30 + 10,
+							  		center_y - NAV_PLOT_VAXIS + 20 + 10);
+
 			break;
 	}
 	cairo_stroke(cr);
@@ -312,6 +326,6 @@ void nav_plot_area(GtkDrawingArea *area, cairo_t *cr, int width,
 	nav_plot_area_labels(cr, width, height);	/* draw labels */
 
 	nav_plot_area_accel(cr, width, height, NAV_ACCEL_X_PLUS);
-	nav_plot_area_gyro(cr, width, height, NAV_GYRO_Z_PLUS);
+	nav_plot_area_gyro(cr, width, height, NAV_GYRO_Z_MINUS);
 }
  

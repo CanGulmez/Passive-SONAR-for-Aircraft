@@ -10,7 +10,7 @@ CONFIG		:= $(shell pkg-config --cflags --libs $(DEPENDS))
 PROGRAM		:= SONAR
 
 FIRMWARE		:= firmware.elf
-FRM_DIR		:= ./firmware/ex/.pio/build/genericSTM32F446RE
+FRM_DIR		:= ./firmware/.pio/build/genericSTM32H750VB
 
 OPENOCD		:= openocd 
 INTERFACE	:= interface/stlink.cfg

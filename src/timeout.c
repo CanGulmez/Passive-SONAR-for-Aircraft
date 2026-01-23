@@ -30,7 +30,7 @@ gboolean timeout_mic_device_node(gpointer data)
 /**
  * Redraw the plot areas.
  */
-gboolean timeout_mic_plot(gpointer data)
+gboolean timeout_mic_plot_car(gpointer data)
 {
 	GtkWidget *carPlot;
 	
