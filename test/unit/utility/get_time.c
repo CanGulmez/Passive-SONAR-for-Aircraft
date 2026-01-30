@@ -15,7 +15,46 @@
  ******************************************************************************
  */
 
-#include "../../../src/main.h"
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <time.h>
+#include <string.h>
+#include <errno.h>
+#include <check.h>
+
+#define __file									__FILE__
+#define __line									__LINE__
+#define __func									__func__
+
+#define syscall_error()																		\
+{                                      												\
+	fprintf(stderr, "\n*** %s (%s::%d in %s()) ***\n", strerror(errno),		\
+			  __file, __line, __func);		   	 										\
+	exit(EXIT_FAILURE);	/* exit with failure status */							\
+} 
+
+/**
+ * Get the current time to show with signal handlers.
+ */
+char *get_time(const char* format)
+{
+	static char buffer[64];
+	time_t t;
+	size_t s;
+	struct tm *tm;
+	
+	t = time(NULL);			/* get the time in seconds */
+	tm = localtime(&t);		/* convert it into broken-down */
+	if (tm == NULL)
+		syscall_error();
+
+	s = strftime(buffer, 64, (format != NULL) ? format : "%c", tm);
+
+	return buffer;
+}
 
 START_TEST(get_time_default_format)
 {
