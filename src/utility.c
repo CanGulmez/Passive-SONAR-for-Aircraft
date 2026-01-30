@@ -42,7 +42,7 @@ void logging(const char* buffer, size_t size)
 /**
  * Get the current time to show with signal handlers.
  */
-char *get_current_time(const char* format)
+char *get_time(const char* format)
 {
 	static char buffer[64];
 	time_t t;

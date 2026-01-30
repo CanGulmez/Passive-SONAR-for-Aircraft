@@ -252,9 +252,9 @@
 #define IMU_REG_OUT_MAG_RAW_Y_H			0x69
 #define IMU_REG_OUT_MAG_RAW_Z_L			0x6A
 #define IMU_REG_OUT_MAG_RAW_Z_H			0x6B
-#define X_OFS_USR								0x73
-#define Y_OFS_USR								0x74
-#define Z_OFS_USR								0x75
+#define IMU_REG_X_OFS_USR					0x73
+#define IMU_REG_Y_OFS_USR					0x74
+#define IMU_REG_Z_OFS_USR					0x75
 
 /* Microhone Sensor Definitions */
 

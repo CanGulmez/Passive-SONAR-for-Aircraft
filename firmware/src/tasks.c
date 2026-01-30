@@ -53,7 +53,6 @@ void taskMicReadingNorth(void *pvParams)
 			{
 				printError(status, "Failed to poll DFSDM conversion!");
 			}
-
 			/* Get the digital MEMS mic data and then shift it. */
 			samples[i] = HAL_DFSDM_FilterGetRegularValue(&hdfsdm1f[0], 0);
 			samples[i] = samples[i] >> 8;	/* 24-bit data */
@@ -112,11 +111,11 @@ void taskMicReadingWest(void *pvParams)
 void taskGPSReading(void *pvParams)
 {
 	int i;
-	uint8_t buffer[DATA_SIZE];
+	uint8_t buffer[DATA_SIZE] = {0};
 	HAL_StatusTypeDef status;
 
 	printLog("I'm taskGPSReading() task!");
-
+	
 	for (;;)
 	{
 		/* Recieve the GPS sentences over serial line. */
@@ -126,8 +125,7 @@ void taskGPSReading(void *pvParams)
 		{
 			printError(status, "Failed to receive GPS sentences!\n");
 		}
-
-		/* Parse the sentences. */
+		/* Parse the NMEA sentences. */
 		__parse_nmea_sentences(buffer, &gpsData);
 	}	
 	vTaskDelete(NULL);
@@ -154,10 +152,9 @@ void taskIMUReading(void *pvParams)
 	__write_to_imu_reg(IMU_REG_CTRL1_XL, 0x6C);	/* 416Hz, 16g */
 	__write_to_imu_reg(IMU_REG_CTRL2_G, 0x6C);	/* 416Hz, 2000dps */
 	__write_to_imu_reg(IMU_REG_CTRL3_C, 0x44);	/* BDU and IF_INC */
-
+	
 	printLog("Configured the accelerometer (416Hz, 16g) "
 				"and gyroscope (416Hz, 2000dps).");
-
 	for (;;)
 	{
 		/* Read the acceleromenter, gyroscope and temperature. */
@@ -186,22 +183,8 @@ void taskSDCardWriting(void *pvParams)
 	{
 		printError(status, "Failed to initialize SD card!");
 	}
-
 	/* Get the SD card information. */
-	HAL_SD_GetCardInfo(&hsdmmc1, &info);
-
-	printLog("SD Card info:");
-	printLog("	Capacity		: %lu sectors", info.BlockNbr);
-	printLog("	Sector Size	: %lu bytes", info.BlockSize);
-	printLog("	Totol Size	: %lu MB",
-		((info.BlockNbr * info.BlockSize) / (1024 * 1024)));
-	printLog("	Card Type	: %s",
-		(info.CardType == CARD_SDSC) ? "SDSC" :
-		(info.CardType == CARD_SDHC_SDXC) ? "SDHC/SDXC" :
-		"UNKNOWN");
-	printLog("	Speed			: %.2f Mo/s",
-		(info.CardSpeed == CARD_NORMAL_SPEED) ? 12.5 :
-		(info.CardSpeed == CARD_HIGH_SPEED) ? 25.0 : 50.0);
+	__get_sd_card_info();
 
 	for (;;)
 	{
@@ -213,7 +196,7 @@ void taskSDCardWriting(void *pvParams)
 			&hsdmmc1,			/* SD card interface */
 			buffer,				/* data that will be written */
 			csector,				/* current sector number */
-			1,						/* just 1 sector at each op */
+			1,						/* just 1 sector at each op. */
 			HAL_MAX_DELAY		/* give some time */
 		);
 		if (status != HAL_OK)
@@ -297,9 +280,9 @@ void taskWatchdogTiming(void *pvParams)
 }
 
 /**
- * Application idle hook
+ * Application Idle Hook
  */
 void vApplicationIdleHook(void)
 {
-	__WFI();		/* enter the deep sleep! */
+	__WFI();		/* enter into deep sleep! */
 }

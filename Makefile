@@ -14,7 +14,7 @@ FRM_DIR		:= ./firmware/.pio/build/genericSTM32H750VB
 
 OPENOCD		:= openocd 
 INTERFACE	:= interface/stlink.cfg
-TARGET		:= target/stm32f4x.cfg
+TARGET		:= target/stm32h7x.cfg
 COMMAND		:= "program $(FIRMWARE) verify reset exit"
 
 .PHONY: firmware station firmware_remove

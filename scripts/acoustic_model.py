@@ -101,11 +101,10 @@ num_test_samples = len(raw_data) - num_train_samples - num_val_samples
 print(f"\nSplitted the raw data into train ({num_train_samples} samples), validation "
       f"({num_val_samples} samples) and test ({num_test_samples} samples) groups.\n")
 
-# Prepare the data to fit. Firstly, normalize the row data so that each 
-# raw data will be between [-1.0, 1.0]. This is default behaviour for 
-# deep learning model. The characterisitic of raw data is timeseries.
-# That means, Each data is bound and directly correlated with previous
-# and next raw data.
+# Prepare the data to fit. Firstly, normalize the row data so that each raw data will 
+# be between [-1.0, 1.0]. This is default behaviour for deep learning model. The 
+# characterisitic of raw data is timeseries.That means, Each data is bound and directly 
+# correlated with previous and next raw data.
 
 mean = raw_data[:num_train_samples].mean(axis=0)
 raw_data -= mean

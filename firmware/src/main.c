@@ -23,7 +23,7 @@ int main(void)
 	BaseType_t status;
 
 	HAL_Init();
-
+	
 	/* Enable the peripheral clocks. */
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();

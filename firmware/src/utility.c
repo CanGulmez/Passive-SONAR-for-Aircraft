@@ -141,7 +141,7 @@ void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
 // }
 
 /**
- * Write the data to IMU sensor registers.
+ * Write the data to IMU sensor register.
  */
 void __write_to_imu_reg(uint8_t reg, uint8_t data)
 {
@@ -158,7 +158,7 @@ void __write_to_imu_reg(uint8_t reg, uint8_t data)
 }
 
 /**
- * Read the IMU sensor registers.
+ * Read the IMU sensor register.
  */
 uint8_t __read_reg_from_imu(uint8_t reg)
 {
@@ -191,7 +191,6 @@ void __read_accel_from_imu(IMUData *imuData)
 	{
 		data[i] = __read_reg_from_imu(IMU_REG_OUTX_L_XL + i);
 	}
-
 	/* Combine bytes (little endian) then convert to mg. */
 	imuData->accelX = ((int16_t)((data[1] << 8) | data[0])) * 0.488;
 	imuData->accelY = ((int16_t)((data[3] << 8) | data[2])) * 0.488;
@@ -211,7 +210,6 @@ void __read_gyro_from_imu(IMUData *imuData)
 	{
 		data[i] = __read_reg_from_imu(IMU_REG_OUTX_L_G + i);
 	}
-
 	/* Combine bytes (little endian) then convert to dps. */
 	imuData->gyroX = ((int16_t)((data[1] << 8) | data[0])) * 0.07;
 	imuData->gyroY = ((int16_t)((data[3] << 8) | data[2])) * 0.07;
@@ -229,4 +227,34 @@ void __read_temp_from_imu(IMUData *imuData)
 	temp_h = __read_reg_from_imu(IMU_REG_OUT_TEMP_H);
 
 	imuData->temp = (((temp_h << 8) | temp_l) / 256.0) + 25.0;
+}
+
+/**
+ * Get the SD Card information.
+ */
+void __get_sd_card_info(void)
+{
+	HAL_StatusTypeDef status;
+	HAL_SD_CardInfoTypeDef info;
+
+	/* Get the card information. */
+	status = HAL_SD_GetCardInfo(&hsdmmc1, &info);
+	if (status != HAL_OK)
+	{
+		printError(status, "Failed to get SD Card information!");
+	}
+
+	/* Print the required card information. */
+	printLog("SD Card Info:");
+	printLog("	Capacity		: %lu sectors", info.BlockNbr);
+	printLog("	Sector Size	: %lu bytes", info.BlockSize);
+	printLog("	Totol Size	: %lu MB",
+		((info.BlockNbr * info.BlockSize) / (1024 * 1024)));
+	printLog("	Card Type	: %s",
+		(info.CardType == CARD_SDSC) ? "SDSC" :
+		(info.CardType == CARD_SDHC_SDXC) ? "SDHC/SDXC" :
+		"UNKNOWN");
+	printLog("	Speed			: %.2f Mo/s",
+		(info.CardSpeed == CARD_NORMAL_SPEED) ? 12.5 :
+		(info.CardSpeed == CARD_HIGH_SPEED) ? 25.0 : 0.0);
 }

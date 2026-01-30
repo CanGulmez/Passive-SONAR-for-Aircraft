@@ -302,5 +302,6 @@ void configServoMotors(void)
  */
 void configWatchdog(void)
 {
-	
+
 }
+ 

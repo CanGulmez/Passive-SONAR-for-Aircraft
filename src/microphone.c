@@ -314,8 +314,8 @@ void microphone(GtkBox *micBox, gpointer data)
 	gtk_widget_set_hexpand(polarPlot, TRUE);
 	gtk_widget_set_vexpand(polarPlot, TRUE);
 
-	gtk_widget_set_size_request(carPlot, 550, -1);
-	gtk_widget_set_size_request(polarPlot, 550, -1);
+	gtk_widget_set_size_request(carPlot, 600, -1);
+	gtk_widget_set_size_request(polarPlot, 600, -1);
 
 	/* Append the all defined widgets in the microphone data page. */
 	gtk_box_append(GTK_BOX(leftBox), commGroup);

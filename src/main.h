@@ -45,7 +45,7 @@ extern "C" {
 #include <limits.h>
 #include <sys/types.h>
 #include <stdint.h>
-#include <endian.h>
+#include <check.h>
 
 /* GUI libraries */
 
@@ -145,7 +145,7 @@ extern "C" {
 																									\
 	memset(buffer, 0, BUFFER_SIZE);														\
 	sprintf(buffer, "[PID=%d][%s] " msg "\n", getpid(), 							\
-			  get_current_time(TIME_FORMAT), ##__VA_ARGS__);						\
+		get_time(TIME_FORMAT), ##__VA_ARGS__);											\
 																									\
 	logging(buffer, strlen(buffer));		/* write the logs */						\
 	printf("%s", buffer);		/* print the log buffer to "stdout" */			\
@@ -471,7 +471,7 @@ extern void microphone_row_flow_control(GtkWidget *);
 extern void microphone_group_UART(gpointer);
 extern void microphone_group_USB(gpointer);
 extern void microphone_group_WiFi(gpointer);
-void microphone_signal_analysis(GtkWidget *, MicSignal *);
+extern void microphone_signal_analysis(GtkWidget *, MicSignal *);
 extern void mic_plot_car(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_car_frame(cairo_t *, int, int);	
 extern void mic_plot_car_grid(cairo_t *, int, int);	
@@ -518,9 +518,8 @@ extern void database_close(struct sqlite3 *);
 
 /* Common utility function prototypes */
 
-extern char *get_host_name(void);
 extern void logging(const char *, size_t);
-extern char *get_current_time(const char *);
+extern char *get_time(const char *);
 extern int get_mic_device_nodes(MicChannel);
 extern int get_camera_USB_nodes(void);
 extern int get_camera_host_videos(void);

@@ -23,7 +23,7 @@ void nav_plot_area_grid(cairo_t *cr, int width, int height)
 
 	cairo_set_source_rgb(cr, 0.3, 0.3, 0.3);	/* gray grid */
 	cairo_set_line_width(cr, 0.2);
-
+	
 	/* Put the vertical grid lines */
 	for (i = (NAV_PLOT_MARGIN + NAV_PLOT_GRID);
 		  i < (width - NAV_PLOT_MARGIN); i += NAV_PLOT_GRID) 
@@ -55,11 +55,11 @@ void nav_plot_area_device(cairo_t *cr, int width, int height)
 	cairo_set_line_width(cr, 2.0);
 
 	cairo_move_to(cr, center_x, center_y);
-	cairo_line_to(cr, center_x + 140, center_y - 140);
-	cairo_line_to(cr, center_x - 100, center_y);
+	cairo_line_to(cr, center_x + 180, center_y - 180);
+	cairo_line_to(cr, center_x - 150, center_y);
 	cairo_line_to(cr, center_x, center_y);
-	cairo_line_to(cr, center_x, center_y + 100);
-	cairo_line_to(cr, center_x + 140, center_y - 140);
+	cairo_line_to(cr, center_x, center_y + 150);
+	cairo_line_to(cr, center_x + 180, center_y - 180);
 	cairo_fill(cr);
 }
 

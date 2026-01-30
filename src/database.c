@@ -102,7 +102,7 @@ void database_bind_data(struct sqlite3 *db, Database database)
 			sqlite3_bind_int(stmt, i, micSensorData.data[i - 1]);
 		}
 		sqlite3_bind_text(stmt, DATA_SIZE + 1, 
-			get_current_time(TIME_FORMAT), -1, SQLITE_STATIC);
+			get_time(TIME_FORMAT), -1, SQLITE_STATIC);
 	}
 	print_log("recorded the last sensor data into '%s'", 
 				 DB_SENSOR_DATA_PATH);

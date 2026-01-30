@@ -47,9 +47,7 @@
 #define SAMPLE_SIZE			(DATA_SIZE * 2)	
 #define CHANNEL_COUNT		4
 #define MIC_COUNT				(CHANNEL_COUNT * 2)
-
 #define START_SECTOR			0x1000	/* 4096 bytes, after 2MB of FAT/reserved */
-#define SECTOR_SIZE			512		/* bytes */
 
 #define FILE					__FILE__
 #define LINE					__LINE__
@@ -64,8 +62,13 @@
 									 (status == HAL_TIMEOUT)	? "TIMEOUT" :	\
 									  "UNDEFINED")
 
+/* Some Useful Shorthands */
+
 #define IMU_NSS_LOW()		(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, RESET))
 #define IMU_NSS_HIGH()		(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, SET))
+
+#define TASK_NUM()			(uxTaskGetNumberOfTasks())
+#define FREE_HEAP()			(xPortGetFreeHeapSize())
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -88,7 +91,7 @@ extern DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT];	/* Mic Sensor */
 
 /* Data Structures and Enumerations */
 
-typedef struct PACKED _MicData 
+PACKED typedef struct _MicData 
 {
 	int32_t north[DATA_SIZE];
 	int32_t northEast[DATA_SIZE];
@@ -100,7 +103,7 @@ typedef struct PACKED _MicData
 	int32_t northWest[DATA_SIZE];
 } MicData;
 
-typedef struct PACKED _GPSData 
+PACKED typedef struct _GPSData 
 {
 	uint8_t UTCTime[BUFFER_SIZE];
 	uint8_t latitude[BUFFER_SIZE];
@@ -114,7 +117,7 @@ typedef struct PACKED _GPSData
 	uint8_t date[BUFFER_SIZE];
 } GPSData;
 
-typedef struct PACKED _IMUData 
+PACKED typedef struct _IMUData 
 {
 	double accelX;		/* mg */
 	double accelY;		/* mg */
@@ -125,7 +128,7 @@ typedef struct PACKED _IMUData
 	double temp;		/* C */ 
 } IMUData;
 
-typedef struct PACKED _DataPackage 
+PACKED typedef struct _DataPackage 
 {
 	MicData MicData;
 	GPSData GPSData;
@@ -310,7 +313,7 @@ extern DataPackage dataPackage;
 }
 
 /**
- * Initialize DFSDM peripheral with given parameters
+ * Initialize DFSDM channel with given parameters.
  */
 #define initDFSDMChannel(handle, i, divider, filtertype, offset, rightshift)	\
 {																										\
@@ -326,6 +329,9 @@ extern DataPackage dataPackage;
 	handle[i].Init.RightBitShift = rightshift;											\
 }
 
+/**
+ * Initialize DFSDM filter with given parameters.
+ */
 #define initDFSDMFilter(handle, i, sincorder, oversampling)							\
 {																										\
 	handle[i].Instance = DFSDM1_Filter0 + i;												\
@@ -376,5 +382,6 @@ extern uint8_t __read_reg_from_imu(uint8_t reg);
 extern void __read_accel_from_imu(IMUData *IMUData);
 extern void __read_gyro_from_imu(IMUData *IMUData);
 extern void __read_temp_from_imu(IMUData *IMUData);
+extern void __get_sd_card_info(void);
 
 #endif /* FIRMWARE_H */
