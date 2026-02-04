@@ -42,7 +42,7 @@ GtkWidget *__generic_header_button_new(const char *icon, const char *tooltip)
 
 	headerBtn = gtk_button_new_from_icon_name(icon);
 	gtk_widget_set_tooltip_text(headerBtn, tooltip);	
-	button_signal(headerBtn, on_header_button_clicked);
+	buttonSig(headerBtn, on_header_button_clicked);
 
 	return headerBtn;
 }
@@ -66,7 +66,7 @@ guint __generic_row_selected(GObject *gobject, GParamSpec *pspec,
 	selected = adw_combo_row_get_selected(comboRow);
 	model = adw_combo_row_get_model(comboRow);
 	item = gtk_string_list_get_string(GTK_STRING_LIST(model), selected);
-	print_log("%s(): '%s'", func, item);
+	printLog("%s(): '%s'", func, item);
 
 	return selected;
 }
@@ -82,7 +82,7 @@ guint __generic_row_changed(GObject *gobject, GParamSpec *pspec, gpointer data,
 	
 	spinRow = ADW_SPIN_ROW(gobject);
 	value = adw_spin_row_get_value(spinRow);
-	print_log("%s(): '%d'", func, value);
+	printLog("%s(): '%d'", func, value);
 
 	return value;
 }
@@ -98,7 +98,7 @@ gboolean __generic_row_switched(GObject *gobject, GParamSpec *pspec, gpointer da
 
 	switchRow = ADW_SWITCH_ROW(gobject);
 	isActive = adw_switch_row_get_active(switchRow);
-	print_log("%s(): '%d'", func, isActive);
+	printLog("%s(): '%d'", func, isActive);
 
 	return isActive;
 }
@@ -112,7 +112,7 @@ char *__generic_row_texted(GObject *gobject, GParamSpec *pspec, gpointer data,
 	char *currentText;
 
 	currentText = (char *) gtk_editable_get_text(GTK_EDITABLE(gobject));
-	print_log("%s(): '%s'", func, currentText);
+	printLog("%s(): '%s'", func, currentText);
 	
 	return currentText;
 }

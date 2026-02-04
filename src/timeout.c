@@ -69,13 +69,13 @@ gboolean timeout_model_keras_log(gpointer data)
 /**
  * Set the timeout to record the sensor data into database.
  */
-gboolean timeout_database_record(gpointer data)
+gboolean timeout_db_record(gpointer data)
 {
 	struct sqlite3 *db;
 
 	db = (struct sqlite3 *) data;
 	/* Bind the last sensor data. */
-	database_bind_data(db, DATABASE_SENSOR_DATA);
+	db_bind_data(db, DATABASE_SENSOR_DATA);
 
 	return G_SOURCE_CONTINUE;
 }

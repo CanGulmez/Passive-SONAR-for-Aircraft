@@ -128,17 +128,17 @@ PACKED typedef struct _IMUData
 	double temp;		/* C */ 
 } IMUData;
 
-PACKED typedef struct _DataPackage 
+PACKED typedef struct _PayloadData
 {
 	MicData MicData;
 	GPSData GPSData;
 	IMUData IMUData;
-} DataPackage;
+} PayloadData;
 
 extern MicData micData;
 extern GPSData gpsData;
 extern IMUData imuData;
-extern DataPackage dataPackage;
+extern PayloadData payloadData;
 
 /*****************************************************************************/
 /*****************************************************************************/

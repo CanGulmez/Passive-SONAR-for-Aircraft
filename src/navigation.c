@@ -17,7 +17,7 @@
 
 #include "main.h"
 
-GtkWidget *navigation_accel_group(gpointer data)
+GtkWidget *nav_accel_group(gpointer data)
 {
 	GtkWidget *accelGroup, *status, *output;
 
@@ -32,7 +32,7 @@ GtkWidget *navigation_accel_group(gpointer data)
 	return accelGroup;
 }
 
-GtkWidget *navigation_gyro_group(gpointer data)
+GtkWidget *nav_gyro_group(gpointer data)
 {
 	GtkWidget *gyroGroup, *status, *output;
 
@@ -47,7 +47,7 @@ GtkWidget *navigation_gyro_group(gpointer data)
 	return gyroGroup;
 }
 
-GtkWidget *navigation_magnet_group(gpointer data)
+GtkWidget *nav_magnet_group(gpointer data)
 {
 	GtkWidget *magnetGroup, *status, *output;
 
@@ -62,7 +62,7 @@ GtkWidget *navigation_magnet_group(gpointer data)
 	return magnetGroup;
 }
 
-GtkWidget *navigation_temp_group(gpointer data)
+GtkWidget *nav_temp_group(gpointer data)
 {
 	GtkWidget *tempGroup, *output;
 
@@ -112,14 +112,14 @@ void navigation(GtkBox *imuBox, gpointer data)
 	__generic_group_add(navGroup, navRow);
 
 	/* Put the accelerometer, gyroscope and gyroscope groups. */
-	accelGroup = navigation_accel_group(NULL);
-	gyroGroup = navigation_gyro_group(NULL);
-	magnetGroup = navigation_magnet_group(NULL);
-	tempGroup = navigation_temp_group(NULL);
+	accelGroup = nav_accel_group(NULL);
+	gyroGroup = nav_gyro_group(NULL);
+	magnetGroup = nav_magnet_group(NULL);
+	tempGroup = nav_temp_group(NULL);
 
 	/* Put the required buttons. */
 	startBtn = __generic_button_new("Start", "suggested-action");
-	button_signal(startBtn, on_nav_button_clicked);
+	buttonSig(startBtn, on_nav_button_clicked);
 
 	/* Put the plot areas. */
 	navPlotArea = gtk_drawing_area_new();

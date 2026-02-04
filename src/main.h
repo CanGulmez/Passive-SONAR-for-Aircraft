@@ -22,7 +22,11 @@
 extern "C" {	
 #endif
 
-/* Standard GNU libaries */
+/* Compile-specific definitions */
+
+#pragma GCC optimize("O3")
+
+/* Required libaries */
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -46,28 +50,12 @@ extern "C" {
 #include <sys/types.h>
 #include <stdint.h>
 #include <check.h>
-
-/* GUI libraries */
-
 #include <cairo/cairo.h>
 #include <adwaita.h>
-
-/* GPS map libraries */
-
 #include <shumate/shumate.h>
-
-/* Database libraries */
-
 #include <sqlite3.h>
-
-/* Custom libraries */
-
 // #include "../lib/include/alat.h"
 #include "../lib/include/dsp.h"
-
-/* Compile-specific definitions */
-
-#pragma GCC optimize("O3")
 
 /* Global macro definitions */
 
@@ -116,8 +104,8 @@ extern "C" {
 
 #define NAV_PLOT_MARGIN						0		/* pixel */
 #define NAV_PLOT_GRID						20		/* pixel */
-#define NAV_PLOT_CAXIS						250	/* pixel */
-#define NAV_PLOT_VAXIS						300	/* pixel */
+#define NAV_PLOT_CAXIS						220	/* pixel */
+#define NAV_PLOT_VAXIS						280	/* pixel */
 
 #define TIMEOUT_DEVICE_READ				1000	/* ms */
 #define TIMEOUT_PLOT_REDRAW				1000	/* ms */
@@ -126,20 +114,20 @@ extern "C" {
 
 /* Attribute and built-in macro definitions  */
 
-#define __file									__FILE__
-#define __line									__LINE__
-#define __func									__func__
-#define __packed								__attribute__((packed))
-#define __noreturn							__attribute__((noreturn))
-#define __deprecated							__attribute__((deprecated))
-#define __aligned(n)							__attribute__((aligned(n)))
-#define __section(s)							__attribute__((section(s)))
-#define __address0							__builtin_return_address(0)
-#define __unreachable						__builtin_unreachable()
+#define FILE									__FILE__
+#define LINE									__LINE__
+#define FUNC									__func__
+#define PACKED									__attribute__((packed))
+#define NORETURN								__attribute__((noreturn))
+#define DEPRECATED							__attribute__((deprecated))
+#define ALIGNED(n)							__attribute__((aligned(n)))
+#define SECTION(s)							__attribute__((section(s)))
+#define ADDRESS0								__builtin_return_address(0)
+#define UNREACHABLE							__builtin_unreachable()
 
 /* Maro function definitions */
 
-#define print_log(msg, ...)																\
+#define printLog(msg, ...)																	\
 {																									\
 	char buffer[BUFFER_SIZE];																\
 																									\
@@ -151,53 +139,50 @@ extern "C" {
 	printf("%s", buffer);		/* print the log buffer to "stdout" */			\
 }
 
-#define syscall_error()																		\
+#define syscallError()																		\
 {                                      												\
 	fprintf(stderr, "\n*** %s (%s::%d in %s()) ***\n", strerror(errno),		\
-			  __file, __line, __func);		   	 										\
+			  FILE, LINE, FUNC);		   	 												\
 	exit(EXIT_FAILURE);	/* exit with failure status */							\
 } 
 
-#define custom_error(errmsg, ...) 														\
+#define customError(errmsg, ...) 														\
 {                            																\
 	fprintf(stderr, "\n*** " errmsg " (%s::%d in %s()) ***\n",					\
-			  ##__VA_ARGS__, __file, __line, __func);									\
+			  ##__VA_ARGS__, FILE, LINE, FUNC);											\
 	exit(EXIT_FAILURE);	/* exit with failure status */							\
 } 
 
-#define database_error(db)																	\
+#define dbError(db)																			\
 {																									\
 	fprintf(stderr, "\n*** %s (%s::%d in %s()) ***\n",								\
-			  sqlite3_errmsg(db), __file, __line, __func);							\
+			  sqlite3_errmsg(db), FILE, LINE, FUNC);									\
 	exit(EXIT_FAILURE);	/* exit with failure status */							\
 }
 
 /* Shorthands for GTK objects */
 
-#define visible_page_signal(page, callback) (g_signal_connect(page, "notify::visible-child", G_CALLBACK(callback), NULL))
-
-#define combo_row_signal(row, callback) (g_signal_connect(row, "notify::selected", G_CALLBACK(callback), NULL))
-#define spin_row_signal(row, callback) (g_signal_connect(row, "notify::value", G_CALLBACK(callback), NULL))
-#define switch_row_signal(row, callback) (g_signal_connect(row, "notify::active", G_CALLBACK(callback), NULL))
-#define entry_row_signal(row, callback) (g_signal_connect(row, "notify::text", G_CALLBACK(callback), NULL))
-#define button_signal(button, callback) (g_signal_connect(button, "clicked", G_CALLBACK(callback), NULL))
-
-#define combo_row_signal_with_data(row, callback, data) (g_signal_connect(row, "notify::selected", G_CALLBACK(callback), data))
-#define spin_row_signal_with_data(row, callback, data) (g_signal_connect(row, "notify::value", G_CALLBACK(callback), data))
-#define button_signal_with_data(button, callback, data) (g_signal_connect(button, "clicked", G_CALLBACK(callback), data))
- 
-#define realize_signal(widget, callback) (g_signal_connect(widget, "realize", G_CALLBACK(callback), NULL))
-#define render_signal(widget, callback) (g_signal_connect(widget, "render", G_CALLBACK(callback), NULL))
-#define pressed_signal(widget, callback) (g_signal_connect(widget, "pressed", G_CALLBACK(callback), NULL))
-#define released_signal(widget, callback) (g_signal_connect(widget, "released", G_CALLBACK(callback), NULL))
-#define motion_signal(widget, callback) (g_signal_connect(widget, "motion", G_CALLBACK(callback), NULL))
+#define visiblePageSig(page, callback) (g_signal_connect(page, "notify::visible-child", G_CALLBACK(callback), NULL))
+#define comboRowSig(row, callback) (g_signal_connect(row, "notify::selected", G_CALLBACK(callback), NULL))
+#define spinRowSig(row, callback) (g_signal_connect(row, "notify::value", G_CALLBACK(callback), NULL))
+#define switchRowSig(row, callback) (g_signal_connect(row, "notify::active", G_CALLBACK(callback), NULL))
+#define entryRowSig(row, callback) (g_signal_connect(row, "notify::text", G_CALLBACK(callback), NULL))
+#define buttonSig(button, callback) (g_signal_connect(button, "clicked", G_CALLBACK(callback), NULL))
+#define comboRowSigWithData(row, callback, data) (g_signal_connect(row, "notify::selected", G_CALLBACK(callback), data))
+#define spinRowSigWithData(row, callback, data) (g_signal_connect(row, "notify::value", G_CALLBACK(callback), data))
+#define buttonSigWithData(button, callback, data) (g_signal_connect(button, "clicked", G_CALLBACK(callback), data))
+#define realizeSig(widget, callback) (g_signal_connect(widget, "realize", G_CALLBACK(callback), NULL))
+#define renderSig(widget, callback) (g_signal_connect(widget, "render", G_CALLBACK(callback), NULL))
+#define pressedSig(widget, callback) (g_signal_connect(widget, "pressed", G_CALLBACK(callback), NULL))
+#define releasedSig(widget, callback) (g_signal_connect(widget, "released", G_CALLBACK(callback), NULL))
+#define motionSig(widget, callback) (g_signal_connect(widget, "motion", G_CALLBACK(callback), NULL))
 
 #define cmp(fstring, sstring)	(strcmp(fstring, sstring) == 0)
 
 /*****************************************************************************/
 /*****************************************************************************/
 
-/* General enumerations and structures */
+/* General enumerations */
 
 typedef enum _CurrentPage 
 {
@@ -222,7 +207,7 @@ typedef enum _Database
 	DATABASE_SENSOR_DATA,
 } Database;
 
-/* Microphone enumerations and structures */
+/* Microphone enumerations */
 
 typedef enum _MicChannel
 {
@@ -279,32 +264,7 @@ typedef enum _MicButton
 	MIC_BUTTON_STOP
 } MicButton;
 
-typedef struct __packed _MicSensorData 
-{
-	int8_t ID;
-	int8_t data[DATA_SIZE];
-} MicSensorData;
-
-typedef struct _MicSignal
-{
-	const char *max;
-	const char *min;
-	const char *mean;
-	const char *stddev;
-	const char *energy;
-	const char *rms;
-	const char *power;
-	const char *crest;
-	const char *skewness;
-	const char *kurtosis;
-	const char *variance;
-	const char *doa;
-	const char *distance;
-	const char *coordinate;
-	const char *target;
-} MicSignal;
-
-/* AI model enumerations and structures */
+/* AI model enumerations */
 
 typedef enum _ModelLayerType
 {
@@ -336,36 +296,7 @@ typedef enum _ModelButton
 	MODEL_BUTTON_PREDICT
 } ModelButton;
 
-typedef struct _ModelParams
-{
-	const char *dataset;
-	const char *outputModel;
-	const char *layerType;
-	const char *layerNumber;
-	const char *units;
-	const char *epochs;
-	const char *batchSize;
-	const char *earlyStop;
-	const char *dropout;
-} ModelParams;
-
-/* GPS map enumerations and structures */
-
-typedef struct _GPSData
-{
-	const char *UTCTime;
-	const char *latitude;
-	const char *longitude;
-	const char *quality;
-	const char *numSat;
-	const char *altitude;
-	const char *status;
-	const char *speed;		/* knots */
-	const char *course;		/* degrees */
-	const char *date;
-} GPSData;
-
-/* Navigation enumerations and structures */
+/* Navigation enumerations */
 
 typedef enum _NavAccel
 {
@@ -387,14 +318,70 @@ typedef enum _NavGyro
 	NAV_GYRO_Z_MINUS
 } NavGyro;
 
+/*****************************************************************************/
+/*****************************************************************************/
+
+/* Global structures */
+typedef struct PACKED _MicSensorData 
+{
+	int8_t data[DATA_SIZE];
+} MicSensorData;
+
+typedef struct _MicSignal
+{
+	const char *max;
+	const char *min;
+	const char *mean;
+	const char *stddev;
+	const char *energy;
+	const char *rms;
+	const char *power;
+	const char *crest;
+	const char *skewness;
+	const char *kurtosis;
+	const char *variance;
+	const char *doa;
+	const char *distance;
+	const char *coordinate;
+	const char *target;
+} MicSignal;
+
+typedef struct _ModelParams
+{
+	const char *dataset;
+	const char *outputModel;
+	const char *layerType;
+	const char *layerNumber;
+	const char *units;
+	const char *epochs;
+	const char *batchSize;
+	const char *earlyStop;
+	const char *dropout;
+} ModelParams;
+
+typedef struct _GPSData
+{
+	const char *UTCTime;
+	const char *latitude;
+	const char *longitude;
+	const char *quality;
+	const char *numSat;
+	const char *altitude;
+	const char *status;
+	const char *speed;		/* knots */
+	const char *course;		/* degrees */
+	const char *date;
+} GPSData;
+
 typedef struct _NavIMUData
 {
-	double accelX;
-	double accelY;
-	double accelZ;
-	double gyroX;
-	double gyroY;
-	double gyroZ;
+	const char *accelX;
+	const char *accelY;
+	const char *accelZ;
+	const char *gyroX;
+	const char *gyroY;
+	const char *gyroZ;
+	const char *temp;
 } NavIMUData;
 
 /*****************************************************************************/
@@ -462,16 +449,16 @@ extern NavIMUData navIMUData;
 /* Microphone function prototypes */
 
 extern void microphone(GtkBox *, gpointer);
-extern void microphone_row_device_node(GtkWidget *);						
-extern void microphone_row_baud_rate(GtkWidget *);	
-extern void microphone_row_data_bits(GtkWidget *);	
-extern void microphone_row_parity_bit(GtkWidget *);
-extern void microphone_row_stop_bits(GtkWidget *);	
-extern void microphone_row_flow_control(GtkWidget *);
-extern void microphone_group_UART(gpointer);
-extern void microphone_group_USB(gpointer);
-extern void microphone_group_WiFi(gpointer);
-extern void microphone_signal_analysis(GtkWidget *, MicSignal *);
+extern void mic_row_device_node(GtkWidget *);						
+extern void mic_row_baud_rate(GtkWidget *);	
+extern void mic_row_data_bits(GtkWidget *);	
+extern void mic_row_parity_bit(GtkWidget *);
+extern void mic_row_stop_bits(GtkWidget *);	
+extern void mic_row_flow_control(GtkWidget *);
+extern void mic_group_UART(gpointer);
+extern void mic_group_USB(gpointer);
+extern void mic_group_WiFi(gpointer);
+extern void mic_signal_analysis(GtkWidget *, MicSignal *);
 extern void mic_plot_car(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_car_frame(cairo_t *, int, int);	
 extern void mic_plot_car_grid(cairo_t *, int, int);	
@@ -482,8 +469,9 @@ extern void mic_plot_polar(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_polar_frame(cairo_t *, int, int);
 extern void mic_plot_polar_label(cairo_t *, int, int);
 extern void mic_plot_polar_fill(cairo_t *, int, int, double, double);
+extern void mic_plot_polar_sector(cairo_t *, int, int, int);
 
-/* AI model function prototypes */
+/* AI Model function prototypes */
 
 extern void model(GtkBox *, gpointer);
 extern void model_group_dataset(GtkWidget *);
@@ -492,9 +480,9 @@ extern void model_group_model(GtkWidget *);
 /* Navigation function prototypes */
 
 extern void navigation(GtkBox *, gpointer);
-extern GtkWidget *navigation_accel_group(gpointer);
-extern GtkWidget *navigation_gyro_group(gpointer);
-extern GtkWidget *navigation_magnet_group(gpointer);
+extern GtkWidget *nav_accel_group(gpointer);
+extern GtkWidget *nav_gyro_group(gpointer);
+extern GtkWidget *nav_magnet_group(gpointer);
 extern void nav_plot_area_grid(cairo_t *, int, int);
 extern void nav_plot_area_axes(cairo_t *, int, int);
 extern void nav_plot_area_labels(cairo_t *, int, int);
@@ -510,11 +498,11 @@ extern void gps_map_area_markers(ShumateMarkerLayer *, double, double);
 
 /* Database function prototypes */
 
-extern struct sqlite3 *database_open(const char *);
-extern void database_create_table(struct sqlite3 *, Database);
-extern void database_bind_data(struct sqlite3 *, Database);
-extern void database_query_data(struct sqlite3 *, Database);
-extern void database_close(struct sqlite3 *);
+extern sqlite3 *db_open(const char *);
+extern void db_create_table(struct sqlite3 *, Database);
+extern void db_bind_data(struct sqlite3 *, Database);
+extern void db_query_data(struct sqlite3 *, Database);
+extern void db_close(struct sqlite3 *);
 
 /* Common utility function prototypes */
 
@@ -535,7 +523,7 @@ extern char *get_keras_script_logs(const char *);
 
 extern gboolean timeout_mic_device_node(gpointer);
 extern gboolean timeout_model_keras_log(gpointer);
-extern gboolean timeout_database_record(gpointer);
+extern gboolean timeout_db_record(gpointer);
 extern gboolean timeout_mic_plot_car(gpointer);
 
 /* Generic component function prototypes */

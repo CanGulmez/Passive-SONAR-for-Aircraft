@@ -148,12 +148,14 @@ void __write_to_imu_reg(uint8_t reg, uint8_t data)
 	HAL_StatusTypeDef status;
 	uint8_t tx_data[2] = {reg | 0x00, data};	/* address then data */
 
+	/* Pull the NNS to low to start the transmission. */
 	IMU_NSS_LOW();
 	status = HAL_SPI_Transmit(&hspi1, tx_data, 2, HAL_MAX_DELAY);
 	if (status != HAL_OK)
 	{
-		printError(status, "Failed to write the data to IMU register!");
+		printError(status, "Failed to write to the IMU register!");
 	}
+	/* Pull the NSS to high to stop the transmission. */
 	IMU_NSS_HIGH();
 }
 
@@ -166,13 +168,16 @@ uint8_t __read_reg_from_imu(uint8_t reg)
 	uint8_t tx_data[2] = {reg | 0x80, 0x00};	/* address then data */
 	uint8_t rx_data[2] = {0};
 
+	/* Pull the NNS to low to start the transmission. */
 	IMU_NSS_LOW();
+	
 	status = HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2,
 		HAL_MAX_DELAY);
 	if (status != HAL_OK)
 	{
 		printError(status, "Failed to read the IMU register!");
 	}
+	/* Pull the NSS to high to stop the transmission. */
 	IMU_NSS_HIGH();
 
 	return rx_data[1];

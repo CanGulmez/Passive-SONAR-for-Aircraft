@@ -174,7 +174,7 @@ void gps_map(GtkBox *mapBox, gpointer data)
 
 	/* Put the required buttons. */
 	startBtn = __generic_button_new("Start", "suggested-action");
-	button_signal(startBtn, on_gps_button_clicked);
+	buttonSig(startBtn, on_gps_button_clicked);
 	
 	/* Layout */
 	gtk_box_append(GTK_BOX(propertyBox), GPSModuleGroup);

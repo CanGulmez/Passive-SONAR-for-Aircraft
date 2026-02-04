@@ -20,14 +20,14 @@
 /**
  * Open the SQLite3 database.
  */
-struct sqlite3 *database_open(const char *filepath)
+struct sqlite3 *db_open(const char *filepath)
 {
 	int rc;
 	struct sqlite3 *db;
 
 	rc = sqlite3_open(filepath, &db);
 	if (rc != SQLITE_OK)
-		database_error(db);
+		dbError(db);
 
 	return db;
 }
@@ -35,7 +35,7 @@ struct sqlite3 *database_open(const char *filepath)
 /**
  * Create a new table into the open database.
  */
-void database_create_table(struct sqlite3 *db, Database database)
+void db_create_table(struct sqlite3 *db, Database database)
 {
 	int i, rc;
 	char data[32];
@@ -60,13 +60,13 @@ void database_create_table(struct sqlite3 *db, Database database)
 	}
 	rc = sqlite3_exec(db, sql, 0, 0, 0);
 	if (rc != SQLITE_OK)
-		database_error(db);
+		dbError(db);
 }
 
 /**
  * Bind the appropriate data into the open database.
  */
-void database_bind_data(struct sqlite3 *db, Database database)
+void db_bind_data(struct sqlite3 *db, Database database)
 {
 	int i, rc;
 	char data[16];
@@ -95,7 +95,7 @@ void database_bind_data(struct sqlite3 *db, Database database)
 		/* Bind the sql sequence into the open database. */
 		rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 		if (rc != SQLITE_OK)
-			database_error(db);
+			dbError(db);
 
 		for (i = 1; i <= DATA_SIZE; i++)
 		{
@@ -104,23 +104,23 @@ void database_bind_data(struct sqlite3 *db, Database database)
 		sqlite3_bind_text(stmt, DATA_SIZE + 1, 
 			get_time(TIME_FORMAT), -1, SQLITE_STATIC);
 	}
-	print_log("recorded the last sensor data into '%s'", 
+	printLog("recorded the last sensor data into '%s'", 
 				 DB_SENSOR_DATA_PATH);
 
 	/* Step and finalize the current insertion. */
 	rc = sqlite3_step(stmt);
 	if (rc != SQLITE_DONE)
-		database_error(db);
+		dbError(db);
 	
 	rc = sqlite3_finalize(stmt);
 	if (rc != SQLITE_OK)
-		database_error(db);
+		dbError(db);
 }
 
 /**
  * Query the appropriate data into the open database.
  */
-void database_query_data(struct sqlite3 *db, Database database)
+void db_query_data(struct sqlite3 *db, Database database)
 {
 	int i, rc;
 	sqlite3_stmt *stmt;
@@ -133,7 +133,7 @@ void database_query_data(struct sqlite3 *db, Database database)
 
 		rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 		if (rc != SQLITE_OK)
-			database_error(db);
+			dbError(db);
 			
 		while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
 		{
@@ -148,17 +148,17 @@ void database_query_data(struct sqlite3 *db, Database database)
 	/* Finalize the reading operations. */
 	rc = sqlite3_finalize(stmt);
 	if (rc != SQLITE_OK)
-		database_error(db);
+		dbError(db);
 }
 
 /**
  * Close the open database.
  */
-void database_close(struct sqlite3 *db)
+void db_close(struct sqlite3 *db)
 {
 	int rc;
 	
 	rc = sqlite3_close(db);
 	if (rc != SQLITE_OK)
-		database_error(db);
+		dbError(db);
 }

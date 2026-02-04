@@ -249,10 +249,10 @@ void mic_plot_polar_label(cairo_t *cr, int width, int height)
 }
 
 /**
- * Fill the sectors of polar plot.
+ * Fill the area between `start` and `end` angles of polar plot.
  */
-void mic_plot_polar_fill(cairo_t *cr, int width, int height, 
-								 double start_angle, double end_angle)
+void mic_plot_polar_fill(cairo_t *cr, int width, int height, double start, 
+								 double end)
 {
 	int center_x, center_y;
 	double radius, start_rad, end_rad;
@@ -265,8 +265,8 @@ void mic_plot_polar_fill(cairo_t *cr, int width, int height,
 	center_y = height / 2;
 	radius = (height - 2 * MIC_PLOT_MARGIN) / 2;
 
-	start_rad = start_angle * (M_PI / 180.0);
-	end_rad = end_angle * (M_PI / 180.0);
+	start_rad = start * (M_PI / 180.0);
+	end_rad = end * (M_PI / 180.0);
 	start_compass = atan2(-cos(start_rad), sin(start_rad));
    end_compass = atan2(-cos(end_rad), sin(end_rad));
 
@@ -274,10 +274,27 @@ void mic_plot_polar_fill(cairo_t *cr, int width, int height,
 	cairo_move_to(cr, center_x, center_y);
 	cairo_line_to(cr, center_x + radius * cos(start_compass),
 							center_y + radius * sin(start_compass));
-	cairo_arc(cr, center_x, center_y, radius, start_compass, 
-				 end_compass);
+	cairo_arc(cr, center_x, center_y, radius, start_compass, end_compass);
 	cairo_close_path(cr);
 	cairo_fill(cr);
+}
+
+/**
+ * Fill the sectors of polar plot.
+ */
+void mic_plot_polar_sector(cairo_t *cr, int width, int height, int mic)
+{
+	switch (mic)
+	{
+		case 1: mic_plot_polar_fill(cr, width, height, -15.0, 15.0); break;
+		case 2: mic_plot_polar_fill(cr, width, height, 30.0, 60.0); break;
+		case 3: mic_plot_polar_fill(cr, width, height, 75.0, 105.0); break;
+		case 4: mic_plot_polar_fill(cr, width, height, 120.0, 150.0); break;
+		case 5: mic_plot_polar_fill(cr, width, height, 165.0, 195.0); break;
+		case 6: mic_plot_polar_fill(cr, width, height, 210.0, 240.0); break;
+		case 7: mic_plot_polar_fill(cr, width, height, 255.0, 285.0); break;
+		case 8: mic_plot_polar_fill(cr, width, height, 300.0, 330.0); break;
+	}
 }
 
 /**
@@ -290,8 +307,8 @@ void mic_plot_polar(GtkDrawingArea *area, cairo_t *cr, int width,
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);	/* white background */
 	cairo_paint(cr);
 	
-	mic_plot_polar_frame(cr, width, height);	
-	mic_plot_polar_label(cr, width, height);
-	mic_plot_polar_fill(cr, width, height, 70, 110);
+	mic_plot_polar_frame(cr, width, height);			/* draw the frame */
+	mic_plot_polar_label(cr, width, height);			/* put the labels */
+	mic_plot_polar_sector(cr, width, height, 8);		/* fill the sector */
 }
  

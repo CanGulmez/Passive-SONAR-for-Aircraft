@@ -22,7 +22,7 @@
 MicData micData = {0};
 GPSData gpsData = {0};
 IMUData imuData = {0};
-DataPackage dataPackage = {0};
+PayloadData payloadData = {0};
 
 /**
  * Read microphone data from the north channel.

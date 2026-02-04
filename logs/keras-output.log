@@ -1,14 +1,14 @@
-2026-01-30 11:32:00.546078: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-30 11:32:01.819599: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-01-30 11:32:02.698066: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-2026-01-30 11:32:03.305997: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-2026-01-30 11:32:03.533490: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-2026-01-30 11:32:05.073756: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+2026-02-02 15:44:51.967009: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-02-02 15:44:51.974324: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-02-02 15:44:51.997891: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-02-02 15:44:52.038859: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-02-02 15:44:52.052181: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-02-02 15:44:52.083226: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
 To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2026-01-30 11:32:15.608121: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-2026-01-30 11:32:30.398223: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+2026-02-02 15:44:54.526634: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2026-02-02 15:44:59.249659: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
 
-Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 10 layer number, 16 units per layer, 20 epochs, and 16 batch size as 'xxx.keras' in the script directory.
+Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 10 layer number, 16 units per layer, 20 epochs, and 16 batch size as 'passive-acoustic-surveillance.keras' in the script directory.
 
 Found 420451 samples and 15 data in each sample.
 Raw data shape : (420451, 14)
@@ -16,7 +16,7 @@ Target shape   : (420451,)
 
 Splitted the raw data into train (210225 samples), validation (105112 samples) and test (105114 samples) groups.
 
-Model: "xxx"
+Model: "passive-acoustic-surveillance"
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
@@ -53,4 +53,21 @@ Model: "xxx"
 Fitting the model with common datasets:
 
 Epoch 1/20
-2026-01-30 11:32:31.625712: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+2026-02-02 15:45:00.013705: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+13095/13095 - 5772s - 441ms/step - loss: 17.1405 - mae: 3.1845 - val_loss: 14.8197 - val_mae: 3.0194
+Epoch 2/20
+13095/13095 - 5510s - 421ms/step - loss: 10.6993 - mae: 2.5701 - val_loss: 14.9980 - val_mae: 3.0420
+Epoch 3/20
+13095/13095 - 7052s - 539ms/step - loss: 8.5731 - mae: 2.3006 - val_loss: 14.8871 - val_mae: 3.0151
+Epoch 4/20
+13095/13095 - 8240s - 629ms/step - loss: 7.2271 - mae: 2.1073 - val_loss: 15.5671 - val_mae: 3.1112
+Epoch 5/20
+13095/13095 - 5534s - 423ms/step - loss: 6.3066 - mae: 1.9614 - val_loss: 15.8053 - val_mae: 3.1341
+Epoch 6/20
+13095/13095 - 5584s - 426ms/step - loss: 5.6244 - mae: 1.8487 - val_loss: 15.3454 - val_mae: 3.0910
+
+Evaluating the fitted model with test dataset:
+
+6472/6472 - 514s - 79ms/step - loss: 14.9842 - mae: 3.0760
+
+Test MAE: 3.0760

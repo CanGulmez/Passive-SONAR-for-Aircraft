@@ -46,7 +46,7 @@ void on_activate(GtkApplication *app, gpointer user_data)
 	/* View Switchers */
 
 	viewStack = adw_view_stack_new();
-	visible_page_signal(viewStack, on_visible_page_changed);
+	visiblePageSig(viewStack, on_visible_page_changed);
 
 	viewSwitcher = adw_view_switcher_new();
 	adw_view_switcher_set_stack(ADW_VIEW_SWITCHER(viewSwitcher), 

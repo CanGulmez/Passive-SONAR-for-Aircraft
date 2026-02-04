@@ -43,7 +43,7 @@ MicSignal micSignal = {"Null", "Null", "Null", "Null", "Null",
 /**
  * Initialize the device node row.
  */
-void microphone_row_device_node(GtkWidget *propertyGroup)
+void mic_row_device_node(GtkWidget *propertyGroup)
 {
 	int i;
 	GtkWidget *deviceNodeRow;
@@ -53,14 +53,14 @@ void microphone_row_device_node(GtkWidget *propertyGroup)
 		"Device Node", (const char **)micDeviceNodes, 0
 	);
 	__generic_group_add(propertyGroup, deviceNodeRow);
-	realize_signal(deviceNodeRow, on_device_node_selected);
-	combo_row_signal(deviceNodeRow, on_device_node_selected);
+	realizeSig(deviceNodeRow, on_device_node_selected);
+	comboRowSig(deviceNodeRow, on_device_node_selected);
 }
 
 /**
  * Initialize the baud rate row.
  */
-void microphone_row_baud_rate(GtkWidget *propertyGroup)
+void mic_row_baud_rate(GtkWidget *propertyGroup)
 {
 	GtkWidget *baudRateRow;
 
@@ -69,13 +69,13 @@ void microphone_row_baud_rate(GtkWidget *propertyGroup)
 		"38400", "57600", "115200", NULL}, 6
 	);
 	__generic_group_add(propertyGroup, baudRateRow);
-	combo_row_signal(baudRateRow, on_baud_rate_selected);
+	comboRowSig(baudRateRow, on_baud_rate_selected);
 }
 
 /**
  * Initialize the data bits row.
  */
-void microphone_row_data_bits(GtkWidget *propertyGroup)
+void mic_row_data_bits(GtkWidget *propertyGroup)
 {
 	GtkWidget *dataBitsRow;
 
@@ -83,13 +83,13 @@ void microphone_row_data_bits(GtkWidget *propertyGroup)
 		"Data Bits", (const char *[]) {"5", "6", "7", "8", NULL}, 3
 	);
 	__generic_group_add(propertyGroup, dataBitsRow);
-	combo_row_signal(dataBitsRow, on_data_bits_selected);
+	comboRowSig(dataBitsRow, on_data_bits_selected);
 }
 
 /**
  * Initialize the parity bit row.
  */
-void microphone_row_parity_bit(GtkWidget *propertyGroup)
+void mic_row_parity_bit(GtkWidget *propertyGroup)
 {
 	GtkWidget *parityBitRow;
 
@@ -98,13 +98,13 @@ void microphone_row_parity_bit(GtkWidget *propertyGroup)
 		"Mark", "Space", NULL}, 0
 	);
 	__generic_group_add(propertyGroup, parityBitRow);
-	combo_row_signal(parityBitRow, on_parity_bit_selected);
+	comboRowSig(parityBitRow, on_parity_bit_selected);
 }
 
 /**
  * Initialize the stop bits row.
  */
-void microphone_row_stop_bits(GtkWidget *propertyGroup)
+void mic_row_stop_bits(GtkWidget *propertyGroup)
 {
 	GtkWidget *stopBitsRow;
 
@@ -112,13 +112,13 @@ void microphone_row_stop_bits(GtkWidget *propertyGroup)
 		"Stop Bits", (const char *[]) {"1", "2", NULL}, 0
 	);
 	__generic_group_add(propertyGroup, stopBitsRow);
-	combo_row_signal(stopBitsRow, on_stop_bits_selected);
+	comboRowSig(stopBitsRow, on_stop_bits_selected);
 }
 
 /**
  * Initialize the flow control row.
  */
-void microphone_row_flow_control(GtkWidget *propertyGroup)
+void mic_row_flow_control(GtkWidget *propertyGroup)
 {
 	GtkWidget *flowControlRow;
 
@@ -127,59 +127,59 @@ void microphone_row_flow_control(GtkWidget *propertyGroup)
 		"Software (XON/XOFF)", NULL}, 0
 	);
 	__generic_group_add(propertyGroup, flowControlRow);
-	combo_row_signal(flowControlRow, on_flow_control_selected);
+	comboRowSig(flowControlRow, on_flow_control_selected);
 }
 
 /**
  * Initialize the UART property group.
  */
-void microphone_group_UART(gpointer data)
+void mic_group_UART(gpointer data)
 {
 	/* Set the UART property group with default settings. */
 	micUARTGroup = __generic_group_new("UART Properties",
 		"Select the UART channel properties");
 
-	microphone_row_device_node(micUARTGroup);			/* Device Node */
-	microphone_row_baud_rate(micUARTGroup);			/* Baud Rate */
-	microphone_row_data_bits(micUARTGroup);			/* Data Bits */
-	microphone_row_parity_bit(micUARTGroup);			/* Parity Bit */
-	microphone_row_stop_bits(micUARTGroup);			/* Stop Bits */
-	microphone_row_flow_control(micUARTGroup);		/* Flow Control */
+	mic_row_device_node(micUARTGroup);		/* Device Node */
+	mic_row_baud_rate(micUARTGroup);			/* Baud Rate */
+	mic_row_data_bits(micUARTGroup);			/* Data Bits */
+	mic_row_parity_bit(micUARTGroup);		/* Parity Bit */
+	mic_row_stop_bits(micUARTGroup);			/* Stop Bits */
+	mic_row_flow_control(micUARTGroup);		/* Flow Control */
 }
 
 /**
  * Initialize the USB property group.
  */
-void microphone_group_USB(gpointer data)
+void mic_group_USB(gpointer data)
 {
 	/* Set the USB property group with default settings. */
 	micUSBGroup = __generic_group_new("USB Properties",
 		"Select the USB channel properties");
 
-	microphone_row_device_node(micUSBGroup);			/* Device Node */
-	microphone_row_baud_rate(micUSBGroup);				/* Baud Rate */
-	microphone_row_data_bits(micUSBGroup);				/* Data Bits */
-	microphone_row_parity_bit(micUSBGroup);			/* Parity Bit */
-	microphone_row_stop_bits(micUSBGroup);				/* Stop Bits */
-	microphone_row_flow_control(micUSBGroup);			/* Flow Control */
+	mic_row_device_node(micUSBGroup);		/* Device Node */
+	mic_row_baud_rate(micUSBGroup);			/* Baud Rate */
+	mic_row_data_bits(micUSBGroup);			/* Data Bits */
+	mic_row_parity_bit(micUSBGroup);			/* Parity Bit */
+	mic_row_stop_bits(micUSBGroup);			/* Stop Bits */
+	mic_row_flow_control(micUSBGroup);		/* Flow Control */
 }
 
 /**
  * Initialize the Wi-Fi property group.
  */
-void microphone_group_WiFi(gpointer data)
+void mic_group_WiFi(gpointer data)
 {
 	/* Set the Wi-Fi property group with default settings. */
 	micWiFiGroup = __generic_group_new("Wi-Fi Properties",
 		"Select the Wi-Fi channel properties");
 
-	microphone_row_device_node(micWiFiGroup);		/* Device Node */
+	mic_row_device_node(micWiFiGroup);		/* Device Node */
 }
 
 /**
  * Update the signal analysis group.
  */
-void microphone_signal_analysis(GtkWidget *analysisGroup, MicSignal *micSignal)
+void mic_signal_analysis(GtkWidget *analysisGroup, MicSignal *micSignal)
 {
 	GtkWidget *maxRow, *minRow, *meanRow, *stddevRow, *energyRow, *rmsRow,
 				 *powerRow, *crestRow, *skewnessRow, *kurtosisRow, *varianceRow,
@@ -225,7 +225,7 @@ void microphone(GtkBox *micBox, gpointer data)
 {
 	int i, numDev;
 	GtkWidget *rightBox, *rightSep, *centerBox, *leftSep, *leftBox;
-	GtkWidget *scrolledWin, *propertyBox, *btnBox;
+	GtkWidget *scrolledComm, *scrolledSig, *propertyBox, *btnBox;
 	GtkWidget *commGroup, *propertyGroup, *analysisGroup;
 	GtkWidget *commRow; 
 	GtkStringList *commList;
@@ -239,7 +239,8 @@ void microphone(GtkBox *micBox, gpointer data)
 	rightBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 	propertyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	btnBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-	scrolledWin = gtk_scrolled_window_new();
+	scrolledComm = gtk_scrolled_window_new();
+	scrolledSig = gtk_scrolled_window_new();
 
 	gtk_widget_set_hexpand(rightBox, TRUE);
 	gtk_widget_set_vexpand(rightBox, TRUE);
@@ -254,9 +255,14 @@ void microphone(GtkBox *micBox, gpointer data)
 	gtk_widget_set_margin_end(centerBox, BOX_INNER_MARGIN);
 	gtk_widget_set_margin_start(rightBox, BOX_INNER_MARGIN);
 
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledWin), 
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledComm), 
 		GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledWin),
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledComm),
+		propertyBox);
+
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledSig), 
+		GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledSig),
 		centerBox);
 
 	/**
@@ -271,12 +277,12 @@ void microphone(GtkBox *micBox, gpointer data)
 		"Channel", (const char *[]){"UART", "USB", "Wi-Fi", NULL}, 0
 	);
 	__generic_group_add(commGroup, commRow);
-	combo_row_signal_with_data(commRow, on_comm_channel_selected, 
+	comboRowSigWithData(commRow, on_comm_channel_selected, 
 		propertyBox);
 
 	/* Put the initial UART property box. */ 
 	numDev = get_mic_device_nodes(micChannel);
-	microphone_group_UART(NULL);
+	mic_group_UART(NULL);
 
 	gtk_box_append(GTK_BOX(propertyBox), micUARTGroup);
 
@@ -284,7 +290,7 @@ void microphone(GtkBox *micBox, gpointer data)
 	analysisGroup = __generic_group_new("Signal Analysis",
 		"Display the static signal analysis results");
 
-	microphone_signal_analysis(analysisGroup, &micSignal);
+	mic_signal_analysis(analysisGroup, &micSignal);
 	
 	/* Put the buttons to manage the upper and lower plots. */
 	startBtn = __generic_button_new("Start", "suggested-action");
@@ -293,7 +299,7 @@ void microphone(GtkBox *micBox, gpointer data)
 
 	for (i = 0; i < 2; i++) 
 	{
-		button_signal(buttons[i], on_mic_button_clicked);	
+		buttonSig(buttons[i], on_mic_button_clicked);	
 		gtk_box_append(GTK_BOX(btnBox), buttons[i]);
 	}
 
@@ -301,10 +307,10 @@ void microphone(GtkBox *micBox, gpointer data)
 	carPlot = gtk_drawing_area_new();
 	polarPlot = gtk_drawing_area_new();
 
-	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(carPlot),
-		mic_plot_car, NULL, NULL);
-	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(polarPlot),
-		mic_plot_polar, NULL, NULL);
+	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(carPlot), mic_plot_car, 
+		NULL, NULL);
+	gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(polarPlot), mic_plot_polar, 
+		NULL, NULL);
 		
 	g_timeout_add(TIMEOUT_PLOT_REDRAW, timeout_mic_plot_car, carPlot);
 	// g_timeout_add(PLOT_REDRAW_TIMEOUT, page_mic_data_plot_timeout, polarPlot);
@@ -319,7 +325,7 @@ void microphone(GtkBox *micBox, gpointer data)
 
 	/* Append the all defined widgets in the microphone data page. */
 	gtk_box_append(GTK_BOX(leftBox), commGroup);
-	gtk_box_append(GTK_BOX(leftBox), propertyBox);
+	gtk_box_append(GTK_BOX(leftBox), scrolledComm);
 	gtk_box_append(GTK_BOX(leftBox), btnBox);
 	gtk_box_append(GTK_BOX(centerBox), analysisGroup);
 	gtk_box_append(GTK_BOX(rightBox), carPlot);
@@ -327,7 +333,7 @@ void microphone(GtkBox *micBox, gpointer data)
 
 	gtk_box_append(micBox, leftBox);
 	gtk_box_append(micBox, leftSep);
-	gtk_box_append(micBox, scrolledWin);
+	gtk_box_append(micBox, scrolledSig);
 	gtk_box_append(micBox, rightSep);
 	gtk_box_append(micBox, rightBox);
 }
