@@ -157,7 +157,7 @@ void read_mic_device_node(MicChannel channel, const char* node)
 	struct termios tty;
 	
 	/* Initialize with NULLs. */
-	memset(&micSensorData, 0, sizeof(micSensorData));
+	memset(&payloadData, 0, sizeof(payloadData));
 
 	/* Create the device node path name correctly. */
 	if (channel == MIC_CHANNEL_UART || channel == MIC_CHANNEL_USB) 
@@ -187,7 +187,7 @@ void read_mic_device_node(MicChannel channel, const char* node)
 	set_serial_attributes(fd, &tty);
 	
 	/* Read the device node. */
-	numRead = read(fd, &micSensorData, sizeof(micSensorData));
+	numRead = read(fd, &payloadData, sizeof(payloadData));
 	if (numRead > 0) 
 	{
 		printLog("read %ld bytes from '%s'", numRead, devicePath);
@@ -211,8 +211,8 @@ int get_model_datasets(void)
 	struct dirent *entry;
 	DIR *dir;
 	char *filename;
-	
-	/* Initialize with NULLs */
+
+	/* Initialize with NULLs. */
 	memset(modelDatasets, 0, MAX_MODEL_DATASET);
 
 	dir = opendir(MODEL_DATASET_PATH);	/* open the directory */

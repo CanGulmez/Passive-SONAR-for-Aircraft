@@ -387,7 +387,7 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 		db = db_open(DB_SENSOR_DATA_PATH);
 		db_create_table(db, DATABASE_SENSOR_DATA);
 
-		/* Add the timeout for updating "micSensorData". */
+		/* Add the timeout for updating "payloadData". */
 		if (!micTimeout) 
 		{
 			micTimeout = g_timeout_add(TIMEOUT_DEVICE_READ, 
@@ -405,7 +405,7 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 		/* Close the open database. */
 		db_close(db);
 
-		/* Stop the timeout for "micSensorData". */
+		/* Stop the timeout for "payloadData". */
 		if (micTimeout) 
 		{
 			g_source_remove(micTimeout);

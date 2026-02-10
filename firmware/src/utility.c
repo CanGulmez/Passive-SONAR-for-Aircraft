@@ -146,7 +146,7 @@ void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
 void __write_to_imu_reg(uint8_t reg, uint8_t data)
 {
 	HAL_StatusTypeDef status;
-	uint8_t tx_data[2] = {reg | 0x00, data};	/* address then data */
+	const uint8_t tx_data[2] = {reg | 0x00, data};	/* address then data */
 
 	/* Pull the NNS to low to start the transmission. */
 	IMU_NSS_LOW();
@@ -165,8 +165,8 @@ void __write_to_imu_reg(uint8_t reg, uint8_t data)
 uint8_t __read_reg_from_imu(uint8_t reg)
 {
 	HAL_StatusTypeDef status;
-	uint8_t tx_data[2] = {reg | 0x80, 0x00};	/* address then data */
-	uint8_t rx_data[2] = {0};
+	const uint8_t tx_data[2] = {reg | 0x80, 0x00};	/* address then data */
+	const uint8_t rx_data[2] = {0};
 
 	/* Pull the NNS to low to start the transmission. */
 	IMU_NSS_LOW();

@@ -67,9 +67,6 @@
 #define IMU_NSS_LOW()		(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, RESET))
 #define IMU_NSS_HIGH()		(HAL_GPIO_WritePin(IMU_PORTA, IMU_PIN_NSS, SET))
 
-#define TASK_NUM()			(uxTaskGetNumberOfTasks())
-#define FREE_HEAP()			(xPortGetFreeHeapSize())
-
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -359,18 +356,18 @@ extern void configServoMotors(void);
 extern void configLEDs(void);
 extern void configWatchdog(void);
 
-extern void taskMicReadingNorth(void *pvParams);
-extern void taskMicReadingEast(void *pvParams);
-extern void taskMicReadingSouth(void *pvParams);
-extern void taskMicReadingWest(void *pvParams);
-extern void taskGPSReading(void *pvParams);
-extern void taskIMUReading(void *pvParams);
-extern void taskSDCardWriting(void *pvParams);
-extern void taskLoRaTransmitting(void *pvParams);
-extern void taskSystemChecking(void *pvParams);
-extern void taskServoDriving(void *pvParams);
-extern void taskLEDUpdating(void *pvParams);
-extern void taskWatchdogTiming(void *pvParams);
+extern void taskMicSensorNorth(void *pvParams);
+extern void taskMicSensorEast(void *pvParams);
+extern void taskMicSensorSouth(void *pvParams);
+extern void taskMicSensorWest(void *pvParams);
+extern void taskGPSModule(void *pvParams);
+extern void taskIMUSensor(void *pvParams);
+extern void taskSDCard(void *pvParams);
+extern void taskLoRaModule(void *pvParams);
+extern void taskSystemCheck(void *pvParams);
+extern void taskServoMotors(void *pvParams);
+extern void taskLEDs(void *pvParams);
+extern void taskWatchdog(void *pvParams);
 
 extern void SysTick_Handler(void);
 extern void xPortSysTickHandler(void);
@@ -379,9 +376,9 @@ extern void vApplicationIdleHook(void);
 extern void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData);
 extern void __write_to_imu_reg(uint8_t reg, uint8_t data);
 extern uint8_t __read_reg_from_imu(uint8_t reg);
-extern void __read_accel_from_imu(IMUData *IMUData);
-extern void __read_gyro_from_imu(IMUData *IMUData);
-extern void __read_temp_from_imu(IMUData *IMUData);
+extern void __read_accel_from_imu(IMUData *imuData);
+extern void __read_gyro_from_imu(IMUData *imuData);
+extern void __read_temp_from_imu(IMUData *imuData);
 extern void __get_sd_card_info(void);
 
 #endif /* FIRMWARE_H */

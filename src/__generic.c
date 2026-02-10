@@ -49,7 +49,6 @@ GtkWidget *__generic_header_button_new(const char *icon, const char *tooltip)
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /**
  * Generic combo row signal handler to get the selected item
@@ -119,8 +118,6 @@ char *__generic_row_texted(GObject *gobject, GParamSpec *pspec, gpointer data,
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
-
 /**
  * Generic combo row creation
  */
@@ -168,7 +165,24 @@ GtkWidget *__generic_action_row_new(const char *title, const char *label)
 	adw_preferences_row_set_title(ADW_PREFERENCES_ROW(actionRow), title);
 	adw_action_row_add_suffix(ADW_ACTION_ROW(actionRow), labelWid);
 
+	/* Store the label widget as data of the action row. */
+   g_object_set_data(G_OBJECT(actionRow), "suffix-label", labelWid);
+	
 	return actionRow;
+}
+
+/**
+ * Generic action row label update
+ */
+void __generic_action_row_update(GtkWidget *row, const char *label)
+{
+   GtkWidget *suffix;
+	
+	suffix = g_object_get_data(G_OBJECT(row), "suffix-label");
+   if (suffix && GTK_IS_LABEL(suffix)) 
+	{
+      gtk_label_set_text(GTK_LABEL(suffix), label);
+   }
 }
 
 /**
@@ -199,7 +213,6 @@ GtkWidget *__generic_entry_row_new(const char *title)
 
 /*****************************************************************************/
 /*****************************************************************************/
-/*****************************************************************************/
 
 /**
  * Generic group creation
@@ -224,7 +237,14 @@ void __generic_group_add(GtkWidget *group, GtkWidget *row)
 	adw_preferences_group_add(ADW_PREFERENCES_GROUP(group), row);
 }
 
-/*****************************************************************************/
+/**
+ * Generic combo group remove row
+ */
+void __generic_group_remove(GtkWidget *group, GtkWidget *row)
+{ 
+	adw_preferences_group_remove(ADW_PREFERENCES_GROUP(group), row);
+}
+
 /*****************************************************************************/
 /*****************************************************************************/
 

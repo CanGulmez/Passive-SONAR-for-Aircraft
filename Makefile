@@ -2,7 +2,7 @@
 
 CC				:= gcc
 PIO			:= pio
-CFLAGS		:= -lm -g3 -lsqlite3 -ldsp -L./lib
+CFLAGS		:= -lm -g3 -lsqlite3 -ldsp -lgsl -L./lib
 
 SRC			:= ./src/*.h ./src/*.c
 DEPENDS		:= gtk4 libadwaita-1 shumate-1.0
@@ -16,6 +16,7 @@ OPENOCD		:= openocd
 INTERFACE	:= interface/stlink.cfg
 TARGET		:= target/stm32h7x.cfg
 COMMAND		:= "program $(FIRMWARE) verify reset exit"
+# COMMAND		:= "init; reset halt; flash write_image erase $(FIRMWARE); verify_image $(FIRMWARE); reset run; shutdown"
 
 .PHONY: firmware station firmware_remove
 
@@ -25,7 +26,7 @@ firmware:
 	@cd ./firmware ; $(PIO) run ; cd ..
 	@echo " "
 	@echo "Uploading embedded firmware..."
-	@cd $(FRM_DIR) ; openocd -f $(INTERFACE) -f $(TARGET) -c $(COMMAND)
+	@cd $(FRM_DIR) ; openocd -f $(INTERFACE) -f $(TARGET) -c $(COMMAND) -c "adapter speed 100"
 	
 # Building and running the ground station program
 station:

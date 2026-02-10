@@ -1,2 +1,4 @@
-./.vscode
-./firmware/.vscode
+.vscode
+firmware/.pio
+firmware/.vscode
+firmware/ex

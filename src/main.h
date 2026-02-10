@@ -61,10 +61,13 @@ extern "C" {
 
 #define TIME_FORMAT							"%F %T"
 #define BUFFER_SIZE							512
-#define DATA_SIZE								BUFFER_SIZE 
+#define DATA_SIZE								BUFFER_SIZE
 #define SQL_SIZE								20480
 #define INTERPRETER							"/bin/python3"
 #define SYSTEM_LOG_PATH						"./logs/system.log"
+#define SAMPLING_FREQ						12000		/* 12kHz */
+#define MIC_COUNT								8
+#define MIC_RADIUS							0.1		/* 0.1 meter */
 
 #define DB_SENSOR_DATA_PATH				"./db/sensor_data.db"
 #define DB_SENSOR_DATA_TABLE				"SensorData"
@@ -93,7 +96,8 @@ extern "C" {
 #define MIC_USB_PREFIX						"ttyUSB"
 #define MIC_WIFI_PREFIX						"wl"
 #define MIC_PLOT_MARGIN						40		/* pixel */
-#define MIC_PLOT_GRID						20 	/* pixel */		
+#define MIC_PLOT_GRID						20 	/* pixel */
+#define MIC_SIGNAL_NUM						15
 
 #define MODEL_DATASET_PATH					"/home/can/Datasets/"
 #define MODEL_DATASET_SUFFIX				".csv"
@@ -322,66 +326,80 @@ typedef enum _NavGyro
 /*****************************************************************************/
 
 /* Global structures */
-typedef struct PACKED _MicSensorData 
-{
-	int8_t data[DATA_SIZE];
-} MicSensorData;
 
-typedef struct _MicSignal
+typedef struct _PayloadData
 {
-	const char *max;
-	const char *min;
-	const char *mean;
-	const char *stddev;
-	const char *energy;
-	const char *rms;
-	const char *power;
-	const char *crest;
-	const char *skewness;
-	const char *kurtosis;
-	const char *variance;
-	const char *doa;
-	const char *distance;
-	const char *coordinate;
-	const char *target;
-} MicSignal;
+	/* The eight microphone data will come here. */
+
+	int8_t micNorth[BUFFER_SIZE];
+	int8_t micNorthEast[BUFFER_SIZE];
+	int8_t micEast[BUFFER_SIZE];
+	int8_t micSouthEast[BUFFER_SIZE];
+	int8_t micSouth[BUFFER_SIZE];
+	int8_t micSouthWest[BUFFER_SIZE];
+	int8_t micWest[BUFFER_SIZE];
+	int8_t micNorthWest[BUFFER_SIZE];
+
+	/* The GPS module data will come here. */
+
+	uint8_t gpsUTCTime[BUFFER_SIZE];
+	uint8_t gpsLatitude[BUFFER_SIZE];
+	uint8_t gpsLongitude[BUFFER_SIZE];
+	uint8_t gpsQuality[BUFFER_SIZE];
+	uint8_t gpsNumSat[BUFFER_SIZE];
+	uint8_t gpsAltitude[BUFFER_SIZE];
+	uint8_t gpsStatus[BUFFER_SIZE];
+	uint8_t gpsSpeed[BUFFER_SIZE];		/* knots */
+	uint8_t gpsCourse[BUFFER_SIZE];		/* degrees */
+	uint8_t gpsDate[BUFFER_SIZE];
+
+	/* The IMU Data will come here. */
+	
+	double imuAccelX;						/* m/s^2 */
+	double imuAccelY;						/* m/s^2 */
+	double imuAccelZ;						/* m/s^2 */
+	double imuGyroX;						/* dps */
+	double imuGyroY;						/* dps */
+	double imuGyroZ;						/* dps */
+	double imuTemp;						/* C */ 
+} PayloadData;
 
 typedef struct _ModelParams
 {
-	const char *dataset;
-	const char *outputModel;
-	const char *layerType;
-	const char *layerNumber;
-	const char *units;
-	const char *epochs;
-	const char *batchSize;
-	const char *earlyStop;
-	const char *dropout;
+	char *dataset;
+	char *outputModel;
+	char *layerType;
+	char *layerNumber;
+	char *units;
+	char *epochs;
+	char *batchSize;
+	char *earlyStop;
+	char *dropout;
 } ModelParams;
 
 typedef struct _GPSData
 {
-	const char *UTCTime;
-	const char *latitude;
-	const char *longitude;
-	const char *quality;
-	const char *numSat;
-	const char *altitude;
-	const char *status;
-	const char *speed;		/* knots */
-	const char *course;		/* degrees */
-	const char *date;
+	uint8_t UTCTime[BUFFER_SIZE];
+	uint8_t latitude[BUFFER_SIZE];
+	uint8_t longitude[BUFFER_SIZE];
+	uint8_t quality[BUFFER_SIZE];
+	uint8_t numSat[BUFFER_SIZE];
+	uint8_t altitude[BUFFER_SIZE];
+	uint8_t status[BUFFER_SIZE];
+	uint8_t speed[BUFFER_SIZE];		/* knots */
+	uint8_t course[BUFFER_SIZE];		/* degrees */
+	uint8_t date[BUFFER_SIZE];
 } GPSData;
 
 typedef struct _NavIMUData
 {
-	const char *accelX;
-	const char *accelY;
-	const char *accelZ;
-	const char *gyroX;
-	const char *gyroY;
-	const char *gyroZ;
-	const char *temp;
+	uint8_t accelX[BUFFER_SIZE];
+	uint8_t accelY[BUFFER_SIZE];
+	uint8_t accelZ[BUFFER_SIZE];
+	uint8_t gyroX[BUFFER_SIZE];
+	uint8_t gyroY[BUFFER_SIZE];
+	uint8_t gyroZ[BUFFER_SIZE];
+	uint8_t temp[BUFFER_SIZE];
 } NavIMUData;
 
 /*****************************************************************************/
@@ -391,6 +409,7 @@ typedef struct _NavIMUData
 
 extern HeaderButton headerButton;
 extern CurrentPage currentPage;
+extern PayloadData payloadData;
 
 /* Microphone shared widgets and variables */
 
@@ -398,7 +417,9 @@ extern char *micDeviceNodes[MAX_DEVICE_NODE];
 extern GtkWidget *micUARTGroup;
 extern GtkWidget *micUSBGroup;
 extern GtkWidget *micWiFiGroup;
-extern GtkWidget *analysisGroup;
+extern GtkWidget *micSignalRows[MIC_SIGNAL_NUM];
+extern GtkWidget *micCarPlot;
+extern GtkWidget *micPolarPlot;
 extern MicChannel micChannel;
 extern char *micDeviceNode;
 extern MicBaudRate micBaudRate;
@@ -409,8 +430,6 @@ extern MicFlowControl micFlowControl;
 extern guint micTimeout;
 extern guint recordTimeout;
 extern MicButton micButton;
-extern MicSensorData micSensorData;
-extern MicSignal micSignal;
 
 /* AI model shared widgets and variables */
 
@@ -435,13 +454,17 @@ extern ModelButton modelButton;
 
 extern ShumateMarkerLayer *gpsMarkerLayer;
 extern ShumateMap *gpsMap;
-extern GPSData gpsData;
 
 /* Nagivation shared widgets and variables */
 
 extern NavAccel navAccel;
 extern NavGyro navGyro;
-extern NavIMUData navIMUData;
+
+/* Signal analysis shared widgets and variables */
+
+extern DspTime micSamples[MIC_COUNT];
+extern DspTime micBeamformed;
+extern guint micVolumest;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -458,7 +481,7 @@ extern void mic_row_flow_control(GtkWidget *);
 extern void mic_group_UART(gpointer);
 extern void mic_group_USB(gpointer);
 extern void mic_group_WiFi(gpointer);
-extern void mic_signal_analysis(GtkWidget *, MicSignal *);
+extern void mic_signal_analysis(GtkWidget *);
 extern void mic_plot_car(GtkDrawingArea *, cairo_t *, int, int, gpointer);
 extern void mic_plot_car_frame(cairo_t *, int, int);	
 extern void mic_plot_car_grid(cairo_t *, int, int);	
@@ -524,7 +547,6 @@ extern char *get_keras_script_logs(const char *);
 extern gboolean timeout_mic_device_node(gpointer);
 extern gboolean timeout_model_keras_log(gpointer);
 extern gboolean timeout_db_record(gpointer);
-extern gboolean timeout_mic_plot_car(gpointer);
 
 /* Generic component function prototypes */
 
@@ -535,13 +557,24 @@ extern guint __generic_row_changed(GObject *, GParamSpec *, gpointer, const char
 extern gboolean __generic_row_switched(GObject *, GParamSpec *, gpointer, const char *);
 extern char *__generic_row_texted(GObject *, GParamSpec *, gpointer, const char *);
 extern GtkWidget *__generic_action_row_new(const char *, const char *);
+extern void __generic_action_row_update(GtkWidget *, const char *);
 extern GtkWidget *__generic_combo_row_new(const char *, const char **, guint);
 extern GtkWidget *__generic_spin_row_new(const char *, double, double, double, double, guint);
 extern GtkWidget *__generic_switch_row_new(const char *);
 extern GtkWidget *__generic_entry_row_new(const char *);
 extern GtkWidget *__generic_group_new(const char *, const char *);
 extern void __generic_group_add(GtkWidget *, GtkWidget *);
+extern void __generic_group_remove(GtkWidget *, GtkWidget *);
 extern GtkWidget *__generic_button_new(const char *, const char *);
+
+/* Signal analysis function prototypes */
+
+extern void convert_payload_to_sample(void);
+extern double find_dominant_freq(void);
+extern int calculate_arrival(double);
+extern DspTime make_beamforming(double, double);
+extern void make_signal_analysis(DspTime *, int);
+extern int select_sector(void);
 
 /*****************************************************************************/
 /*****************************************************************************/

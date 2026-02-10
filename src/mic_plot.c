@@ -129,7 +129,7 @@ void mic_plot_car_data(cairo_t *cr, int width, int height)
 		else
 		{
 			cairo_line_to(cr, MIC_PLOT_MARGIN + (step * i) + 2, 
-				middle - micSensorData.data[i - 1]);
+				middle - micBeamformed.data[i - 1]);
 		}
 	}
 	cairo_stroke(cr);
@@ -307,8 +307,9 @@ void mic_plot_polar(GtkDrawingArea *area, cairo_t *cr, int width,
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);	/* white background */
 	cairo_paint(cr);
 	
-	mic_plot_polar_frame(cr, width, height);			/* draw the frame */
-	mic_plot_polar_label(cr, width, height);			/* put the labels */
-	mic_plot_polar_sector(cr, width, height, 8);		/* fill the sector */
+	mic_plot_polar_frame(cr, width, height);	/* draw the frame */
+	mic_plot_polar_label(cr, width, height);	/* put the labels */
+	mic_plot_polar_sector(cr, width, height, 
+		micVolumest);									/* fill the sector */
 }
  

@@ -17,18 +17,18 @@
 
 /* FreeRTOS-specific Definitions */
 
-#define TASK_MIC_NAME_N				"MicReadingNorth"
-#define TASK_MIC_NAME_E				"MicReadingEast"
-#define TASK_MIC_NAME_S				"MicReadingSouth"
-#define TASK_MIC_NAME_W				"MicReadingWest"
-#define TASK_GPS_NAME				"GPSReading"
-#define TASK_IMU_NAME				"IMUReading"
-#define TASK_SD_NAME					"SDCardWriting"
-#define TASK_SERVO_NAME				"ServoDriving"
-#define TASK_LORA_NAME				"LoRaTransmitting"
-#define TASK_SYSTEM_NAME			"SystemChecking"
-#define TASK_LED_NAME				"LEDUpdating"
-#define TASK_WATCHDOG_NAME			"WatchDogTiming"
+#define TASK_MIC_NAME_N				"taskMicSensorNorth"
+#define TASK_MIC_NAME_E				"taskMicSensorEast"
+#define TASK_MIC_NAME_S				"taskMicSensorSouth"
+#define TASK_MIC_NAME_W				"taskMicSensorWest"
+#define TASK_GPS_NAME				"taskGPSModule"
+#define TASK_IMU_NAME				"taskIMUSensor"
+#define TASK_SD_NAME					"taskSDCard"
+#define TASK_SERVO_NAME				"taskServoMotors"
+#define TASK_LORA_NAME				"taskLoRaModule"
+#define TASK_SYSTEM_NAME			"taskSystemCheck"
+#define TASK_LED_NAME				"taskLEDs"
+#define TASK_WATCHDOG_NAME			"taskWatchdog"
 
 #define TASK_MIC_STACK				10240
 #define TASK_GPS_STACK				10240
@@ -49,3 +49,4 @@
 #define TASK_SYSTEM_PRIORITY		1
 #define TASK_LED_PRIORITY			1
 #define TASK_WATCHDOG_PRIORITY	1
+ 

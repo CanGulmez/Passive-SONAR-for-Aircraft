@@ -287,7 +287,7 @@
 #define LED_PIN_HEARTBEAT					GPIO_PIN_0	/* GPIOE - Output */
 #define LED_PIN_ERROR						GPIO_PIN_1	/* GPIOE - Output */
 #define LED_PIN_DETECT						GPIO_PIN_9	/* GPIOE - Output */
-#define LED_PORT								GPIOA
+#define LED_PORT								GPIOE
 #define LED_MODE								GPIO_MODE_OUTPUT_PP
 #define LED_PULL								GPIO_NOPULL
 

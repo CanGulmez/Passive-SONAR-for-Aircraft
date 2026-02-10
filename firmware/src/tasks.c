@@ -27,13 +27,13 @@ PayloadData payloadData = {0};
 /**
  * Read microphone data from the north channel.
  */
-void taskMicReadingNorth(void *pvParams)
+void taskMicSensorNorth(void *pvParams)
 {
 	uint8_t i;
 	int32_t samples[SAMPLE_SIZE];
 	HAL_StatusTypeDef status;
-
-	printLog("I'm taskMicReadingNorth() task!");
+	
+	printLog("I'm taskMicSensorNorth() task!");
 
 	/* Start the regular DFSDM filter conversion. */
 	status = HAL_DFSDM_FilterRegularStart(&hdfsdm1f[0]);
@@ -57,7 +57,7 @@ void taskMicReadingNorth(void *pvParams)
 			samples[i] = HAL_DFSDM_FilterGetRegularValue(&hdfsdm1f[0], 0);
 			samples[i] = samples[i] >> 8;	/* 24-bit data */
 			
-			printLog("#%i:		%d", i, samples[i]);
+			printLog("#%ld:		%d", i, samples[i]);
 		}
 	}	
 	vTaskDelete(NULL);
@@ -66,9 +66,9 @@ void taskMicReadingNorth(void *pvParams)
 /**
  * Read microphone data from the east channel.
  */
-void taskMicReadingEast(void *pvParams)
+void taskMicSensorEast(void *pvParams)
 {
-	printLog("I'm taskMicReadingEast() task!");
+	printLog("I'm taskMicSensorEast() task!");
 
 	for (;;)
 	{
@@ -80,9 +80,9 @@ void taskMicReadingEast(void *pvParams)
 /**
  * Read microphone data from the south channel.
  */
-void taskMicReadingSouth(void *pvParams)
+void taskMicSensorSouth(void *pvParams)
 {
-	printLog("I'm taskMicReadingSouth() task!");
+	printLog("I'm taskMicSensorSouth() task!");
 
 	for (;;)
 	{
@@ -94,9 +94,9 @@ void taskMicReadingSouth(void *pvParams)
 /**
  * Read microphone data from the west channel.
  */
-void taskMicReadingWest(void *pvParams)
+void taskMicSensorWest(void *pvParams)
 {
-	printLog("I'm taskMicReadingWest() task!");
+	printLog("I'm taskMicSensorWest() task!");
 
 	for (;;)
 	{
@@ -108,13 +108,12 @@ void taskMicReadingWest(void *pvParams)
 /**
  * Read GPS data from the existing module.
  */
-void taskGPSReading(void *pvParams)
+void taskGPSModule(void *pvParams)
 {
-	int i;
 	uint8_t buffer[DATA_SIZE] = {0};
 	HAL_StatusTypeDef status;
 
-	printLog("I'm taskGPSReading() task!");
+	printLog("I'm taskGPSModule() task!");
 	
 	for (;;)
 	{
@@ -134,11 +133,11 @@ void taskGPSReading(void *pvParams)
 /**
  * Read IMU data from the existing sensor.
  */
-void taskIMUReading(void *pvParams)
+void taskIMUSensor(void *pvParams)
 {
 	uint8_t whoami;
 
-	printLog("I'm taskIMUReading() task!");
+	printLog("I'm taskIMUSensor() task!");
 
 	/* Confirm that IMU sensor is registered. */
 	whoami = __read_reg_from_imu(IMU_REG_WHO_AM_I);
@@ -168,14 +167,14 @@ void taskIMUReading(void *pvParams)
 /**
  * Write the backup data into existing SD card.
  */
-void taskSDCardWriting(void *pvParams)
+void taskSDCard(void *pvParams)
 {
 	uint8_t buffer[DATA_SIZE]= {0};
 	HAL_StatusTypeDef status;
 	HAL_SD_CardInfoTypeDef info;
 	static uint32_t csector = START_SECTOR;
 
-	printLog("I'm taskSDCardWriting() task!");
+	printLog("I'm taskSDCard() task!");
 
 	/* Initialize the SD card handler. */
 	status = HAL_SD_Init(&hsdmmc1);
@@ -212,9 +211,9 @@ void taskSDCardWriting(void *pvParams)
 /**
  * Drive the servo motors to vectorize system.
  */
-void taskServoDriving(void *pvParams)
+void taskServoMotors(void *pvParams)
 {
-	printLog("I'm taskServoDriving() task!");
+	printLog("I'm taskServoMotors() task!");
 
 	for (;;)
 	{
@@ -226,9 +225,9 @@ void taskServoDriving(void *pvParams)
 /**
  * Transmit the LoRa package down to ground.
  */
-void taskLoRaTransmitting(void *pvParams)
+void taskLoRaModule(void *pvParams)
 {
-	printLog("I'm taskLoRaTransmitting() task!");
+	printLog("I'm taskLoRaModule() task!");
 
 	for (;;)
 	{
@@ -240,9 +239,9 @@ void taskLoRaTransmitting(void *pvParams)
 /**
  * Check the system healthy with predefined conditions.
  */
-void taskSystemChecking(void *pvParams)
+void taskSystemCheck(void *pvParams)
 {
-	printLog("I'm taskSystemChecking() task!");
+	printLog("I'm taskSystemCheck() task!");
 
 	for (;;)
 	{
@@ -254,9 +253,9 @@ void taskSystemChecking(void *pvParams)
 /**
  * Blink the LEDs to give visual insights.
  */
-void taskLEDUpdating(void *pvParams)
+void taskLEDs(void *pvParams)
 {
-	printLog("I'm taskLEDUpdating() task!");
+	printLog("I'm taskLEDs() task!");
 
 	for (;;)
 	{		
@@ -268,9 +267,9 @@ void taskLEDUpdating(void *pvParams)
 /**
  * Handle the watch dog to maintain system wakeup. 
  */
-void taskWatchdogTiming(void *pvParams)
+void taskWatchdog(void *pvParams)
 {
-	printLog("I'm taskWatchDogTiming() task!");
+	printLog("I'm taskWatchDog() task!");
 	
 	for (;;)
 	{		
