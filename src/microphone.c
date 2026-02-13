@@ -266,7 +266,7 @@ void microphone(GtkBox *micBox, gpointer data)
 	comboRowSigWithData(commRow, on_comm_channel_selected, propertyBox);
 
 	/* Put the initial UART property box. */ 
-	numDev = get_mic_device_nodes(micChannel);
+	numDev = get_device_nodes(micChannel);
 	mic_group_UART(NULL);
 
 	gtk_box_append(GTK_BOX(propertyBox), micUARTGroup);

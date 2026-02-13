@@ -88,7 +88,7 @@ void set_serial_attributes(int fd, struct termios *tty)
 /**
  * Get the available microphone device nodes.
  */
-int get_mic_device_nodes(MicChannel channel)
+int get_device_nodes(MicChannel channel)
 {
 	int i, index = 0;
 	struct dirent *entry;
@@ -147,17 +147,13 @@ int get_mic_device_nodes(MicChannel channel)
 }
 
 /**
- * Read the selected channel's device node and return the bytes.
+ * Open the microphone device node and then return the fd.
  */
-void read_mic_device_node(MicChannel channel, const char* node)
+int open_device_node(MicChannel channel, const char *node)
 {
 	int fd, pathSize = 0;
 	char devicePath[32];
-	ssize_t numRead;
 	struct termios tty;
-	
-	/* Initialize with NULLs. */
-	memset(&payloadData, 0, sizeof(payloadData));
 
 	/* Create the device node path name correctly. */
 	if (channel == MIC_CHANNEL_UART || channel == MIC_CHANNEL_USB) 
@@ -174,31 +170,60 @@ void read_mic_device_node(MicChannel channel, const char* node)
 	pathSize += strlen(node);
 	devicePath[pathSize] = '\0';
 	
-	fd = open(devicePath, 
+	fd = open(
+		devicePath, 
 		O_RDONLY 	| 						/* read-only channel */
-		O_NOCTTY 	| 						/* no controlling terminal */
+		O_NOCTTY 	|						/* no controlling terminal */
 		O_NONBLOCK 	| 						/* non-blocking I/O */
 		O_SYNC								/* wait for completion */
 	);	
 	if (fd == -1)
+	{
 		syscallError();
-	
+	}
+	else
+	{
+		printLog("opened the '%s' device node", devicePath);
+	}
+
 	/* Set serial terminal attributes. */
 	set_serial_attributes(fd, &tty);
-	
-	/* Read the device node. */
-	numRead = read(fd, &payloadData, sizeof(payloadData));
-	if (numRead > 0) 
+
+	return fd;
+}
+
+/**
+ * Read the selected channel's device node.
+ */
+void read_device_node(int fd)
+{
+	ssize_t numRead, totalRead;
+	uint8_t *payloadPtr;
+	long payloadSize;
+
+	/* Initialize with NULLs. */
+	memset(&payloadData, 0, sizeof(payloadData));
+
+	payloadPtr = (uint8_t *) &payloadData;
+	payloadSize = sizeof(payloadData);
+	totalRead = 0;
+	/* Read the device node simulatenously. If the received data is 
+		bigger than kernel buffer size (defaultly, 4096 bytes), loop 
+		the read operations. */
+	while (totalRead < payloadSize)
 	{
-		printLog("read %ld bytes from '%s'", numRead, devicePath);
-		if (close(fd) == -1)
-			syscallError(); 
-	} 
-	else if (numRead == -1) 
-	{
-		if (errno != EAGAIN && errno != EWOULDBLOCK)
-			syscallError(); 
-			/* EAGAIN is normal (no data at this cycle) */
+		numRead = read(fd, payloadPtr+totalRead, payloadSize-totalRead);
+		if (numRead > 0) 
+		{
+			totalRead += numRead;
+			printLog("read %ld bytes from the node", numRead);
+		} 
+		else if (numRead == -1) 
+		{
+			if (errno != EAGAIN && errno != EWOULDBLOCK)
+				syscallError(); 
+				/* EAGAIN is normal (no data at this cycle) */
+		}
 	}
 }
 

@@ -105,7 +105,7 @@ void on_comm_channel_selected(GObject *gobject, GParamSpec *pspec, gpointer data
 		default:	
 			customError("Unknown combo row selection");
 	}
-	numDev = get_mic_device_nodes(micChannel);
+	numDev = get_device_nodes(micChannel);
 	micDeviceNodes[numDev] = NULL;	/* NULL-terminating for GTK list */
 
 	/* First, remove the current property group. */
@@ -356,6 +356,8 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 {
 	int i;
 	const char *label;
+	sqlite3 *db;
+	int deviceFd;
 
 	label = gtk_button_get_label(button);
 	printLog("%s(): '%s'", FUNC, label);
@@ -378,12 +380,14 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 	}
 	
 	/* Declare the database entry-point here. */
-	struct sqlite3 *db;
 
 	/* When the buttons clicked, take the required actions. */
 	if (micButton == MIC_BUTTON_START) 
 	{
-		/* Open the "sensor_data.db" database. */
+		/* Open the selected device node. */
+		deviceFd = open_device_node(micChannel, micDeviceNode);
+
+		/* Open the 'sensor_data.db' database. */
 		db = db_open(DB_SENSOR_DATA_PATH);
 		db_create_table(db, DATABASE_SENSOR_DATA);
 
@@ -391,7 +395,7 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 		if (!micTimeout) 
 		{
 			micTimeout = g_timeout_add(TIMEOUT_DEVICE_READ, 
-				timeout_mic_device_node, NULL);
+				timeout_device_node, GINT_TO_POINTER(deviceFd));
 		}
 		/* Add the timeout for recording sensor data into database. */
 		if (!recordTimeout)
@@ -404,6 +408,13 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 	{
 		/* Close the open database. */
 		db_close(db);
+
+		/* Close also the open device node. */
+		if (deviceFd)
+		{
+			if (close(deviceFd) == -1)
+			syscallError();
+		}
 
 		/* Stop the timeout for "payloadData". */
 		if (micTimeout) 
@@ -500,7 +511,22 @@ void on_nav_button_clicked(GtkButton *button, gpointer data)
 	const char *label;
 
 	label = gtk_button_get_label(button);
-	printLog("%s(): '%s'", FUNC, label);	
+	printLog("%s(): '%s'", FUNC, label);
+
+	if (cmp(label, "Start"))
+	{
+		navButton = NAV_BUTTON_START;
+	}
+
+	/* If the 'Start' button is clicked, activate the readings. */
+	if (navButton == NAV_BUTTON_START)
+	{
+		if (!navTimeout)
+		{
+			/* Start the timeout for real-time tracking. */
+			g_timeout_add(TIMEOUT_NAV_UPDATE, timeout_nav_update, NULL);
+		}
+	}
 }
 
 void on_gps_button_clicked(GtkButton *button, gpointer data)
@@ -511,11 +537,19 @@ void on_gps_button_clicked(GtkButton *button, gpointer data)
 	label = gtk_button_get_label(button);
 	printLog("%s(): '%s'", FUNC, label);
 
-	/* Put the markers into map area. */
-	shumate_map_center_on(gpsMap, 41.008, 28.9784);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9784);
+	if (cmp(label, "Start"))
+	{
+		gpsButton = GPS_BUTTON_START;
+	}
 
-	shumate_map_center_on(gpsMap, 41.008, 29.0500);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0500);
+	/* If 'Start' button is clicked, activate the readings. */
+	if (gpsButton == GPS_BUTTON_START)
+	{
+		if (!gpsTimeout)
+		{
+			/* Start the timeout for real-time tracking. */
+			g_timeout_add(TIMEOUT_GPS_UPDATE, timeout_gps_update, NULL);
+		}
+	}
 }
  

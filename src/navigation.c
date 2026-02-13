@@ -17,32 +17,55 @@
 
 #include "main.h"
 
+/* Shared widgets and variables */
+
+NavAccel navAccel;
+NavGyro navGyro;
+NavButton navButton;
+GtkWidget *navSensorRows[8];	/* module, accel-status, accel-output,
+											gyro-status, gyro-output, magnet-status,
+											magnet-output, temp */
+guint navTimeout = 0;
+
+GtkWidget *nav_info_group(gpointer data)
+{
+	GtkWidget *infoGroup;
+
+	infoGroup = __generic_group_new(
+		"IMU Module", "Show the used IMU sensor information"
+	);
+	navSensorRows[0] = __generic_action_row_new("Sensor Series", "Null");
+	__generic_group_add(infoGroup, navSensorRows[0]);
+
+	return infoGroup;
+}
+
 GtkWidget *nav_accel_group(gpointer data)
 {
-	GtkWidget *accelGroup, *status, *output;
+	GtkWidget *accelGroup;
 
 	accelGroup = __generic_group_new(
 		"Accelerometer", "Show the accelerometer status and data"
 	);
-	status = __generic_action_row_new("Status", "Not Running");
-	__generic_group_add(accelGroup, status);
-	output = __generic_action_row_new("Output", "[Null, Null, Null]");
-	__generic_group_add(accelGroup, output);
+	navSensorRows[1] = __generic_action_row_new("Status", "Not Running");
+	__generic_group_add(accelGroup, navSensorRows[1]);
+	navSensorRows[2] = __generic_action_row_new("Output", "[Null, Null, Null]");
+	__generic_group_add(accelGroup, navSensorRows[2]);
 
 	return accelGroup;
 }
 
 GtkWidget *nav_gyro_group(gpointer data)
 {
-	GtkWidget *gyroGroup, *status, *output;
+	GtkWidget *gyroGroup;
 
 	gyroGroup = __generic_group_new(
 		"Gyroscope", "Show the gyroscope status and data"
 	);
-	status = __generic_action_row_new("Status", "Not Running");
-	__generic_group_add(gyroGroup, status);
-	output = __generic_action_row_new("Output", "[Null, Null, Null]");
-	__generic_group_add(gyroGroup, output);
+	navSensorRows[3] = __generic_action_row_new("Status", "Not Running");
+	__generic_group_add(gyroGroup, navSensorRows[3]);
+	navSensorRows[4] = __generic_action_row_new("Output", "[Null, Null, Null]");
+	__generic_group_add(gyroGroup, navSensorRows[4]);
 
 	return gyroGroup;
 }
@@ -54,10 +77,10 @@ GtkWidget *nav_magnet_group(gpointer data)
 	magnetGroup = __generic_group_new(
 		"Magnetometer", "Show the magnetometer status and data"
 	);
-	status = __generic_action_row_new("Status", "Not Running");
-	__generic_group_add(magnetGroup, status);
-	output = __generic_action_row_new("Output", "[Null, Null, Null]");
-	__generic_group_add(magnetGroup, output);
+	navSensorRows[5] = __generic_action_row_new("Status", "Not Running");
+	__generic_group_add(magnetGroup, navSensorRows[5]);
+	navSensorRows[6] = __generic_action_row_new("Output", "[Null, Null, Null]");
+	__generic_group_add(magnetGroup, navSensorRows[6]);
 
 	return magnetGroup;
 }
@@ -69,8 +92,8 @@ GtkWidget *nav_temp_group(gpointer data)
 	tempGroup = __generic_group_new(
 		"Temperature", "Show the temperature data"
 	);
-	output = __generic_action_row_new("Output", "Null");
-	__generic_group_add(tempGroup, output);
+	navSensorRows[7] = __generic_action_row_new("Output", "Null");
+	__generic_group_add(tempGroup, navSensorRows[7]);
 
 	return tempGroup;
 }
@@ -78,10 +101,9 @@ GtkWidget *nav_temp_group(gpointer data)
 void navigation(GtkBox *imuBox, gpointer data)
 {
 	GtkWidget *leftBox, *separator, *rightBox;
-	GtkWidget *accelGroup, *gyroGroup, *magnetGroup, *tempGroup;	
-	GtkWidget *navPlotArea;
-	GtkWidget *navGroup, *navRow, *propertyBox;
-	GtkWidget *scrolledWin, *startBtn;
+	GtkWidget *accelGroup, *gyroGroup, *magnetGroup, *tempGroup,
+				 *infoGroup;	
+	GtkWidget *navPlotArea, *propertyBox, *scrolledWin, *startBtn;
 
 	/* Put the required boxes. */
 	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
@@ -104,14 +126,8 @@ void navigation(GtkBox *imuBox, gpointer data)
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledWin),
 		propertyBox);
 
-	/* Put the navigation series module group. */
-	navGroup = __generic_group_new(
-		"IMU Module", "Show the used IMU sensor information"
-	);
-	navRow = __generic_action_row_new("Sensor Series", "Null");
-	__generic_group_add(navGroup, navRow);
-
 	/* Put the accelerometer, gyroscope and gyroscope groups. */
+	infoGroup = nav_info_group(NULL);
 	accelGroup = nav_accel_group(NULL);
 	gyroGroup = nav_gyro_group(NULL);
 	magnetGroup = nav_magnet_group(NULL);
@@ -131,7 +147,7 @@ void navigation(GtkBox *imuBox, gpointer data)
 	gtk_widget_set_size_request(navPlotArea, 900, -1);
 
 	/* Append the all groups and widgets to main box. */
-	gtk_box_append(GTK_BOX(propertyBox), navGroup);
+	gtk_box_append(GTK_BOX(propertyBox), infoGroup);
 	gtk_box_append(GTK_BOX(propertyBox), accelGroup);
 	gtk_box_append(GTK_BOX(propertyBox), gyroGroup);
 	gtk_box_append(GTK_BOX(propertyBox), magnetGroup);

@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 /* Compile-specific definitions */
-
+ 
 #pragma GCC optimize("O3")
 
 /* Required libaries */
@@ -68,6 +68,8 @@ extern "C" {
 #define SAMPLING_FREQ						12000		/* 12kHz */
 #define MIC_COUNT								8
 #define MIC_RADIUS							0.1		/* 0.1 meter */
+#define USED_IMU_SENSOR						"LSM6DALTR (ST)"
+#define USED_GPS_MODULE						"E22 900T22D Lora"
 
 #define DB_SENSOR_DATA_PATH				"./db/sensor_data.db"
 #define DB_SENSOR_DATA_TABLE				"SensorData"
@@ -106,15 +108,21 @@ extern "C" {
 #define MODEL_PREDICT_SCRIPT				"scripts/predicting_acoustic_model.py"
 #define MODEL_LOG_PATH						"./logs/keras-output.log"
 
-#define NAV_PLOT_MARGIN						0		/* pixel */
-#define NAV_PLOT_GRID						20		/* pixel */
-#define NAV_PLOT_CAXIS						220	/* pixel */
-#define NAV_PLOT_VAXIS						280	/* pixel */
+#define NAV_PLOT_MARGIN						0			/* pixel */
+#define NAV_PLOT_GRID						20			/* pixel */
+#define NAV_PLOT_CAXIS						220		/* pixel */
+#define NAV_PLOT_VAXIS						280		/* pixel */
 
-#define TIMEOUT_DEVICE_READ				1000	/* ms */
-#define TIMEOUT_PLOT_REDRAW				1000	/* ms */
-#define TIMEOUT_MODEL_LOG					5000	/* ms */
-#define TIMEOUT_DATA_RECORD				4000	/* ms */
+#define GPS_ZOOM_LEVEL						12.0
+#define GPS_INIT_LAT							41.008
+#define GPS_INIT_LONG						28.9784
+
+#define TIMEOUT_DEVICE_READ				2000		/* ms */
+#define TIMEOUT_PLOT_REDRAW				2000		/* ms */
+#define TIMEOUT_MODEL_LOG					10000		/* ms */
+#define TIMEOUT_DATA_RECORD				10000		/* ms */
+#define TIMEOUT_NAV_UPDATE					2000		/* ms */ 
+#define TIMEOUT_GPS_UPDATE					2000		/* ms */
 
 /* Attribute and built-in macro definitions  */
 
@@ -322,46 +330,58 @@ typedef enum _NavGyro
 	NAV_GYRO_Z_MINUS
 } NavGyro;
 
+typedef enum _NavButton
+{
+	NAV_BUTTON_START
+} NavButton;
+
+/* GPS map enumerations */
+
+typedef enum _GPSButton
+{
+	GPS_BUTTON_START
+} GPSButton;
+
 /*****************************************************************************/
 /*****************************************************************************/
 
 /* Global structures */
 
-typedef struct _PayloadData
+typedef struct PACKED _PayloadData
 {
-	/* The eight microphone data will come here. */
+	/* The microphone sensors payload data  */
 
-	int8_t micNorth[BUFFER_SIZE];
-	int8_t micNorthEast[BUFFER_SIZE];
-	int8_t micEast[BUFFER_SIZE];
-	int8_t micSouthEast[BUFFER_SIZE];
-	int8_t micSouth[BUFFER_SIZE];
-	int8_t micSouthWest[BUFFER_SIZE];
-	int8_t micWest[BUFFER_SIZE];
-	int8_t micNorthWest[BUFFER_SIZE];
+	int8_t micNorth[DATA_SIZE];
+	int8_t micNorthEast[DATA_SIZE];
+	int8_t micEast[DATA_SIZE];
+	int8_t micSouthEast[DATA_SIZE];
+	int8_t micSouth[DATA_SIZE];
+	int8_t micSouthWest[DATA_SIZE];
+	int8_t micWest[DATA_SIZE];
+	int8_t micNorthWest[DATA_SIZE];
 
-	/* The GPS module data will come here. */
-
-	uint8_t gpsUTCTime[BUFFER_SIZE];
-	uint8_t gpsLatitude[BUFFER_SIZE];
-	uint8_t gpsLongitude[BUFFER_SIZE];
-	uint8_t gpsQuality[BUFFER_SIZE];
-	uint8_t gpsNumSat[BUFFER_SIZE];
-	uint8_t gpsAltitude[BUFFER_SIZE];
-	uint8_t gpsStatus[BUFFER_SIZE];
-	uint8_t gpsSpeed[BUFFER_SIZE];		/* knots */
-	uint8_t gpsCourse[BUFFER_SIZE];		/* degrees */
-	uint8_t gpsDate[BUFFER_SIZE];
-
-	/* The IMU Data will come here. */
+	/* The IMU sensor payload data */
 	
-	double imuAccelX;						/* m/s^2 */
-	double imuAccelY;						/* m/s^2 */
-	double imuAccelZ;						/* m/s^2 */
-	double imuGyroX;						/* dps */
-	double imuGyroY;						/* dps */
-	double imuGyroZ;						/* dps */
-	double imuTemp;						/* C */ 
+	float imuAccelX;						/* m/s^2 */
+	float imuAccelY;						/* m/s^2 */
+	float imuAccelZ;						/* m/s^2 */
+	float imuGyroX;						/* dps */
+	float imuGyroY;						/* dps */
+	float imuGyroZ;						/* dps */
+	float imuTemp;							/* C */ 
+
+	/* The GPS module payload data */
+
+	int8_t gpsUTCTime[DATA_SIZE];
+	int8_t gpsLatitude[DATA_SIZE];
+	int8_t gpsLongitude[DATA_SIZE];
+	int8_t gpsQuality[DATA_SIZE];
+	int8_t gpsNumSat[DATA_SIZE];
+	int8_t gpsAltitude[DATA_SIZE];
+	int8_t gpsStatus[DATA_SIZE];
+	int8_t gpsSpeed[DATA_SIZE];		/* knots */
+	int8_t gpsCourse[DATA_SIZE];		/* degrees */
+	int8_t gpsDate[DATA_SIZE];
 } PayloadData;
 
 typedef struct _ModelParams
@@ -376,31 +396,6 @@ typedef struct _ModelParams
 	char *earlyStop;
 	char *dropout;
 } ModelParams;
-
-typedef struct _GPSData
-{
-	uint8_t UTCTime[BUFFER_SIZE];
-	uint8_t latitude[BUFFER_SIZE];
-	uint8_t longitude[BUFFER_SIZE];
-	uint8_t quality[BUFFER_SIZE];
-	uint8_t numSat[BUFFER_SIZE];
-	uint8_t altitude[BUFFER_SIZE];
-	uint8_t status[BUFFER_SIZE];
-	uint8_t speed[BUFFER_SIZE];		/* knots */
-	uint8_t course[BUFFER_SIZE];		/* degrees */
-	uint8_t date[BUFFER_SIZE];
-} GPSData;
-
-typedef struct _NavIMUData
-{
-	uint8_t accelX[BUFFER_SIZE];
-	uint8_t accelY[BUFFER_SIZE];
-	uint8_t accelZ[BUFFER_SIZE];
-	uint8_t gyroX[BUFFER_SIZE];
-	uint8_t gyroY[BUFFER_SIZE];
-	uint8_t gyroZ[BUFFER_SIZE];
-	uint8_t temp[BUFFER_SIZE];
-} NavIMUData;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -454,11 +449,17 @@ extern ModelButton modelButton;
 
 extern ShumateMarkerLayer *gpsMarkerLayer;
 extern ShumateMap *gpsMap;
+extern GPSButton gpsButton;
+extern guint gpsTimeout;
+extern GtkWidget *gpsModuleRows[11];
 
 /* Nagivation shared widgets and variables */
 
 extern NavAccel navAccel;
 extern NavGyro navGyro;
+extern NavButton navButton;
+extern GtkWidget *navSensorRows[8];
+extern guint navTimeout;
 
 /* Signal analysis shared widgets and variables */
 
@@ -531,11 +532,10 @@ extern void db_close(struct sqlite3 *);
 
 extern void logging(const char *, size_t);
 extern char *get_time(const char *);
-extern int get_mic_device_nodes(MicChannel);
-extern int get_camera_USB_nodes(void);
-extern int get_camera_host_videos(void);
+extern int get_device_nodes(MicChannel);
+extern int open_device_node(MicChannel, const char *);
+extern void read_device_node(int);
 extern int get_model_datasets(void);
-extern void read_mic_device_node(MicChannel, const char *);
 extern void set_serial_attributes(int, struct termios *);
 extern int run_keras_script(const char *);
 extern void abort_keras_script(int);
@@ -544,9 +544,11 @@ extern char *get_keras_script_logs(const char *);
 
 /* Timeout utility function prototypes */
 
-extern gboolean timeout_mic_device_node(gpointer);
+extern gboolean timeout_device_node(gpointer);
 extern gboolean timeout_model_keras_log(gpointer);
 extern gboolean timeout_db_record(gpointer);
+extern gboolean timeout_nav_update(gpointer);
+extern gboolean timeout_gps_update(gpointer);
 
 /* Generic component function prototypes */
 

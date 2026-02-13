@@ -21,7 +21,11 @@
 
 ShumateMarkerLayer *gpsMarkerLayer = {0};
 ShumateMap *gpsMap = {0};
-GPSData gpsData = {0};
+GtkWidget *gpsModuleRows[11];	/* module, time, latitude, longitude, quality,
+											num of sat, altitude, status, speed, course,
+											date */
+GPSButton gpsButton;
+guint gpsTimeout = 0;
 
 /**
  * Put the markers at specific locations in the map.
@@ -66,11 +70,11 @@ void gps_map_area(GtkBox *rightBox, gpointer data)
 	mapSource = shumate_map_source_registry_get_by_id(registry,
 		SHUMATE_MAP_SOURCE_OSM_MAPNIK);
 	
-	shumate_map_center_on(gpsMap, 41.008, 28.9784);
+	shumate_map_center_on(gpsMap, GPS_INIT_LAT, GPS_INIT_LONG);
 	shumate_simple_map_set_map_source(simpleMap, mapSource);
 	
 	shumate_viewport_set_reference_map_source(viewport, mapSource);
-	shumate_viewport_set_zoom_level(viewport, 12.0);
+	shumate_viewport_set_zoom_level(viewport, GPS_ZOOM_LEVEL);
 
 	/* Create marker and path layers. */
 	gpsMarkerLayer = shumate_marker_layer_new(viewport);
@@ -90,12 +94,10 @@ void gps_map_area(GtkBox *rightBox, gpointer data)
  */
 void gps_map(GtkBox *mapBox, gpointer data)
 {
+	int i;
 	GtkWidget *rightBox, *leftBox, *separator;	
 	GtkWidget *GPSModuleGroup, *GPSResGroup;
 	GtkWidget *scrolledWin, *propertyBox;
-	GtkWidget *timeRow, *latitudeRow, *longitudeRow, *qualityRow;
-	GtkWidget *numSatRow, *altitudeRow, *statusRow, *speedRow;
-	GtkWidget *courseRow, *dateRow, *seriesRow;
 	GtkWidget *startBtn;
 
 	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
@@ -124,8 +126,8 @@ void gps_map(GtkBox *mapBox, gpointer data)
 	GPSModuleGroup = __generic_group_new("GPS Module",
 		"Show the used GPS module information");
 
-	seriesRow = __generic_action_row_new("Module Series", "Null");
-	__generic_group_add(GPSModuleGroup, seriesRow);
+	gpsModuleRows[0] = __generic_action_row_new("Module Series", "Null");
+	__generic_group_add(GPSModuleGroup, gpsModuleRows[0]);
 
 	/* GPS Data (NMEA 0183 sentences)
 	
@@ -150,27 +152,22 @@ void gps_map(GtkBox *mapBox, gpointer data)
 		"Show the GPS module data simultaneously");
 
 	/* Put the GPS module outputs. */
-	timeRow = __generic_action_row_new("UTC Time", "Null");
-	latitudeRow = __generic_action_row_new("Latitude", "Null");
-	longitudeRow = __generic_action_row_new("Longitude", "Null");
-	qualityRow = __generic_action_row_new("Fix Quality", "Null");
-	numSatRow = __generic_action_row_new("Number of Sattelites", "Null");
-	altitudeRow = __generic_action_row_new("Altitude", "Null");
-	statusRow = __generic_action_row_new("Status", "Null");
-	speedRow = __generic_action_row_new("Speed over Ground (knots)", "Null");
-	courseRow = __generic_action_row_new("Course over Ground (degrees)", "Null");
-	dateRow = __generic_action_row_new("Date", "Null");
+	gpsModuleRows[1] = __generic_action_row_new("UTC Time", "Null");
+	gpsModuleRows[2] = __generic_action_row_new("Latitude", "Null");
+	gpsModuleRows[3] = __generic_action_row_new("Longitude", "Null");
+	gpsModuleRows[4] = __generic_action_row_new("Fix Quality", "Null");
+	gpsModuleRows[5] = __generic_action_row_new("Number of Sattelites", "Null");
+	gpsModuleRows[6] = __generic_action_row_new("Altitude", "Null");
+	gpsModuleRows[7] = __generic_action_row_new("Status", "Null");
+	gpsModuleRows[8] = __generic_action_row_new("Speed over Ground (knots)", "Null");
+	gpsModuleRows[9] = __generic_action_row_new("Course over Ground (degrees)", "Null");
+	gpsModuleRows[10] = __generic_action_row_new("Date", "Null");
 
-	__generic_group_add(GPSResGroup, timeRow);
-	__generic_group_add(GPSResGroup, latitudeRow);
-	__generic_group_add(GPSResGroup, longitudeRow);
-	__generic_group_add(GPSResGroup, qualityRow);
-	__generic_group_add(GPSResGroup, numSatRow);
-	__generic_group_add(GPSResGroup, altitudeRow);
-	__generic_group_add(GPSResGroup, statusRow);
-	__generic_group_add(GPSResGroup, speedRow);
-	__generic_group_add(GPSResGroup, courseRow);
-	__generic_group_add(GPSResGroup, dateRow);
+	/* Put the outputs into group. */
+	for (i = 1; i < 11; i++)
+	{
+		__generic_group_add(GPSResGroup, gpsModuleRows[i]);
+	}
 
 	/* Put the required buttons. */
 	startBtn = __generic_button_new("Start", "suggested-action");

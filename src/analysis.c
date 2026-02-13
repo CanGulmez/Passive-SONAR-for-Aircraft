@@ -2,7 +2,7 @@
  ******************************************************************************
  * @file 	analysis.c
  * @author 	Ahmet Can GULMEZ
- * @brief 	Signal analysis operations of AeroSONAR.
+ * @brief 	Payload analysis operations of AeroSONAR.
  * 
  ******************************************************************************
  * @attention 
@@ -169,7 +169,7 @@ int select_sector(void)
 		means[i] = dsp_time_mean(&micSamples[i]);
 	}
 	/* Find the biggest mean. */
-	biggest = means[i];
+	biggest = means[0];
 	for (i = 0; i < MIC_COUNT; i++)
 	{
 		if (means[i] > biggest)
