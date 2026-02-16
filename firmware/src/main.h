@@ -44,6 +44,7 @@
 
 #define BUFFER_SIZE			64
 #define DATA_SIZE				512
+#define GPS_SIZE				64
 #define SAMPLE_SIZE			(DATA_SIZE * 2)	
 #define CHANNEL_COUNT		4
 #define MIC_COUNT				(CHANNEL_COUNT * 2)
@@ -83,58 +84,49 @@ extern SD_HandleTypeDef	hsdmmc1;										/* SD Card */
 extern DFSDM_Channel_HandleTypeDef hdfsdm1c[CHANNEL_COUNT];	/* Mic Sensor */
 extern DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT];	/* Mic Sensor */
 
+extern SemaphoreHandle_t payloadMutex;	/* Mutex for payload data */
+
 /*****************************************************************************/
 /*****************************************************************************/
 
 /* Data Structures and Enumerations */
-
-PACKED typedef struct _MicData 
+typedef struct PACKED _PayloadData
 {
-	int32_t north[DATA_SIZE];
-	int32_t northEast[DATA_SIZE];
-	int32_t east[DATA_SIZE];
-	int32_t southEast[DATA_SIZE];
-	int32_t south[DATA_SIZE];
-	int32_t southWest[DATA_SIZE];
-	int32_t west[DATA_SIZE];
-	int32_t northWest[DATA_SIZE];
-} MicData;
+	/* The microphone sensors payload data  */
 
-PACKED typedef struct _GPSData 
-{
-	uint8_t UTCTime[BUFFER_SIZE];
-	uint8_t latitude[BUFFER_SIZE];
-	uint8_t longitude[BUFFER_SIZE];
-	uint8_t quality[BUFFER_SIZE];
-	uint8_t numSat[BUFFER_SIZE];
-	uint8_t altitude[BUFFER_SIZE];
-	uint8_t status[BUFFER_SIZE];
-	uint8_t speed[BUFFER_SIZE];		/* knots */
-	uint8_t course[BUFFER_SIZE];		/* degrees */
-	uint8_t date[BUFFER_SIZE];
-} GPSData;
+	int8_t micNorth[DATA_SIZE];
+	int8_t micNorthEast[DATA_SIZE];
+	int8_t micEast[DATA_SIZE];
+	int8_t micSouthEast[DATA_SIZE];
+	int8_t micSouth[DATA_SIZE];
+	int8_t micSouthWest[DATA_SIZE];
+	int8_t micWest[DATA_SIZE];
+	int8_t micNorthWest[DATA_SIZE];
 
-PACKED typedef struct _IMUData 
-{
-	double accelX;		/* mg */
-	double accelY;		/* mg */
-	double accelZ;		/* mg */
-	double gyroX;		/* dps */
-	double gyroY;		/* dps */
-	double gyroZ;		/* dps */
-	double temp;		/* C */ 
-} IMUData;
+	/* The GPS module payload data */
 
-PACKED typedef struct _PayloadData
-{
-	MicData MicData;
-	GPSData GPSData;
-	IMUData IMUData;
+	uint8_t gpsUTCTime[GPS_SIZE];
+	uint8_t gpsLatitude[GPS_SIZE];
+	uint8_t gpsLongitude[GPS_SIZE];
+	uint8_t gpsQuality[GPS_SIZE];
+	uint8_t gpsNumSat[GPS_SIZE];
+	uint8_t gpsAltitude[GPS_SIZE];
+	uint8_t gpsStatus[GPS_SIZE];
+	uint8_t gpsSpeed[GPS_SIZE];		/* knots */
+	uint8_t gpsCourse[GPS_SIZE];		/* degrees */
+	uint8_t gpsDate[GPS_SIZE];
+
+	/* The IMU sensor payload data */
+	
+	float imuAccelX;						/* m/s^2 */
+	float imuAccelY;						/* m/s^2 */
+	float imuAccelZ;						/* m/s^2 */
+	float imuGyroX;						/* dps */
+	float imuGyroY;						/* dps */
+	float imuGyroZ;						/* dps */
+	float imuTemp;							/* C */ 
 } PayloadData;
 
-extern MicData micData;
-extern GPSData gpsData;
-extern IMUData imuData;
 extern PayloadData payloadData;
 
 /*****************************************************************************/
@@ -356,29 +348,29 @@ extern void configServoMotors(void);
 extern void configLEDs(void);
 extern void configWatchdog(void);
 
-extern void taskMicSensorNorth(void *pvParams);
-extern void taskMicSensorEast(void *pvParams);
-extern void taskMicSensorSouth(void *pvParams);
-extern void taskMicSensorWest(void *pvParams);
-extern void taskGPSModule(void *pvParams);
-extern void taskIMUSensor(void *pvParams);
-extern void taskSDCard(void *pvParams);
-extern void taskLoRaModule(void *pvParams);
-extern void taskSystemCheck(void *pvParams);
-extern void taskServoMotors(void *pvParams);
-extern void taskLEDs(void *pvParams);
-extern void taskWatchdog(void *pvParams);
+extern void taskMicSensorNorth(void *);
+extern void taskMicSensorEast(void *);
+extern void taskMicSensorSouth(void *);
+extern void taskMicSensorWest(void *);
+extern void taskGPSModule(void *);
+extern void taskIMUSensor(void *);
+extern void taskSDCard(void *);
+extern void taskLoRaModule(void *);
+extern void taskSystemCheck(void *);
+extern void taskServoMotors(void *);
+extern void taskLEDs(void *);
+extern void taskWatchdog(void *);
 
 extern void SysTick_Handler(void);
 extern void xPortSysTickHandler(void);
 extern void vApplicationIdleHook(void);
 
-extern void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData);
-extern void __write_to_imu_reg(uint8_t reg, uint8_t data);
-extern uint8_t __read_reg_from_imu(uint8_t reg);
-extern void __read_accel_from_imu(IMUData *imuData);
-extern void __read_gyro_from_imu(IMUData *imuData);
-extern void __read_temp_from_imu(IMUData *imuData);
+extern void __parse_nmea_sentences(uint8_t *, PayloadData *);
+extern void __write_to_imu_reg(uint8_t, uint8_t);
+extern uint8_t __read_reg_from_imu(uint8_t);
+extern void __read_accel_from_imu(PayloadData *);
+extern void __read_gyro_from_imu(PayloadData *);
+extern void __read_temp_from_imu(PayloadData *);
 extern void __get_sd_card_info(void);
 
 #endif /* FIRMWARE_H */

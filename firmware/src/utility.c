@@ -20,10 +20,30 @@
 /**
  * Parse the NMEA sentences coming from GPS module.
  */
-void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
+void __parse_nmea_sentences(uint8_t *buffer, PayloadData *payloadData)
 {
 	int length;
 	uint8_t *sentence, *token;
+
+	/* GPS Data (NMEA 0183 sentences)
+	
+		$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
+			+ 123519 		--> UTC time (12:35:19)
+			+ 4807.038,N	--> latitude 48^07.038' North
+			+ 01131.000,E	--> longitude 11^31.000' East
+			+ 1 				--> fix quality (1 = GPS fix)
+			+ 08				--> number of sattelite used
+			+ 545.4,M		--> altitude 545.4 m
+	
+		$GPRCM,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+			+ 123519			--> UTC time
+			+ A				--> status (A = valid, V = invalid)
+			+ 					--> latitude
+			+ 					--> longitude
+			+ 022.4			--> speed over ground (knots)
+			+ 084.4			--> course over ground (degrees)
+			+ 230394			--> date (23 March 1994)
+	*/
 	
 	/* Tokenize the each sentence in buffer. */
 	sentence = strtok(buffer, "\n");
@@ -34,14 +54,23 @@ void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
 			token = strchr(sentence, sentence[7]);
 
 			/* Get the UTC time (123519 --> 12:35:19). */
-			strncpy(gpsData->UTCTime, token, 6);
-
+			strncpy(payloadData->gpsUTCTime, token, 6);
+			
 			/* Get the latitude (4807.038 --> 48^ 07.038' N). */
+			/* Get the longitude (01131.000 --> 11^ 31.000' East). */
+			/* Get the fix quality (1 --> GPS fix). */
+			/* Get the number of satellites used. */
+			/* Get the altitude (545.4 --> 545.4 meters). */
 			
 		}
 		else if (strncmp(sentence, "$GPRCM", 6) == 0)
 		{
 			token = strchr(sentence, sentence[7]);
+
+			/* Get the status (A --> valid, V --> invalid). */
+			/* Get the speed over ground (knots). */
+			/* Get the course over ground (degrees). */
+			/* Get the date (230394 --> 23 March 1994). */
 		}
 		else
 		{
@@ -51,94 +80,6 @@ void __parse_nmea_sentences(uint8_t *buffer, GPSData *gpsData)
 		strtok(NULL, "\n");
 	}
 }
-
-/**
- * Parse the NMEA sentences into sentences.
- */
-// void __parse_nmea_sentences(uint8_t *sentences, GPSData *result)
-// {
-// 	uint8_t *sentence, *token;
-
-// 	/* Tokenize the each sentence. */
-// 	sentence = strtok(sentences, "\n");
-// 	while (sentence != NULL)
-// 	{
-// 		if (strncmp(sentence, "$GPGGA", 6) == 0)
-// 		{
-// 			/* Get the remaining string and then parse. */
-// 			token = strchr(sentence, sentence[7]);
-
-// 			/* Get the UTC time (123519 --> 12:35:19). */
-// 			result->UTCTime = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the latitude (4807.038 --> 48^ 07.038' N). */
-// 			result->latitude = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the longitude (01131.000 --> 11^ 31.000' East). */
-// 			result->longitude = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the fix quality (1 --> GPS fix). */
-// 			result->quality = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the number of satellites used. */
-// 			result->numSat = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the altitude (545.4 --> 545.4 meters). */
-// 			result->altitude = strchr(token, ',');
-// 		}
-// 		else if (strncmp(sentence, "$GPRCM", 6))
-// 		{
-// 			/* Get the remaining string and then parse. */
-// 			token = strchr(sentence, sentence[7]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the status (A --> valid, V --> invalid). */
-// 			result->status = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the speed over ground (knots). */
-// 			result->speed = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the course over ground (degrees). */
-// 			result->course = strchr(token, ',');
-// 			token = strchr(token, ',');
-// 			token = strchr(token, token[1]);
-
-// 			/* Get the date (230394 --> 23 March 1994). */
-// 			result->course = strchr(token, ',');
-// 		}
-// 		/* Proceed to next sentence in buffer. */
-// 		sentence = strtok(NULL, "\n");
-// 	}
-// }
 
 /**
  * Write the data to IMU sensor register.
@@ -171,8 +112,7 @@ uint8_t __read_reg_from_imu(uint8_t reg)
 	/* Pull the NNS to low to start the transmission. */
 	IMU_NSS_LOW();
 	
-	status = HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2,
-		HAL_MAX_DELAY);
+	status = HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, HAL_MAX_DELAY);
 	if (status != HAL_OK)
 	{
 		printError(status, "Failed to read the IMU register!");
@@ -186,7 +126,7 @@ uint8_t __read_reg_from_imu(uint8_t reg)
 /**
  * Read the acceleromenter from IMU sensor.
  */
-void __read_accel_from_imu(IMUData *imuData)
+void __read_accel_from_imu(PayloadData *payloadData)
 {
 	int i;
 	uint8_t data[6];
@@ -197,15 +137,15 @@ void __read_accel_from_imu(IMUData *imuData)
 		data[i] = __read_reg_from_imu(IMU_REG_OUTX_L_XL + i);
 	}
 	/* Combine bytes (little endian) then convert to mg. */
-	imuData->accelX = ((int16_t)((data[1] << 8) | data[0])) * 0.488;
-	imuData->accelY = ((int16_t)((data[3] << 8) | data[2])) * 0.488;
-	imuData->accelZ = ((int16_t)((data[5] << 8) | data[4])) * 0.488;
+	payloadData->imuAccelX = ((int16_t)((data[1] << 8) | data[0])) * 0.488;
+	payloadData->imuAccelY = ((int16_t)((data[3] << 8) | data[2])) * 0.488;
+	payloadData->imuAccelZ = ((int16_t)((data[5] << 8) | data[4])) * 0.488;
 }
 
 /**
  * Read the gyroscope from IMU sensor.
  */
-void __read_gyro_from_imu(IMUData *imuData)
+void __read_gyro_from_imu(PayloadData *payloadData)
 {
 	int i;
 	uint8_t data[6];
@@ -216,22 +156,22 @@ void __read_gyro_from_imu(IMUData *imuData)
 		data[i] = __read_reg_from_imu(IMU_REG_OUTX_L_G + i);
 	}
 	/* Combine bytes (little endian) then convert to dps. */
-	imuData->gyroX = ((int16_t)((data[1] << 8) | data[0])) * 0.07;
-	imuData->gyroY = ((int16_t)((data[3] << 8) | data[2])) * 0.07;
-	imuData->gyroZ = ((int16_t)((data[5] << 8) | data[4])) * 0.07;
+	payloadData->imuGyroX = ((int16_t)((data[1] << 8) | data[0])) * 0.07;
+	payloadData->imuGyroY = ((int16_t)((data[3] << 8) | data[2])) * 0.07;
+	payloadData->imuGyroZ = ((int16_t)((data[5] << 8) | data[4])) * 0.07;
 }
 
 /**
  * Read the temperature from IMU sensor.
  */
-void __read_temp_from_imu(IMUData *imuData)
+void __read_temp_from_imu(PayloadData *payloadData)
 {
 	uint8_t temp_l, temp_h;
 
 	temp_l = __read_reg_from_imu(IMU_REG_OUT_TEMP_L);
 	temp_h = __read_reg_from_imu(IMU_REG_OUT_TEMP_H);
 
-	imuData->temp = (((temp_h << 8) | temp_l) / 256.0) + 25.0;
+	payloadData->imuTemp = (((temp_h << 8) | temp_l) / 256.0) + 25.0;
 }
 
 /**

@@ -36,51 +36,23 @@ DFSDM_Filter_HandleTypeDef hdfsdm1f[CHANNEL_COUNT] = {0};
 void configOscClk(void)
 {
 	/* Initialize the system oscillator. */
-	// initOscillator(
-	// 	iosc, OSC_TYPE, OSC_HSE_STATE, OSC_PLL_STATE, OSC_PLL_SRC, 
-	// 	OSC_PLLM, OSC_PLLN, OSC_PLLP, OSC_PLLQ, OSC_PLLR, OSC_PLLRGE, 
-	// 	OSC_PLLVCOSEL, OSC_PLLFRACN
-	// );
-
-	// iosc.OscillatorType = OSC_TYPE;
-	// iosc.HSEState = OSC_HSE_STATE;
-	// iosc.PLL.PLLState = OSC_PLL_STATE;
-	// iosc.PLL.PLLSource = OSC_PLL_SRC;
-	// iosc.PLL.PLLM = OSC_PLLM;		
-	// iosc.PLL.PLLN = OSC_PLLN;	
-	// iosc.PLL.PLLP = OSC_PLLP;		
-	// iosc.PLL.PLLQ = OSC_PLLQ;				
-	// iosc.PLL.PLLR = OSC_PLLR;				
-	// iosc.PLL.PLLRGE = OSC_PLLRGE;		
-	// iosc.PLL.PLLVCOSEL = OSC_PLLVCOSEL;
-	// iosc.PLL.PLLFRACN = OSC_PLLFRACN;	
-
-	iosc.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-   iosc.HSIState = RCC_HSI_ON;
-   iosc.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-
+	initOscillator(
+		iosc, OSC_TYPE, OSC_HSE_STATE, OSC_PLL_STATE, OSC_PLL_SRC, 
+		OSC_PLLM, OSC_PLLN, OSC_PLLP, OSC_PLLQ, OSC_PLLR, OSC_PLLRGE, 
+		OSC_PLLVCOSEL, OSC_PLLFRACN
+	);
 	HAL_RCC_OscConfig(&iosc); 
 
 	/* Initialize the system clock. */
-	// initClock(
-	// 	iclk, CLOCK_TYPE, CLOCK_SOURCE, CLOCK_SYS_DIV, CLOCK_AHB_DIV, 
-	// 	CLOCK_APB1_DIV, CLOCK_APB2_DIV, CLOCK_APB3_DIV, CLOCK_APB4_DIV
-	// );
-
-	iclk.ClockType = CLOCK_TYPE;
-	iclk.SYSCLKSource = CLOCK_SOURCE;		
-	iclk.SYSCLKDivider = CLOCK_SYS_DIV;	
-	iclk.AHBCLKDivider = CLOCK_AHB_DIV;	
-	iclk.APB1CLKDivider = CLOCK_APB1_DIV;	
-	iclk.APB2CLKDivider = CLOCK_APB2_DIV;	
-	iclk.APB3CLKDivider = CLOCK_APB3_DIV;	
-	iclk.APB4CLKDivider = CLOCK_APB4_DIV;					
-
+	initClock(
+		iclk, CLOCK_TYPE, CLOCK_SOURCE, CLOCK_SYS_DIV, CLOCK_AHB_DIV, 
+		CLOCK_APB1_DIV, CLOCK_APB2_DIV, CLOCK_APB3_DIV, CLOCK_APB4_DIV
+	);
 	HAL_RCC_ClockConfig(&iclk, FLASH_LATENCY_3);
 
 	/* Enable data and instruction caches. */
-	// SCB_EnableDCache();
-	// SCB_EnableICache();
+	SCB_EnableDCache();
+	SCB_EnableICache();
 }
 
 /**
@@ -310,16 +282,10 @@ void configLoRaModule(void)
 void configLEDs(void)
 {
 	/* Initialize the GPIOE peripheral. */
-	// initGPIO(
-	// 	igpio, LED_PIN_HEARTBEAT | LED_PIN_ERROR | LED_PIN_DETECT, 
-	// 	LED_MODE, LED_PULL, NULL
-	// );
-
-	igpio.Mode = LED_MODE;
-	igpio.Pin = LED_PIN_HEARTBEAT | LED_PIN_ERROR | LED_PIN_DETECT;
-	igpio.Pull = GPIO_NOPULL;
-	igpio.Speed = GPIO_SPEED_HIGH;
-
+	initGPIO(
+		igpio, LED_PIN_HEARTBEAT | LED_PIN_ERROR | LED_PIN_DETECT, 
+		LED_MODE, LED_PULL, NULL
+	);
 	HAL_GPIO_Init(LED_PORT, &igpio);
 }
 

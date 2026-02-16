@@ -47,7 +47,12 @@ int main(void)
 	configLEDs();
 	configWatchdog();
 
-	printLog("Firmware started successfully...");
+	/* Create the mutex for the payload data. */
+	payloadMutex = xSemaphoreCreateMutex();
+	if (payloadMutex == NULL)
+	{
+		printKernel("Failed to create the payload mutex!");
+	}
 
 	/* Create the taskMicSensorNorth() task. */
 	status = xTaskCreate(taskMicSensorNorth, TASK_MIC_NAME_N, 

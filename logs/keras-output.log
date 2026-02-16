@@ -1,12 +1,12 @@
-2026-02-16 11:16:30.280452: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-02-16 11:16:33.291953: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
-2026-02-16 11:16:34.049221: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
-2026-02-16 11:16:35.707488: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
-2026-02-16 11:16:35.990499: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
-2026-02-16 11:16:40.006385: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+2026-02-16 17:05:07.525494: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-02-16 17:05:07.531292: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2026-02-16 17:05:07.549274: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:485] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2026-02-16 17:05:07.579353: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:8454] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2026-02-16 17:05:07.588111: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1452] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-02-16 17:05:07.608102: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
 To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2026-02-16 11:17:01.210760: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-2026-02-16 11:17:29.449059: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+2026-02-16 17:05:10.184329: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2026-02-16 17:05:15.053140: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
 
 Processing '/home/can/Datasets/jena_climate.csv' dataset with LSTM layer type, 5 layer number, 16 units per layer, 20 epochs, and 16 batch size as 'passive-acoustic-surveillance.keras' in the script directory.
 
@@ -43,4 +43,4 @@ Model: "passive-acoustic-surveillance"
 Fitting the model with common datasets:
 
 Epoch 1/20
-2026-02-16 11:17:31.399422: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
+2026-02-16 17:05:15.637084: W external/local_tsl/tsl/framework/cpu_allocator_impl.cc:83] Allocation of 23545200 exceeds 10% of free system memory.
