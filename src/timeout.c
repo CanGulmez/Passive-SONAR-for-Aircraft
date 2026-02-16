@@ -36,14 +36,14 @@ gboolean timeout_device_node(gpointer data)
 	/* Extract the required calculations in here. */
 	max_freq = find_dominant_freq();
 	arrival = calculate_arrival(max_freq);
-	micBeamformed = make_beamforming(max_freq, arrival);
-	micVolumest = select_sector();
+	sigBeamformed = do_beamforming(max_freq, arrival);
+	sigVolumest = select_sector();
 
 	/* Make sure the amplitude of signal fits into the frame. */
-	dsp_time_scale(&micBeamformed, 128.0, &micBeamformed);
+	dsp_time_scale(&sigBeamformed, 128.0, &sigBeamformed);
 
 	/* Make the signal analysis. */
-	make_signal_analysis(&micBeamformed, arrival);
+	make_signal_analysis(&sigBeamformed, arrival);
 	printLog("completed the signal analysis operations");
 
 	/* Lastly, redraw the cartesian and polar plots. */
@@ -82,9 +82,9 @@ gboolean timeout_model_keras_log(gpointer data)
  */
 gboolean timeout_db_record(gpointer data)
 {
-	struct sqlite3 *db;
+	sqlite3 *db;
 
-	db = (struct sqlite3 *) data;
+	db = (sqlite3 *) data;
 	/* Bind the last sensor data. */
 	db_bind_data(db, DATABASE_SENSOR_DATA);
 
@@ -96,32 +96,8 @@ gboolean timeout_db_record(gpointer data)
  */
 gboolean timeout_nav_update(gpointer data)
 {
-	char buffer[BUFFER_SIZE];
-
-	/* Update the sensor series and information. */
-	// __generic_action_row_update(navSensorRows[0], USED_IMU_SENSOR);
-	// printf("%.2f, %.2f, %.2f\n", payloadData.imuAccelX, payloadData.imuAccelY, payloadData.imuAccelZ);
-	/* Update the acceloremeter output. */
-	// snprintf(
-	// 	buffer, BUFFER_SIZE, "[%.2f, %.2f, %.2f]", 
-	// 	payloadData.imuAccelX, payloadData.imuAccelY, payloadData.imuAccelZ
-	// );
-	// __generic_action_row_update(navSensorRows[1], "Running");
-	// __generic_action_row_update(navSensorRows[2], buffer);
-	printf("%s\n", payloadData.gpsUTCTime);
-	/* Update the gyroscope output. */
-	// snprintf(
-	// 	buffer, BUFFER_SIZE, "[%.2f, %.2f, %.2f]", 
-	// 	payloadData.imuGyroX, payloadData.imuGyroY, payloadData.imuGyroZ
-	// );	
-	// __generic_action_row_update(navSensorRows[3], "Running");
-	// __generic_action_row_update(navSensorRows[4], buffer);
-
-	/* Update the temperature output. */
-	// snprintf(
-	// 	buffer, BUFFER_SIZE, "%.3f", payloadData.imuTemp
-	// );	
-	// __generic_action_row_update(navSensorRows[7], buffer);
+	/* Update the navigation data. */
+	update_nav_data();
 
 	return G_SOURCE_CONTINUE;
 }
@@ -134,18 +110,13 @@ gboolean timeout_gps_update(gpointer)
 	static int i = 0;
 	char buffer[BUFFER_SIZE];
 
+	/* Update the gps module data. */
+	update_gps_data();
+
 	/* Put the markers into map area. */
 	shumate_map_center_on(gpsMap, 41.008, 28.9784 + i * 0.01);
 	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9784 + i * 0.01);
 
-	// printf("%s\n", payloadData.gpsUTCTime);
-
-	// __generic_action_row_update(gpsModuleRows[0], USED_GPS_MODULE);
-	// __generic_action_row_update(gpsModuleRows[1], (const char *) payloadData.gpsLatitude);
-	// __generic_action_row_update(gpsModuleRows[2], (const char *) payloadData.gpsLongitude);
-
-	// shumate_map_center_on(gpsMap, 41.008, 29.0500);
-	// gps_map_area_markers(gpsMarkerLayer, 41.008, 29.0500);
 	i++;
 
 	return G_SOURCE_CONTINUE;

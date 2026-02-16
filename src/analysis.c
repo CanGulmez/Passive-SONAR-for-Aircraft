@@ -19,9 +19,9 @@
 
 /* Global and Shared Variables */
 
-DspTime micSamples[MIC_COUNT] = {0};
-DspTime micBeamformed = {0};
-guint micVolumest = 1;
+DspTime sigSamples[MIC_COUNT] = {0};
+DspTime sigBeamformed = {0};
+guint sigVolumest = 1;
 
 /**
  * Convert the payload mic data to 'DspTime' objects.
@@ -33,18 +33,18 @@ void convert_payload_to_sample(void)
 	/* Convert the payload data to 'DspTime' objects. */
 	for (i = 0; i < MIC_COUNT; i++)
 	{
-		micSamples[i].length = DATA_SIZE;
+		sigSamples[i].length = DATA_SIZE;
 	}
 	for (i = 0; i < DATA_SIZE; i++)
 	{
-		micSamples[0].data[i] = (double) payloadData.micNorth[i];
-		micSamples[1].data[i] = (double) payloadData.micNorthEast[i];
-		micSamples[2].data[i] = (double) payloadData.micEast[i];
-		micSamples[3].data[i] = (double) payloadData.micSouthEast[i];
-		micSamples[4].data[i] = (double) payloadData.micSouth[i];
-		micSamples[5].data[i] = (double) payloadData.micSouthWest[i];
-		micSamples[6].data[i] = (double) payloadData.micWest[i];
-		micSamples[7].data[i] = (double) payloadData.micNorthWest[i];
+		sigSamples[0].data[i] = (double) payloadData.micNorth[i];
+		sigSamples[1].data[i] = (double) payloadData.micNorthEast[i];
+		sigSamples[2].data[i] = (double) payloadData.micEast[i];
+		sigSamples[3].data[i] = (double) payloadData.micSouthEast[i];
+		sigSamples[4].data[i] = (double) payloadData.micSouth[i];
+		sigSamples[5].data[i] = (double) payloadData.micSouthWest[i];
+		sigSamples[6].data[i] = (double) payloadData.micWest[i];
+		sigSamples[7].data[i] = (double) payloadData.micNorthWest[i];
 	}
 }
 
@@ -63,7 +63,7 @@ double find_dominant_freq(void)
 	/* Convert the time domain signals into frequency domain. */
 	for (i = 0; i < MIC_COUNT; i++)
 	{
-		dsp_transform_dft(&micSamples[i], &outputs[i]);
+		dsp_transform_dft(&sigSamples[i], &outputs[i]);
 		outputs[i].length = (int) (outputs[i].length / 2);
 	}
 	/* Find the maximum frequencies and corresponding bins. */
@@ -99,7 +99,7 @@ int calculate_arrival(double freq)
 	arrival.sources = 1;
 	for (i = 0; i < MIC_COUNT; i++)
 	{
-		arrival.samples[i] = &micSamples[i];	/* samples itself */
+		arrival.samples[i] = &sigSamples[i];	/* samples itself */
 	}
 	return dsp_arrival_music(&arrival);
 }
@@ -107,7 +107,7 @@ int calculate_arrival(double freq)
 /**
  * Make the delay-and-sum beamforming.
  */
-DspTime make_beamforming(double freq, double arrival)
+DspTime do_beamforming(double freq, double arrival)
 {
 	int i;
 	DspBeamform beamform;
@@ -119,7 +119,7 @@ DspTime make_beamforming(double freq, double arrival)
 	beamform.theta = arrival;
 	for (i = 0; i < MIC_COUNT; i++)	
 	{
-		beamform.samples[i] = &micSamples[i];	/* samples itself */
+		beamform.samples[i] = &sigSamples[i];	/* samples itself */
 	}
 	dsp_beamform_delay_sum(&beamform, &sample);
 
@@ -166,7 +166,7 @@ int select_sector(void)
 	/* Get the mean of sensor signals. */
 	for (i = 0; i < MIC_COUNT; i++)
 	{
-		means[i] = dsp_time_mean(&micSamples[i]);
+		means[i] = dsp_time_mean(&sigSamples[i]);
 	}
 	/* Find the biggest mean. */
 	biggest = means[0];
@@ -185,3 +185,72 @@ int select_sector(void)
 		}
 	}
 }
+
+/**
+ * Update the navigation data including IMU outputs.
+ */
+void update_nav_data(void)
+{
+	char buffer[BUFFER_SIZE];
+
+	/* Update the sensor series and information. */
+	__generic_action_row_update(navSensorRows[0], USED_IMU_SENSOR);
+
+	/* Update the acceloremeter output. */
+	snprintf(
+		buffer, BUFFER_SIZE, "[%.2f, %.2f, %.2f]", 
+		payloadData.imuAccelX, payloadData.imuAccelY, payloadData.imuAccelZ
+	);
+	__generic_action_row_update(navSensorRows[1], "Running");
+	__generic_action_row_update(navSensorRows[2], buffer);
+
+	/* Update the gyroscope output. */
+	snprintf(
+		buffer, BUFFER_SIZE, "[%.2f, %.2f, %.2f]", 
+		payloadData.imuGyroX, payloadData.imuGyroY, payloadData.imuGyroZ
+	);	
+	__generic_action_row_update(navSensorRows[3], "Running");
+	__generic_action_row_update(navSensorRows[4], buffer);
+
+	/* Update the temperature output. */
+	snprintf(
+		buffer, BUFFER_SIZE, "%.3f", payloadData.imuTemp
+	);	
+	__generic_action_row_update(navSensorRows[7], buffer);
+}
+
+/**
+ * Update the GPS data including LoRa outputs.
+ */
+void update_gps_data(void)
+{
+	char buffer[BUFFER_SIZE];
+
+	/* Update the GPS module information. */
+	__generic_action_row_update(gpsModuleRows[0], USED_GPS_MODULE);
+
+	/* Update the UTC time output. */
+	snprintf(
+		buffer, BUFFER_SIZE, "%c%c:%c%c:%c%c",
+		payloadData.gpsUTCTime[0], payloadData.gpsUTCTime[1],
+		payloadData.gpsUTCTime[2], payloadData.gpsUTCTime[3],
+		payloadData.gpsUTCTime[4], payloadData.gpsUTCTime[5]
+	);
+	__generic_action_row_update(gpsModuleRows[1], buffer);
+
+	/* Update the latitude output. */
+	
+	/* Update the longitude output. */
+
+	/* Update the fix quality output. */
+	__generic_action_row_update(gpsModuleRows[4], payloadData.gpsQuality);
+	__generic_action_row_update(gpsModuleRows[5], payloadData.gpsNumSat);
+	__generic_action_row_update(gpsModuleRows[6], payloadData.gpsAltitude);
+	__generic_action_row_update(gpsModuleRows[7], payloadData.gpsStatus);
+	__generic_action_row_update(gpsModuleRows[8], payloadData.gpsSpeed);
+	__generic_action_row_update(gpsModuleRows[9], payloadData.gpsCourse);
+
+	/* Update the date output. */
+	
+}
+ 

@@ -129,7 +129,7 @@ void mic_plot_car_data(cairo_t *cr, int width, int height)
 		else
 		{
 			cairo_line_to(cr, MIC_PLOT_MARGIN + (step * i) + 2, 
-				middle - micBeamformed.data[i - 1]);
+				middle - sigBeamformed.data[i - 1]);
 		}
 	}
 	cairo_stroke(cr);
@@ -310,6 +310,6 @@ void mic_plot_polar(GtkDrawingArea *area, cairo_t *cr, int width,
 	mic_plot_polar_frame(cr, width, height);	/* draw the frame */
 	mic_plot_polar_label(cr, width, height);	/* put the labels */
 	mic_plot_polar_sector(cr, width, height, 
-		micVolumest);									/* fill the sector */
+		sigVolumest);									/* fill the sector */
 }
  

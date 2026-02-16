@@ -63,13 +63,15 @@ extern "C" {
 #define BUFFER_SIZE							512
 #define DATA_SIZE								BUFFER_SIZE
 #define SQL_SIZE								20480
+#define GPS_SIZE								64
 #define INTERPRETER							"/bin/python3"
 #define SYSTEM_LOG_PATH						"./logs/system.log"
 #define SAMPLING_FREQ						12000		/* 12kHz */
 #define MIC_COUNT								8
 #define MIC_RADIUS							0.1		/* 0.1 meter */
 #define USED_IMU_SENSOR						"LSM6DALTR (ST)"
-#define USED_GPS_MODULE						"E22 900T22D Lora"
+#define USED_GPS_MODULE						"E22 900T22D"
+#define MAGIC_WORD							0xDEADBEEF
 
 #define DB_SENSOR_DATA_PATH				"./db/sensor_data.db"
 #define DB_SENSOR_DATA_TABLE				"SensorData"
@@ -360,6 +362,19 @@ typedef struct PACKED _PayloadData
 	int8_t micWest[DATA_SIZE];
 	int8_t micNorthWest[DATA_SIZE];
 
+	/* The GPS module payload data */
+
+	char gpsUTCTime[GPS_SIZE];
+	char gpsLatitude[GPS_SIZE];
+	char gpsLongitude[GPS_SIZE];
+	char gpsQuality[GPS_SIZE];
+	char gpsNumSat[GPS_SIZE];
+	char gpsAltitude[GPS_SIZE];
+	char gpsStatus[GPS_SIZE];
+	char gpsSpeed[GPS_SIZE];			/* knots */
+	char gpsCourse[GPS_SIZE];			/* degrees */
+	char gpsDate[GPS_SIZE];
+
 	/* The IMU sensor payload data */
 	
 	float imuAccelX;						/* m/s^2 */
@@ -369,19 +384,6 @@ typedef struct PACKED _PayloadData
 	float imuGyroY;						/* dps */
 	float imuGyroZ;						/* dps */
 	float imuTemp;							/* C */ 
-
-	/* The GPS module payload data */
-
-	int8_t gpsUTCTime[DATA_SIZE];
-	int8_t gpsLatitude[DATA_SIZE];
-	int8_t gpsLongitude[DATA_SIZE];
-	int8_t gpsQuality[DATA_SIZE];
-	int8_t gpsNumSat[DATA_SIZE];
-	int8_t gpsAltitude[DATA_SIZE];
-	int8_t gpsStatus[DATA_SIZE];
-	int8_t gpsSpeed[DATA_SIZE];		/* knots */
-	int8_t gpsCourse[DATA_SIZE];		/* degrees */
-	int8_t gpsDate[DATA_SIZE];
 } PayloadData;
 
 typedef struct _ModelParams
@@ -463,9 +465,9 @@ extern guint navTimeout;
 
 /* Signal analysis shared widgets and variables */
 
-extern DspTime micSamples[MIC_COUNT];
-extern DspTime micBeamformed;
-extern guint micVolumest;
+extern DspTime sigSamples[MIC_COUNT];
+extern DspTime sigBeamformed;
+extern guint sigVolumest;
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -574,9 +576,11 @@ extern GtkWidget *__generic_button_new(const char *, const char *);
 extern void convert_payload_to_sample(void);
 extern double find_dominant_freq(void);
 extern int calculate_arrival(double);
-extern DspTime make_beamforming(double, double);
+extern DspTime do_beamforming(double, double);
 extern void make_signal_analysis(DspTime *, int);
 extern int select_sector(void);
+extern void update_nav_data(void);
+extern void update_gps_data(void);
 
 /*****************************************************************************/
 /*****************************************************************************/

@@ -77,8 +77,8 @@ void set_serial_attributes(int fd, struct termios *tty)
    tty->c_iflag &= ~(IXON | IXOFF | IXANY);
    tty->c_lflag &= ~(ICANON | ECHO | ECHOE | ECHONL | ISIG); 	/* Raw mode */
    tty->c_oflag &= ~OPOST;
-   tty->c_cc[VTIME] = 0;  				/* No inter-character timer */
-   tty->c_cc[VMIN] = 0;   				/* Non-blocking read */
+   tty->c_cc[VTIME] = 0;  				
+   tty->c_cc[VMIN] = 0;
    tty->c_cflag |= CREAD | CLOCAL;	/* Enable receiver */
 
    if (tcsetattr(fd, TCSANOW, tty) == -1)
@@ -169,7 +169,7 @@ int open_device_node(MicChannel channel, const char *node)
 	strcat(devicePath, node);
 	pathSize += strlen(node);
 	devicePath[pathSize] = '\0';
-	
+
 	fd = open(
 		devicePath, 
 		O_RDONLY 	| 						/* read-only channel */
@@ -185,7 +185,6 @@ int open_device_node(MicChannel channel, const char *node)
 	{
 		printLog("opened the '%s' device node", devicePath);
 	}
-
 	/* Set serial terminal attributes. */
 	set_serial_attributes(fd, &tty);
 
@@ -225,6 +224,7 @@ void read_device_node(int fd)
 				/* EAGAIN is normal (no data at this cycle) */
 		}
 	}
+	printLog("read total %ld bytes from the associated node", totalRead);
 }
 
 /**

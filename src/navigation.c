@@ -32,7 +32,7 @@ GtkWidget *nav_info_group(gpointer data)
 	GtkWidget *infoGroup;
 
 	infoGroup = __generic_group_new(
-		"IMU Module", "Show the used IMU sensor information"
+		"IMU Sensor", "Show the used IMU sensor information"
 	);
 	navSensorRows[0] = __generic_action_row_new("Sensor Series", "Null");
 	__generic_group_add(infoGroup, navSensorRows[0]);
