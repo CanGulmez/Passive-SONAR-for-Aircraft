@@ -1,6 +1,7 @@
 # Passive Acoustic Surveillance System
 
-This project is being designed for TUBITAK 2209-A project. It's basically passive acoustic surveillance system primarily designed for drones and helicopers. It 
+This project is being designed for TUBITAK 2209-A project. It's basically passive 
+acoustic surveillance system primarily designed for drones and helicopers. It 
 consists of three parts:
 
 + Custom DSP library
@@ -17,7 +18,7 @@ To get the repo, use this command:
 $ git clone https://github.com/CanGulmez/Digital-Signal-Processing.git
 ```
 
-Also I put the library and header file in the `./lib` directory.
+Also I put the library and header file in the **./lib** directory.
 
 Embedded firmware was made with PlatformIO library. So please make sure that you
 have it. It's Python 3 package. If you don't have it, get it with this command:
@@ -34,8 +35,13 @@ $ make firmware
 
 This command will compile the firmware codebase and then flash it into the embedded
 board. So connect the embedded board into your PC firstly. Another important point
-is that this command use the  `openocd` command with st-link configuration. If you
-have the another port like JTAG, edit the `Makefile`.
+is that this command use the  **openocd** command with st-link configuration. If you
+have the another port like JTAG, edit the **Makefile**. If you don't have **openocd**,
+install it with this command:
+
+```bash
+$ sudo apt install openocd		# there is no need any st-link driver for GNU/Linux.
+```
 
 At ground station side, it is done on the Linux machine so that the all codebase is
 writting with POSIX standards. To build and then run the ground station, use this 
@@ -71,9 +77,9 @@ At center, there is the signal analysises. As I said, it is done over my custom 
 library. Also there are cartesian and polar plots to visualize the sensor data.
 
 In `AI Model` sub-module, there is a deep learning model written in Python 3 with
-`Tensorflow` library. At UI, there is a model parameter selection panel. This 
-model is being run as a `child` process. It's made by `fork()/exec()` routines as
-general. Because, model fitting is computationally heavy.
+**Tensorflow** library. At UI, there is a model parameter selection panel. This 
+model is being run as a **child** process. It's made by **fork()/exec()** routines 
+as general. Because, model fitting is computationally heavy.
 
 In `Navigation` sub-module, the IMU (Interial Measurement Unit) sensor data is
 being visualized.
