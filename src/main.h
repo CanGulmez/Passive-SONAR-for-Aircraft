@@ -22,10 +22,6 @@
 extern "C" {	
 #endif
 
-/* Compile-specific definitions */
- 
-#pragma GCC optimize("O3")
-
 /* Required libaries */
 
 #define _GNU_SOURCE
@@ -66,11 +62,6 @@ extern "C" {
 #define GPS_SIZE								64
 #define INTERPRETER							"/bin/python3"
 #define SYSTEM_LOG_PATH						"./logs/system.log"
-#define SAMPLING_FREQ						12000		/* 12kHz */
-#define MIC_COUNT								8
-#define MIC_RADIUS							0.1		/* 0.1 meter */
-#define USED_IMU_SENSOR						"LSM6DALTR (ST)"
-#define USED_GPS_MODULE						"E22 900T22D"
 #define MAGIC_WORD							0xDEADBEEF
 
 #define DB_SENSOR_DATA_PATH				"./db/sensor_data.db"
@@ -102,6 +93,9 @@ extern "C" {
 #define MIC_PLOT_MARGIN						40		/* pixel */
 #define MIC_PLOT_GRID						20 	/* pixel */
 #define MIC_SIGNAL_NUM						15
+#define MIC_COUNT								8
+#define MIC_RADIUS							0.1		/* 0.1 meter */
+#define MIC_SAMPLE_FREQ						12000		/* 12kHz */
 
 #define MODEL_DATASET_PATH					"/home/can/Datasets/"
 #define MODEL_DATASET_SUFFIX				".csv"
@@ -114,10 +108,15 @@ extern "C" {
 #define NAV_PLOT_GRID						20			/* pixel */
 #define NAV_PLOT_CAXIS						220		/* pixel */
 #define NAV_PLOT_VAXIS						280		/* pixel */
+#define NAV_FLAT_GRAVITY					9.81		/* m/s^2 */
+#define NAV_ACCEL_NOISE						1.0		/* m/s^2 */		
+#define NAV_GYRO_NOISE						NAV_ACCEL_NOISE				
+#define NAV_IMU_SENSOR						"LSM6DALTR (ST)"
 
 #define GPS_ZOOM_LEVEL						12.0
 #define GPS_INIT_LAT							41.008
 #define GPS_INIT_LONG						28.9784
+#define GPS_MODULE							"E22 900T22D"
 
 #define TIMEOUT_DEVICE_READ				2000		/* ms */
 #define TIMEOUT_PLOT_REDRAW				2000		/* ms */
@@ -459,6 +458,7 @@ extern GtkWidget *gpsModuleRows[11];
 
 extern NavAccel navAccel;
 extern NavGyro navGyro;
+extern GtkWidget *navPlotArea;
 extern NavButton navButton;
 extern GtkWidget *navSensorRows[8];
 extern guint navTimeout;
@@ -579,6 +579,8 @@ extern int calculate_arrival(double);
 extern DspTime do_beamforming(double, double);
 extern void make_signal_analysis(DspTime *, int);
 extern int select_sector(void);
+extern NavAccel select_accel_direction(void);
+extern NavGyro select_gyro_rotation(void);
 extern void update_nav_data(void);
 extern void update_gps_data(void);
 

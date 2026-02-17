@@ -57,7 +57,7 @@ void __parse_nmea_sentences(uint8_t *buffer, PayloadData *payloadData)
 			strncpy(payloadData->gpsUTCTime, token, 6);
 			
 			/* Get the latitude (4807.038 --> 48^ 07.038' N). */
-			/* Get the longitude (01131.000 --> 11^ 31.000' East). */
+			/* Get the longitude (01131.000 --> 11^ 31.000' E). */
 			/* Get the fix quality (1 --> GPS fix). */
 			/* Get the number of satellites used. */
 			/* Get the altitude (545.4 --> 545.4 meters). */
@@ -137,9 +137,9 @@ void __read_accel_from_imu(PayloadData *payloadData)
 		data[i] = __read_reg_from_imu(IMU_REG_OUTX_L_XL + i);
 	}
 	/* Combine bytes (little endian) then convert to mg. */
-	payloadData->imuAccelX = ((int16_t)((data[1] << 8) | data[0])) * 0.488;
-	payloadData->imuAccelY = ((int16_t)((data[3] << 8) | data[2])) * 0.488;
-	payloadData->imuAccelZ = ((int16_t)((data[5] << 8) | data[4])) * 0.488;
+	payloadData->imuAccelX = ((int16_t)((data[1] << 8) | data[0])) * 0.004787f;
+	payloadData->imuAccelY = ((int16_t)((data[3] << 8) | data[2])) * 0.004787f;
+	payloadData->imuAccelZ = ((int16_t)((data[5] << 8) | data[4])) * 0.004787f;
 }
 
 /**
@@ -156,9 +156,9 @@ void __read_gyro_from_imu(PayloadData *payloadData)
 		data[i] = __read_reg_from_imu(IMU_REG_OUTX_L_G + i);
 	}
 	/* Combine bytes (little endian) then convert to dps. */
-	payloadData->imuGyroX = ((int16_t)((data[1] << 8) | data[0])) * 0.07;
-	payloadData->imuGyroY = ((int16_t)((data[3] << 8) | data[2])) * 0.07;
-	payloadData->imuGyroZ = ((int16_t)((data[5] << 8) | data[4])) * 0.07;
+	payloadData->imuGyroX = ((int16_t)((data[1] << 8) | data[0])) * 0.07f;
+	payloadData->imuGyroY = ((int16_t)((data[3] << 8) | data[2])) * 0.07f;
+	payloadData->imuGyroZ = ((int16_t)((data[5] << 8) | data[4])) * 0.07f;
 }
 
 /**
@@ -171,7 +171,7 @@ void __read_temp_from_imu(PayloadData *payloadData)
 	temp_l = __read_reg_from_imu(IMU_REG_OUT_TEMP_L);
 	temp_h = __read_reg_from_imu(IMU_REG_OUT_TEMP_H);
 
-	payloadData->imuTemp = (((temp_h << 8) | temp_l) / 256.0) + 25.0;
+	payloadData->imuTemp = (((temp_h << 8) | temp_l) / 256.0f) + 25.0f;
 }
 
 /**

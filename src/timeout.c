@@ -23,7 +23,7 @@
 gboolean timeout_device_node(gpointer data)
 {
 	double max_freq;
-	int i, arrival;
+	int arrival;
 	int deviceFd;
 
 	/* Read the device node to update 'payloadData' object. */
@@ -99,6 +99,13 @@ gboolean timeout_nav_update(gpointer data)
 	/* Update the navigation data. */
 	update_nav_data();
 
+	/* Select the direction and rotation for plot. */
+	navAccel = select_accel_direction();
+	navGyro = select_gyro_rotation();
+
+	/* Request redraw for navigation plot. */
+	gtk_widget_queue_draw(navPlotArea);
+
 	return G_SOURCE_CONTINUE;
 }
 
@@ -108,7 +115,6 @@ gboolean timeout_nav_update(gpointer data)
 gboolean timeout_gps_update(gpointer)
 {
 	static int i = 0;
-	char buffer[BUFFER_SIZE];
 
 	/* Update the gps module data. */
 	update_gps_data();

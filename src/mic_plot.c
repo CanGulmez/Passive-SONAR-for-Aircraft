@@ -215,7 +215,7 @@ void mic_plot_polar_frame(cairo_t *cr, int width, int height)
  */
 void mic_plot_polar_label(cairo_t *cr, int width, int height)
 {
-	int i, center_x, center_y, radius;
+	int center_x, center_y, radius;
 
 	center_x = width / 2;
 	center_y = height / 2;

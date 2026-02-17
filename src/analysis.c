@@ -53,7 +53,7 @@ void convert_payload_to_sample(void)
  */
 double find_dominant_freq(void)
 {
-	int i, j;
+	int i;
 	DspFreq outputs[MIC_COUNT];
 	DspTime magnitudes[MIC_COUNT];
 	int indexes[MIC_COUNT];
@@ -72,7 +72,7 @@ double find_dominant_freq(void)
 		dsp_freq_magnitude(&outputs[i], &magnitudes[i]);
 		magnitudes[i].data[0] = 0.0;	/* pass the DC bias */
 		indexes[i] = dsp_time_argmax(&magnitudes[i]);
-		frequencies[i] = (SAMPLING_FREQ / DATA_SIZE) * indexes[i];
+		frequencies[i] = (MIC_SAMPLE_FREQ / DATA_SIZE) * indexes[i];
 	}
 	/* Compare the frequencies to find the maximum. */
 	for (i = 0; i < MIC_COUNT; i++)
@@ -187,6 +187,68 @@ int select_sector(void)
 }
 
 /**
+ * Select the accelerometer direction to be drawed.
+ */
+NavAccel select_accel_direction(void)
+{
+	if (payloadData.imuAccelX > NAV_ACCEL_NOISE)
+	{
+		return NAV_ACCEL_X_PLUS;
+	}
+	else if (payloadData.imuAccelX < -NAV_ACCEL_NOISE)
+	{
+		return NAV_ACCEL_X_MINUS;
+	}
+	else if (payloadData.imuAccelY > NAV_ACCEL_NOISE)
+	{
+		return NAV_ACCEL_Y_PLUS;
+	}
+	else if (payloadData.imuAccelY < -NAV_ACCEL_NOISE)
+	{
+		return NAV_ACCEL_Y_MINUS;
+	}
+	else if (payloadData.imuAccelZ > NAV_FLAT_GRAVITY)
+	{
+		return NAV_ACCEL_Z_PLUS;
+	}
+	else if (payloadData.imuAccelZ < -NAV_FLAT_GRAVITY)
+	{
+		return NAV_ACCEL_Z_MINUS;
+	}
+}
+
+/**
+ * Select the gyroscope rotation to be drawed.
+ */
+NavGyro select_gyro_rotation(void)
+{
+	if (payloadData.imuGyroX > NAV_GYRO_NOISE)
+	{
+		return NAV_GYRO_X_PLUS;
+	}
+	else if (payloadData.imuGyroX < -NAV_GYRO_NOISE)
+	{
+		return NAV_GYRO_X_MINUS;
+	}
+	else if (payloadData.imuGyroY > NAV_GYRO_NOISE)
+	{
+		return NAV_GYRO_Y_PLUS;		
+	}
+	else if (payloadData.imuGyroY < -NAV_GYRO_NOISE)
+	{
+		return NAV_GYRO_Y_MINUS;
+	}
+	else if (payloadData.imuGyroZ > NAV_GYRO_NOISE)
+	{
+		return NAV_GYRO_Z_PLUS;		
+	}
+	else if (payloadData.imuGyroZ < -NAV_GYRO_NOISE)
+	{
+		return NAV_GYRO_Z_MINUS;
+	}
+}
+
+/**
  * Update the navigation data including IMU outputs.
  */
 void update_nav_data(void)
@@ -194,7 +256,7 @@ void update_nav_data(void)
 	char buffer[BUFFER_SIZE];
 
 	/* Update the sensor series and information. */
-	__generic_action_row_update(navSensorRows[0], USED_IMU_SENSOR);
+	__generic_action_row_update(navSensorRows[0], NAV_IMU_SENSOR);
 
 	/* Update the acceloremeter output. */
 	snprintf(
@@ -227,7 +289,7 @@ void update_gps_data(void)
 	char buffer[BUFFER_SIZE];
 
 	/* Update the GPS module information. */
-	__generic_action_row_update(gpsModuleRows[0], USED_GPS_MODULE);
+	__generic_action_row_update(gpsModuleRows[0], GPS_MODULE);
 
 	/* Update the UTC time output. */
 	snprintf(

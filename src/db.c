@@ -72,7 +72,6 @@ void db_bind_data(struct sqlite3 *db, Database database)
 	char data[16];
 	char sql[SQL_SIZE];
 	sqlite3_stmt *stmt;
-	const char *timestamp;
 	
 	/* Bind the "micSensorData" structure into open database. */
 	if (database == DATABASE_SENSOR_DATA)

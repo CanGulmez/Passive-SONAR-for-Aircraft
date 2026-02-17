@@ -41,10 +41,8 @@ ModelButton modelButton;
  */
 void model_group_dataset(GtkWidget *datasetGroup)
 {
-	int i, numDataset;
+	int numDataset;
 	GtkWidget *datasetRow;
-	GtkStringList *datasetList;
-
 	/* Dataset */
 	numDataset = get_model_datasets();	/* datasets from host */
 
@@ -60,10 +58,9 @@ void model_group_dataset(GtkWidget *datasetGroup)
  */
 void model_group_model(GtkWidget *modelGroup)
 {
-	int i;
-	GtkWidget *layerTypeRow, *unitsRow, *useBiasRow, *epochsRow, 
-		*batchSizeRow, *earlyStopRow, *dropoutRow, *outputModelRow,
-		*layerNumberRow;
+	GtkWidget *layerTypeRow, *unitsRow, *epochsRow, 
+		*batchSizeRow, *earlyStopRow, *dropoutRow, 
+		*outputModelRow, *layerNumberRow;
 
 	/* Output Model Name */
 	outputModelRow = __generic_entry_row_new("Output Model");

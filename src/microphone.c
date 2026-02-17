@@ -43,9 +43,7 @@ PayloadData payloadData = {0};
  */
 void mic_row_device_node(GtkWidget *propertyGroup)
 {
-	int i;
 	GtkWidget *deviceNodeRow;
-	GtkStringList *deviceNodeList;
 
 	deviceNodeRow = __generic_combo_row_new(
 		"Device Node", (const char **)micDeviceNodes, 0
@@ -215,7 +213,6 @@ void microphone(GtkBox *micBox, gpointer data)
 	GtkWidget *scrolledComm, *scrolledSig, *propertyBox, *btnBox;
 	GtkWidget *commGroup, *propertyGroup, *analysisGroup;
 	GtkWidget *commRow; 
-	GtkStringList *commList;
 	GtkWidget *startBtn, *stopBtn;
 
 	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);

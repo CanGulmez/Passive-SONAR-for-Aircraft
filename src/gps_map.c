@@ -35,7 +35,6 @@ void gps_map_area_markers(ShumateMarkerLayer *gpsMarkerLayer,
 {
 	GtkWidget *image;
 	ShumateMarker *marker;
-	GtkCssProvider *provider;
 	
 	image = gtk_image_new_from_icon_name("process-stop");
 	marker = shumate_marker_new();
@@ -60,7 +59,6 @@ void gps_map_area(GtkBox *rightBox, gpointer data)
 	ShumateViewport *viewport;
 	ShumateMapSourceRegistry *registry;
 	ShumateMapSource *mapSource;
-	ShumateLocation *location;
 	
 	simpleMap = shumate_simple_map_new();
 	gpsMap = shumate_simple_map_get_map(simpleMap);

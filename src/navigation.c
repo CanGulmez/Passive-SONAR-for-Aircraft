@@ -19,8 +19,9 @@
 
 /* Shared widgets and variables */
 
-NavAccel navAccel;
-NavGyro navGyro;
+NavAccel navAccel = NAV_ACCEL_X_PLUS;
+NavGyro navGyro = NAV_ACCEL_Z_MINUS;
+GtkWidget *navPlotArea;
 NavButton navButton;
 GtkWidget *navSensorRows[8];	/* module, accel-status, accel-output,
 											gyro-status, gyro-output, magnet-status,
@@ -72,7 +73,7 @@ GtkWidget *nav_gyro_group(gpointer data)
 
 GtkWidget *nav_magnet_group(gpointer data)
 {
-	GtkWidget *magnetGroup, *status, *output;
+	GtkWidget *magnetGroup;
 
 	magnetGroup = __generic_group_new(
 		"Magnetometer", "Show the magnetometer status and data"
@@ -87,7 +88,7 @@ GtkWidget *nav_magnet_group(gpointer data)
 
 GtkWidget *nav_temp_group(gpointer data)
 {
-	GtkWidget *tempGroup, *output;
+	GtkWidget *tempGroup;
 
 	tempGroup = __generic_group_new(
 		"Temperature", "Show the temperature data"
@@ -103,7 +104,7 @@ void navigation(GtkBox *imuBox, gpointer data)
 	GtkWidget *leftBox, *separator, *rightBox;
 	GtkWidget *accelGroup, *gyroGroup, *magnetGroup, *tempGroup,
 				 *infoGroup;	
-	GtkWidget *navPlotArea, *propertyBox, *scrolledWin, *startBtn;
+	GtkWidget *propertyBox, *scrolledWin, *startBtn;
 
 	/* Put the required boxes. */
 	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);

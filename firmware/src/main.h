@@ -25,7 +25,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
 #include <math.h>
 
 #include <FreeRTOS.h>
@@ -42,7 +41,7 @@
 
 /* Global and General Definitions */
 
-#define BUFFER_SIZE			64
+#define BUFFER_SIZE			256
 #define DATA_SIZE				512
 #define GPS_SIZE				64
 #define SAMPLE_SIZE			(DATA_SIZE * 2)	

@@ -45,8 +45,7 @@ void nav_plot_area_grid(cairo_t *cr, int width, int height)
 
 void nav_plot_area_device(cairo_t *cr, int width, int height)
 {
-	int i;
-	double center_x, center_y, margin;
+	double center_x, center_y;
 
 	center_x = (width - (2 * NAV_PLOT_MARGIN)) / 2;
 	center_y = (height - (2 * NAV_PLOT_MARGIN)) / 2;
@@ -65,7 +64,6 @@ void nav_plot_area_device(cairo_t *cr, int width, int height)
 
 void nav_plot_area_axes(cairo_t *cr, int width, int height)
 {
-	int i;
 	double center_x, center_y;
 
 	center_x = (width - (2 * NAV_PLOT_MARGIN)) / 2;
@@ -93,7 +91,6 @@ void nav_plot_area_axes(cairo_t *cr, int width, int height)
 
 void nav_plot_area_labels(cairo_t *cr, int width, int height)
 {
-	int i;
 	double center_x, center_y;
 
 	center_x = (width - (2 * NAV_PLOT_MARGIN)) / 2;
@@ -123,8 +120,7 @@ void nav_plot_area_labels(cairo_t *cr, int width, int height)
 	cairo_show_text(cr, "-Y");	
 }
 
-void nav_plot_area_accel(cairo_t *cr, int width, int height, 
-	NavAccel navAccel)
+void nav_plot_area_accel(cairo_t *cr, int width, int height, NavAccel navAccel)
 {
 	double center_x, center_y;
 
@@ -188,13 +184,10 @@ void nav_plot_area_accel(cairo_t *cr, int width, int height,
 	cairo_stroke(cr);
 }
 
-void nav_plot_area_gyro(cairo_t *cr, int width, int height, 
-	NavGyro navGyro)
+void nav_plot_area_gyro(cairo_t *cr, int width, int height, NavGyro navGyro)
 {
-	int i, segments;
 	double center_x, center_y;
 
-	segments = 360;
 	center_x = (width - (2 * NAV_PLOT_MARGIN)) / 2;
 	center_y = (height - (2 * NAV_PLOT_MARGIN)) / 2;
 
@@ -278,7 +271,7 @@ void nav_plot_area(GtkDrawingArea *area, cairo_t *cr, int width,
 	nav_plot_area_axes(cr, width, height);		/* draw axes */
 	nav_plot_area_labels(cr, width, height);	/* draw labels */
 
-	nav_plot_area_accel(cr, width, height, NAV_ACCEL_X_PLUS);
-	nav_plot_area_gyro(cr, width, height, NAV_GYRO_Z_MINUS);
+	nav_plot_area_accel(cr, width, height, navAccel);
+	nav_plot_area_gyro(cr, width, height, navGyro);
 }
  

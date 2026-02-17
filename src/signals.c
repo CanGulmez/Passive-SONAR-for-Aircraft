@@ -90,7 +90,7 @@ void on_header_button_clicked(GtkButton *button, gpointer data)
 
 void on_comm_channel_selected(GObject *gobject, GParamSpec *pspec, gpointer data)
 {
-	int i, numDev;
+	int numDev;
 	guint selected;
 	GtkWidget *child;
 
@@ -354,7 +354,6 @@ void on_output_model_texted(GObject *gobject, GParamSpec *pspec, gpointer data)
 
 void on_mic_button_clicked(GtkButton *button, gpointer data)
 {
-	int i;
 	const char *label;
 	sqlite3 *db;
 	int deviceFd;
@@ -378,8 +377,6 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 	{
 		customError("Unknown microphone button: '%s'", label);
 	}
-	
-	/* Declare the database entry-point here. */
 
 	/* When the buttons clicked, take the required actions. */
 	if (micButton == MIC_BUTTON_START) 
@@ -433,7 +430,6 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 
 void on_model_button_clicked(GtkButton *button, gpointer data)
 {
-	int i;
 	const char *label;
 
 	label = gtk_button_get_label(button);
@@ -507,7 +503,6 @@ void on_model_button_clicked(GtkButton *button, gpointer data)
 
 void on_nav_button_clicked(GtkButton *button, gpointer data)
 {
-	int i;
 	const char *label;
 
 	label = gtk_button_get_label(button);
@@ -531,7 +526,6 @@ void on_nav_button_clicked(GtkButton *button, gpointer data)
 
 void on_gps_button_clicked(GtkButton *button, gpointer data)
 {
-	int i;
 	const char *label;
 
 	label = gtk_button_get_label(button);

@@ -27,6 +27,13 @@ have it. It's Python 3 package. If you don't have it, get it with this command:
 $ python3 install platformio --break-system-packages
 ```
 
+PlatformIO project inherits the required CMSIS/HAL libraries defaulty. But you need
+to install FreeRTOS kernel externally and put the **./lib** directory as I did. For
+all settings including **platformio.ini** and **FreeRTOSConfig.h**, you can follow 
+my specifications.
+
+Embedded firmware was written for STM32H750x microcontroller. 
+
 To build the firmware, use this command:
 
 ```bash

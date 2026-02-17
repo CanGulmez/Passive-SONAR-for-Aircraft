@@ -90,7 +90,7 @@ void set_serial_attributes(int fd, struct termios *tty)
  */
 int get_device_nodes(MicChannel channel)
 {
-	int i, index = 0;
+	int index = 0;
 	struct dirent *entry;
 	const char *prefix;
 	DIR *dir;
@@ -232,7 +232,7 @@ void read_device_node(int fd)
  */
 int get_model_datasets(void)
 {
-	int i, index = 0, num;
+	int i, index = 0;
 	struct dirent *entry;
 	DIR *dir;
 	char *filename;
@@ -322,7 +322,7 @@ void set_keras_script_params(ModelParams *modelParams)
  */
 int run_keras_script(const char *script)
 {
-	int i, childPid, logFd;
+	int childPid, logFd;
 	char scriptFile[BUFFER_SIZE], logFile[BUFFER_SIZE];
 	ModelParams modelParams;
 
