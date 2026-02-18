@@ -355,8 +355,8 @@ void on_output_model_texted(GObject *gobject, GParamSpec *pspec, gpointer data)
 void on_mic_button_clicked(GtkButton *button, gpointer data)
 {
 	const char *label;
-	sqlite3 *db;
-	int deviceFd;
+	static sqlite3 *db = NULL;
+	static int deviceFd = -1;
 
 	label = gtk_button_get_label(button);
 	printLog("%s(): '%s'", FUNC, label);
@@ -404,10 +404,12 @@ void on_mic_button_clicked(GtkButton *button, gpointer data)
 	else if (micButton == MIC_BUTTON_STOP) 
 	{
 		/* Close the open database. */
-		db_close(db);
-
+		if (db != NULL)
+		{
+			db_close(db);
+		}
 		/* Close also the open device node. */
-		if (deviceFd)
+		if (deviceFd != -1)
 		{
 			if (close(deviceFd) == -1)
 			syscallError();

@@ -46,7 +46,6 @@ char *get_time(const char* format)
 {
 	static char buffer[64];
 	time_t t;
-	size_t s;
 	struct tm *tm;
 	
 	t = time(NULL);			/* get the time in seconds */
@@ -54,7 +53,8 @@ char *get_time(const char* format)
 	if (tm == NULL)
 		syscallError();
 
-	s = strftime(buffer, 64, (format != NULL) ? format : "%c", tm);
+	/* Format the 'tm' struct into buffer. */
+	strftime(buffer, 64, (format != NULL) ? format : "%c", tm);
 
 	return buffer;
 }
@@ -95,8 +95,8 @@ int get_device_nodes(MicChannel channel)
 	const char *prefix;
 	DIR *dir;
 
-	/* Initialize with NULLs. */
-	memset(micDeviceNodes, 0, MAX_DEVICE_NODE);
+	/* Initialize with 0s. */
+	memset(micDeviceNodes, 0, sizeof(micDeviceNodes));
 
 	if (channel == MIC_CHANNEL_WIFI)
 	{
@@ -237,8 +237,8 @@ int get_model_datasets(void)
 	DIR *dir;
 	char *filename;
 
-	/* Initialize with NULLs. */
-	memset(modelDatasets, 0, MAX_MODEL_DATASET);
+	/* Initialize with 0s. */
+	memset(modelDatasets, 0, sizeof(modelDatasets));
 
 	dir = opendir(MODEL_DATASET_PATH);	/* open the directory */
 	if (dir == NULL)
@@ -259,7 +259,7 @@ int get_model_datasets(void)
 		filename = entry->d_name;
 		for (i = 0; i < strlen(entry->d_name)-4; i++)
 		{
-			*filename++;
+			filename++;
 		}
 		if (strstr(filename, MODEL_DATASET_SUFFIX)) 
 		{
@@ -274,69 +274,54 @@ int get_model_datasets(void)
 }
 
 /**
- * Set the acoustic sensor data model parameters.
- */
-void set_keras_script_params(ModelParams *modelParams)
-{
-	char dataset[BUFFER_SIZE];
-	char layerNumber[4], units[4], epochs[4], dropout[8];
-
-	/* Build the dataset path. */
-	strcpy(dataset, MODEL_DATASET_PATH);
-	strcat(dataset, modelDataset);
-	dataset[strlen(dataset)] = '\0';
-	
-	modelParams->dataset = dataset;					/* dataset */
-	modelParams->outputModel = modelOutputName;	/* output model name */
-	snprintf(units, 4, "%d", modelUnits);
-	modelParams->units = units;						/* units per layer */
-	snprintf(epochs, 4, "%d", modelEpochs);
-	modelParams->epochs = epochs;						/* epochs */
-	snprintf(dropout, 8, "%.2f", modelDropout);
-	modelParams->dropout = dropout;					/* recurrent dropout */
-	switch (modelLayerType)								/* layer type */
-	{
-		case MODEL_LAYER_TYPE_LSTM: modelParams->layerType = "LSTM"; break;
-		case MODEL_LAYER_TYPE_GRU:  modelParams->layerType = "GRU";  break;
-	}
-	snprintf(layerNumber, 4, "%d", modelLayerNumber);
-	modelParams->layerNumber = layerNumber;
-	switch (modelBatchSize)								/* batch size */
-	{
-		case MODEL_BATCH_SIZE_16:	modelParams->batchSize = "16";  break;
-		case MODEL_BATCH_SIZE_32:	modelParams->batchSize = "32";  break;
-		case MODEL_BATCH_SIZE_64:	modelParams->batchSize = "64";  break;
-		case MODEL_BATCH_SIZE_128:	modelParams->batchSize = "128"; break;
-		case MODEL_BATCH_SIZE_256:	modelParams->batchSize = "256"; break;
-		case MODEL_BATCH_SIZE_512:	modelParams->batchSize = "512"; break;
-	}
-	switch (modelEarlyStop) 						/* early stop */
-	{
-		case MODEL_EARLY_STOP_FALSE: modelParams->earlyStop = "0"; break;
-		case MODEL_EARLY_STOP_TRUE:  modelParams->earlyStop = "1"; break;
-	}	
-}
-
-/**
  * Run the Keras script and return the child process ID.
  */
 int run_keras_script(const char *script)
 {
 	int childPid, logFd;
-	char scriptFile[BUFFER_SIZE], logFile[BUFFER_SIZE];
-	ModelParams modelParams;
+	char scriptFile[BUFFER_SIZE];
+	char logFile[BUFFER_SIZE];
+	char datasetPath[BUFFER_SIZE];
+	char layerNumStr[8];
+	char unitsStr[8];
+	char epochsStr[8];
+	char dropoutStr[8];
+	const char *layerTypeStr = NULL;
+	const char *batchSizeStr = NULL;
+	const char *earlyStopStr = NULL;
 
-	/* Build the script file. */
-	strncpy(scriptFile, script, strlen(script));
-	scriptFile[strlen(script)] = '\0';
+	/* Build the required file paths. */
+	snprintf(scriptFile, sizeof(scriptFile), "%s", script);
+	snprintf(logFile, sizeof(logFile), "%s", MODEL_LOG_PATH);
+	snprintf(datasetPath, sizeof(datasetPath), "%s%s", MODEL_DATASET_PATH,
+				modelDataset);
 
-	/* Build the log file. */
-	strncpy(logFile, MODEL_LOG_PATH, strlen(MODEL_LOG_PATH));
-	logFile[strlen(MODEL_LOG_PATH)] = '\0';
-
-	/* Set the model parameters. */
-	set_keras_script_params(&modelParams);
+	/* Convert enum values to strings. */
+	switch (modelLayerType)								/* layer type */
+	{
+		case MODEL_LAYER_TYPE_LSTM: layerTypeStr = "LSTM";	break;
+		case MODEL_LAYER_TYPE_GRU:  layerTypeStr = "GRU";  break;
+	}
+	snprintf(layerNumStr, sizeof(layerNumStr), "%u", modelLayerNumber);
+   snprintf(unitsStr, sizeof(unitsStr), "%u", modelUnits);
+   snprintf(epochsStr, sizeof(epochsStr), "%u", modelEpochs);
+	switch (modelBatchSize) 							/* batch size */
+	{
+      case MODEL_BATCH_SIZE_16:   batchSizeStr = "16"; break;
+      case MODEL_BATCH_SIZE_32:   batchSizeStr = "32"; break;
+      case MODEL_BATCH_SIZE_64:   batchSizeStr = "64"; break;
+      case MODEL_BATCH_SIZE_128:  batchSizeStr = "128"; break;
+      case MODEL_BATCH_SIZE_256:  batchSizeStr = "256"; break;
+      case MODEL_BATCH_SIZE_512:  batchSizeStr = "512"; break;
+   }
+	switch (modelEarlyStop) 							/* early stopping */
+	{
+      case MODEL_EARLY_STOP_FALSE: earlyStopStr = "0"; break;
+      case MODEL_EARLY_STOP_TRUE:  earlyStopStr = "1"; break;
+   }
+	snprintf(dropoutStr, sizeof(dropoutStr), "%.2f", modelDropout);
 	
+	/* Create a new child-process and then execute the deep learning script. */
 	switch (childPid = fork()) 
 	{
 		case -1: 	/* child-process couldn't be forked */
@@ -347,9 +332,8 @@ int run_keras_script(const char *script)
 			if (logFd == -1)
 				syscallError();
 
-			if (dup2(logFd, STDOUT_FILENO) == -1)	/* duplicate the stdout */
-				syscallError();
-			if (dup2(logFd, STDERR_FILENO) == -1)	/* duplicate the stdin */
+			if ((dup2(logFd, STDOUT_FILENO) == -1) ||
+				 (dup2(logFd, STDERR_FILENO) == -1))	/* duplicate the stdout */
 				syscallError();
 
 			if (close(logFd) == -1)
@@ -357,12 +341,9 @@ int run_keras_script(const char *script)
 			
 			execl(
 				INTERPRETER, 						/* python 3 interpreter */
-				INTERPRETER, scriptFile, modelParams.dataset,
-				modelParams.outputModel, modelParams.layerType,
-				modelParams.layerNumber, modelParams.units, 
-				modelParams.epochs, modelParams.batchSize, 
-				modelParams.earlyStop, modelParams.dropout, 
-				NULL									/* command-line options */
+				INTERPRETER, scriptFile, datasetPath, modelOutputName, 
+				layerTypeStr, layerNumStr, unitsStr, epochsStr, batchSizeStr,
+				earlyStopStr, dropoutStr, NULL
 			);	
 			_exit(EXIT_SUCCESS);					/* NEVER should come here */
 		

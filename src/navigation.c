@@ -46,7 +46,7 @@ GtkWidget *nav_accel_group(gpointer data)
 	GtkWidget *accelGroup;
 
 	accelGroup = __generic_group_new(
-		"Accelerometer", "Show the accelerometer status and data"
+		"Accelerometer", "Show the accelerometer status and data (m/s^2)"
 	);
 	navSensorRows[1] = __generic_action_row_new("Status", "Not Running");
 	__generic_group_add(accelGroup, navSensorRows[1]);
@@ -61,7 +61,7 @@ GtkWidget *nav_gyro_group(gpointer data)
 	GtkWidget *gyroGroup;
 
 	gyroGroup = __generic_group_new(
-		"Gyroscope", "Show the gyroscope status and data"
+		"Gyroscope", "Show the gyroscope status and data (dps)"
 	);
 	navSensorRows[3] = __generic_action_row_new("Status", "Not Running");
 	__generic_group_add(gyroGroup, navSensorRows[3]);

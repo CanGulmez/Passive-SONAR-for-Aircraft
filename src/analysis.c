@@ -184,6 +184,8 @@ int select_sector(void)
 			return i + 1;
 		}
 	}
+	/* Never should come here. */
+	return -1;
 }
 
 /**
@@ -215,6 +217,7 @@ NavAccel select_accel_direction(void)
 	{
 		return NAV_ACCEL_Z_MINUS;
 	}
+	return -1;
 }
 
 /**
@@ -246,6 +249,7 @@ NavGyro select_gyro_rotation(void)
 	{
 		return NAV_GYRO_Z_MINUS;
 	}
+	return -1;
 }
 
 /**

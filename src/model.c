@@ -41,10 +41,10 @@ ModelButton modelButton;
  */
 void model_group_dataset(GtkWidget *datasetGroup)
 {
-	int numDataset;
 	GtkWidget *datasetRow;
-	/* Dataset */
-	numDataset = get_model_datasets();	/* datasets from host */
+
+	/* Get datasets */
+	get_model_datasets();	/* datasets from host */
 
 	datasetRow = __generic_combo_row_new(
 		"Dataset", (const char **)modelDatasets, -1
@@ -124,7 +124,7 @@ void model(GtkBox *modelBox, gpointer data)
 	GtkWidget *rightBox, *separator, *leftBox;
 	GtkWidget *scrolledWin, *settingsBox, *btnBox;
 	GtkWidget *datasetGroup, *modelGroup;
-	GtkWidget *fitBtn, *abortBtn, *evaluateBtn, *predictBtn;
+	GtkWidget *fitBtn, *abortBtn;
 	GtkWidget *scrolledText;
 
 	leftBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
@@ -183,8 +183,6 @@ void model(GtkBox *modelBox, gpointer data)
 	/* Put the fit, evaluate, and predict buttons. */
 	fitBtn = __generic_button_new("Fit", "suggested-action");
 	abortBtn = __generic_button_new("Abort", "destructive-action");
-	evaluateBtn = __generic_button_new("Evaluate", "suggested-action");
-	predictBtn = __generic_button_new("Predict", "suggested-action");
 	GtkWidget *buttons[2] = {fitBtn, abortBtn};
 
 	for (i = 0; i < 2; i++) 

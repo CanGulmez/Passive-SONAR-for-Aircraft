@@ -114,16 +114,18 @@ gboolean timeout_nav_update(gpointer data)
  */
 gboolean timeout_gps_update(gpointer)
 {
-	static int i = 0;
+	double longitude, latitude;
 
 	/* Update the gps module data. */
 	update_gps_data();
 
-	/* Put the markers into map area. */
-	shumate_map_center_on(gpsMap, 41.008, 28.9784 + i * 0.01);
-	gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9784 + i * 0.01);
-
-	i++;
+	/* Update the GPS map. */
+	latitude = atof(payloadData.gpsLatitude);
+	longitude = atof(payloadData.gpsLongitude);
+	// shumate_map_center_on(gpsMap, 41.008, 28.9784 + i * 0.01);
+	// gps_map_area_markers(gpsMarkerLayer, 41.008, 28.9784 + i * 0.01);
+	shumate_map_center_on(gpsMap, latitude, longitude);
+	gps_map_area_markers(gpsMarkerLayer, latitude, longitude);
 
 	return G_SOURCE_CONTINUE;
 }

@@ -99,9 +99,7 @@ extern "C" {
 
 #define MODEL_DATASET_PATH					"/home/can/Datasets/"
 #define MODEL_DATASET_SUFFIX				".csv"
-#define MODEL_FIT_SCRIPT					"scripts/acoustic_model.py"
-#define MODEL_EVALUATE_SCRIPT				"scripts/evaluating_acoustic_model.py"
-#define MODEL_PREDICT_SCRIPT				"scripts/predicting_acoustic_model.py"
+#define MODEL_FIT_SCRIPT					"./scripts/acoustic_model.py"
 #define MODEL_LOG_PATH						"./logs/keras-output.log"
 
 #define NAV_PLOT_MARGIN						0			/* pixel */
@@ -384,19 +382,6 @@ typedef struct PACKED _PayloadData
 	float imuGyroZ;						/* dps */
 	float imuTemp;							/* C */ 
 } PayloadData;
-
-typedef struct _ModelParams
-{
-	char *dataset;
-	char *outputModel;
-	char *layerType;
-	char *layerNumber;
-	char *units;
-	char *epochs;
-	char *batchSize;
-	char *earlyStop;
-	char *dropout;
-} ModelParams;
 
 /*****************************************************************************/
 /*****************************************************************************/

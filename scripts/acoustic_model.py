@@ -2,10 +2,10 @@
 Acoustic Sensor Data Deep Learning Model 
 ----------------------------------------
 
-This model is designed for TUBITAK 2209-A as a part of AeroSONAR
-project. This project contains any sub-modules and each modules 
-has massive functionalities. In "AI Model" submodule, this Keras
-model is being fitted, evaluated, tested. 
+This model is designed for TUBITAK 2209-A as a part of AeroSONAR project. 
+This project contains any sub-modules and each modules has massive 
+functionalities. In "AI Model" submodule, this Keras model is being fitted, 
+evaluated, tested. 
 
 The model parameters that come from ground station:
 
@@ -38,8 +38,7 @@ import tensorflow.keras as keras
 parser = argparse.ArgumentParser(
 	prog = sys.argv[0],
 	description = "Acoustic sensor data deep learning model",
-	epilog="The model will be used for AeroSONAR project's "
- 			 "AI integration."
+	epilog="The model will be used for AeroSONAR project's AI integration."
 )
 
 parser.add_argument("dataset", type=str)

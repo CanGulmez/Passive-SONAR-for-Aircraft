@@ -208,10 +208,10 @@ void mic_signal_analysis(GtkWidget *analysisGroup)
  */
 void microphone(GtkBox *micBox, gpointer data)
 {
-	int i, numDev;
+	int i;
 	GtkWidget *rightBox, *rightSep, *centerBox, *leftSep, *leftBox;
 	GtkWidget *scrolledComm, *scrolledSig, *propertyBox, *btnBox;
-	GtkWidget *commGroup, *propertyGroup, *analysisGroup;
+	GtkWidget *commGroup, *analysisGroup;
 	GtkWidget *commRow; 
 	GtkWidget *startBtn, *stopBtn;
 
@@ -263,7 +263,7 @@ void microphone(GtkBox *micBox, gpointer data)
 	comboRowSigWithData(commRow, on_comm_channel_selected, propertyBox);
 
 	/* Put the initial UART property box. */ 
-	numDev = get_device_nodes(micChannel);
+	get_device_nodes(micChannel);
 	mic_group_UART(NULL);
 
 	gtk_box_append(GTK_BOX(propertyBox), micUARTGroup);
